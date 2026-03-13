@@ -75,17 +75,7 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
 .pin-dot.wrong{border-color:var(--red);animation:shake .4s}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-/* Settings overlay */
-.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
-.settings-box{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px;width:90%;max-width:380px}
-.settings-box h2{font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--tx)}
-.settings-box label{font-size:.8rem;color:var(--tx2);display:block;margin-bottom:6px}
-.settings-box input{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--s2);color:var(--tx);font-size:.9rem;font-family:var(--f);outline:0;margin-bottom:16px}
-.settings-box input:focus{border-color:var(--ac)}
-.settings-box .hint{font-size:.72rem;color:var(--tx3);margin:-10px 0 16px}
-.btn-primary{padding:10px 20px;border-radius:10px;border:0;background:var(--ac2);color:#fff;font-size:.85rem;font-weight:600;cursor:pointer;width:100%}
-.btn-primary:active{transform:scale(.98)}
-.btn-secondary{padding:8px 16px;border-radius:10px;border:1px solid var(--bd);background:0;color:var(--tx2);font-size:.8rem;cursor:pointer;margin-top:8px;width:100%}
+
 </style>
 </head>
 <body>
@@ -125,7 +115,7 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
       <div class="ct" id="cht">Wähle eine Aufgabe</div>
       <div class="cs" id="chs"></div>
     </div>
-    <button onclick="openSettings()" style="background:0;border:0;color:var(--tx3);font-size:1.1rem;cursor:pointer;padding:4px" title="Einstellungen">⚙️</button>
+
   </div>
   <div class="cm" id="cms">
     <div class="ec">
@@ -148,20 +138,7 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
 </div>
 </div>
 
-<!-- Settings Overlay -->
-<div class="settings-overlay" id="settingsOverlay" style="display:none" onclick="if(event.target===this)closeSettings()">
-  <div class="settings-box">
-    <h2>⚙️ Einstellungen</h2>
-    <label>Groq API Key</label>
-    <input type="password" id="apiKeyInput" placeholder="gsk_..." autocomplete="off">
-    <div class="hint">Kostenlos auf <a href="https://console.groq.com/keys" target="_blank" style="color:var(--ac)">console.groq.com/keys</a> erstellen</div>
-    <label>Modell</label>
-    <input type="text" id="modelInput" value="llama-3.3-70b-versatile" placeholder="llama-3.3-70b-versatile">
-    <div class="hint">Empfohlen: llama-3.3-70b-versatile (kostenlos)</div>
-    <button class="btn-primary" onclick="saveSettings()">Speichern</button>
-    <button class="btn-secondary" onclick="closeSettings()">Abbrechen</button>
-  </div>
-</div>
+
 
 <script>
 // ══════════════════════════════════════════
@@ -169,12 +146,11 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
 // ══════════════════════════════════════════
 
 const CONFIG = {
-  // PIN hash (SHA-256 of "0709") — change this to set a new PIN
-  // To generate: run in console: crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_PIN')).then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
   PIN_HASH: "53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0",
   PIN_LEN: 4,
-  GROQ_URL: "https://api.groq.com/openai/v1/chat/completions",
-  DEFAULT_MODEL: "llama-3.3-70b-versatile",
+  // ← IDE ÍRD BE A CLOUDFLARE WORKER URL-T (lásd README)
+  API_URL: "https://martha-proxy.98ktndkptv.workers.dev",
+  MODEL: "llama-3.3-70b-versatile",
 };
 
 const SYSTEM_PROMPT = `Du bist Martha, eine erfahrene und geduldige Mathematik-Nachhilfelehrerin fuer das NRW Abitur.
@@ -219,8 +195,6 @@ WICHTIG: Antworte IMMER auf Deutsch. Halte Antworten fokussiert und nicht zu lan
 let T=[], F=[], si=-1, H={}, tp="Alle", lv="all", str=false;
 let storedPin="";
 let pinEntry="";
-let apiKey="";
-let modelName=CONFIG.DEFAULT_MODEL;
 
 // ══════════════════════════════════════════
 //  PIN LOGIN
@@ -232,12 +206,6 @@ async function hashPin(pin){
 }
 
 function initLogin(){
-  // Load settings
-  apiKey = localStorage.getItem("martha_api_key") || "";
-  modelName = localStorage.getItem("martha_model") || CONFIG.DEFAULT_MODEL;
-  
-  const saved = localStorage.getItem("martha_pin");
-  if(saved){ tryPin(saved); return; }
   renderPinPad();
 }
 
@@ -273,13 +241,11 @@ async function tryPin(pin){
   const hash = await hashPin(pin);
   if(hash === CONFIG.PIN_HASH){
     storedPin = pin;
-    localStorage.setItem("martha_pin", pin);
     document.getElementById("login").style.display="none";
     document.getElementById("app").style.display="flex";
     init();
   } else {
     pinEntry="";
-    localStorage.removeItem("martha_pin");
     document.getElementById("pin-err").textContent="Falscher PIN. Versuche es nochmal.";
     document.querySelectorAll(".pin-dot").forEach(d=>d.classList.add("wrong"));
     setTimeout(()=>{document.getElementById("pin-err").textContent="";renderPinPad();},1200);
@@ -287,38 +253,12 @@ async function tryPin(pin){
 }
 
 // ══════════════════════════════════════════
-//  SETTINGS
+//  STATUS
 // ══════════════════════════════════════════
 
-function openSettings(){
-  document.getElementById("apiKeyInput").value = apiKey;
-  document.getElementById("modelInput").value = modelName;
-  document.getElementById("settingsOverlay").style.display="flex";
-}
-
-function closeSettings(){
-  document.getElementById("settingsOverlay").style.display="none";
-}
-
-function saveSettings(){
-  apiKey = document.getElementById("apiKeyInput").value.trim();
-  modelName = document.getElementById("modelInput").value.trim() || CONFIG.DEFAULT_MODEL;
-  localStorage.setItem("martha_api_key", apiKey);
-  localStorage.setItem("martha_model", modelName);
-  closeSettings();
-  updateStatus();
-}
-
 function updateStatus(){
-  const dot = document.getElementById("sd");
-  const st = document.getElementById("st");
-  if(apiKey){
-    dot.className="dot ok";
-    st.textContent="Martha bereit · " + modelName;
-  } else {
-    dot.className="dot";
-    st.textContent="API Key fehlt — klicke ⚙️";
-  }
+  document.getElementById("sd").className="dot ok";
+  document.getElementById("st").textContent="Martha bereit · " + CONFIG.MODEL;
 }
 
 // ══════════════════════════════════════════
@@ -335,11 +275,6 @@ async function init(){
   }catch(e){
     document.getElementById("st").textContent="Fehler: tasks.json nicht gefunden";
   }
-  
-  // Prompt for API key if missing
-  if(!apiKey){
-    setTimeout(()=>openSettings(), 500);
-  }
 }
 
 // ══════════════════════════════════════════
@@ -347,23 +282,17 @@ async function init(){
 // ══════════════════════════════════════════
 
 async function* streamGroq(messages, taskContext){
-  if(!apiKey){
-    yield "Bitte gib zuerst deinen Groq API Key in den Einstellungen (⚙️) ein. Du kannst ihn kostenlos auf console.groq.com erstellen.";
-    return;
-  }
-  
   const fullSys = SYSTEM_PROMPT + "\n\n--- AKTUELLE AUFGABE ---\n" + taskContext;
   const msgs = [{role:"system", content:fullSys}, ...messages];
   
   try{
-    const resp = await fetch(CONFIG.GROQ_URL, {
+    const resp = await fetch(CONFIG.API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + apiKey,
       },
       body: JSON.stringify({
-        model: modelName,
+        model: CONFIG.MODEL,
         messages: msgs,
         stream: true,
         temperature: 0.4,
@@ -374,7 +303,7 @@ async function* streamGroq(messages, taskContext){
     if(!resp.ok){
       const err = await resp.json().catch(()=>({}));
       if(resp.status === 401){
-        yield "API Key ungültig. Bitte prüfe deinen Key in den Einstellungen (⚙️).";
+        yield "API Key ungültig. Bitte kontaktiere deinen Lehrer.";
       } else {
         yield `Fehler (${resp.status}): ${err.error?.message || "Unbekannter Fehler"}`;
       }

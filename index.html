@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Martha · Abitur Mathe Tutor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0c0d12;--s1:#14161e;--s2:#1c1f2b;--s3:#252938;--bd:#2a2e40;--tx:#e4e6ef;--tx2:#7c82a0;--tx3:#555a73;--ac:#7c6cff;--ac2:#635bff;--grn:#34d399;--amb:#fbbf24;--red:#f87171;--blu:#60a5fa;--r:14px;--f:-apple-system,"SF Pro Text",system-ui,sans-serif}
+html{font-family:var(--f);font-size:16px;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;height:100%}
+body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.app{display:flex;height:100%}
+.pl{width:340px;min-width:340px;border-right:1px solid var(--bd);display:flex;flex-direction:column;background:var(--s1)}
+.ph{padding:18px 16px 12px;border-bottom:1px solid var(--bd)}
+.ph h1{font-size:1.15rem;font-weight:700;background:linear-gradient(135deg,var(--ac),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ph .sub{font-size:.75rem;color:var(--tx2);margin-top:2px}
+.status{padding:6px 16px;background:var(--s2);font-size:.7rem;color:var(--tx3);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--red)}.dot.ok{background:var(--grn)}
+.fr{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;border-bottom:1px solid var(--bd);scrollbar-width:none}.fr::-webkit-scrollbar{display:none}
+.fb{flex-shrink:0;padding:6px 14px;border-radius:100px;border:1px solid var(--bd);background:0;color:var(--tx2);font-size:.78rem;font-weight:500;cursor:pointer}
+.fb.on{background:var(--ac2);color:#fff;border-color:var(--ac2)}
+.ts{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ti{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s}
+.ti:active,.ti.sel{background:var(--s2)}.ti.sel{border-left:3px solid var(--ac)}
+.tic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.tic.an{background:rgba(96,165,250,.12);color:var(--blu)}
+.tic.st{background:rgba(251,191,36,.12);color:var(--amb)}
+.tic.ge{background:rgba(52,211,153,.12);color:var(--grn)}
+.tic.al{background:rgba(248,113,113,.12);color:var(--red)}
+.tit{flex:1;min-width:0}.tit .n{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tit .m{font-size:.7rem;color:var(--tx2);margin-top:1px}
+.tip{font-size:.7rem;color:var(--tx3);font-weight:600;padding:3px 8px;background:var(--s3);border-radius:6px}
+.pr{flex:1;display:flex;flex-direction:column;background:var(--bg)}
+.ch{padding:14px 20px;border-bottom:1px solid var(--bd);background:var(--s1);display:flex;align-items:center;gap:10px}
+.ch .ct{font-size:.95rem;font-weight:700;flex:1}.ch .cs{font-size:.75rem;color:var(--tx2)}
+.cm{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
+.mg{max-width:85%;margin-bottom:16px;animation:mi .25s ease-out}
+@keyframes mi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.mg.u{margin-left:auto}.mg.u .bu{background:var(--ac2);color:#fff;border-radius:var(--r) var(--r) 4px var(--r);padding:12px 16px;font-size:.9rem;line-height:1.55}
+.mg.a .bu{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r) var(--r) var(--r) 4px;padding:14px 16px;font-size:.9rem;line-height:1.65;white-space:pre-wrap}
+.mg.a .sn{font-size:.7rem;color:var(--ac);font-weight:600;margin-bottom:6px;letter-spacing:.03em}
+.mg.s .bu{background:var(--s1);border:1px dashed var(--bd);border-radius:var(--r);padding:14px 16px;font-size:.85rem;color:var(--tx2);line-height:1.6;max-width:100%}
+.tp{display:inline-flex;gap:4px;padding:4px 0}
+.tp span{width:7px;height:7px;background:var(--tx3);border-radius:50%;animation:bl 1.4s infinite}
+.tp span:nth-child(2){animation-delay:.2s}.tp span:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,80%,100%{opacity:.3}40%{opacity:1}}
+.qa{display:flex;gap:6px;padding:8px 16px 0;flex-wrap:wrap}
+.qb{padding:7px 14px;border-radius:100px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);font-size:.78rem;cursor:pointer}
+.qb:active{background:var(--s3);color:var(--tx)}
+.ci{padding:12px 16px;border-top:1px solid var(--bd);background:var(--s1);display:flex;gap:10px;align-items:flex-end}
+.ci textarea{flex:1;resize:none;border:1px solid var(--bd);border-radius:12px;background:var(--s2);color:var(--tx);padding:12px 14px;font-size:.9rem;font-family:var(--f);line-height:1.4;max-height:120px;outline:0}
+.ci textarea::placeholder{color:var(--tx3)}.ci textarea:focus{border-color:var(--ac)}
+.sb{width:44px;height:44px;border-radius:12px;border:0;background:var(--ac2);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb:disabled{opacity:.4}.sb:active:not(:disabled){transform:scale(.95)}
+.ec{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:var(--tx2)}
+.ec .ei{font-size:3rem;margin-bottom:12px}.ec .et{font-size:1.1rem;font-weight:600;color:var(--tx)}
+.ec .ed{font-size:.85rem;margin-top:6px;max-width:300px}
+.bb{display:none;background:0;border:0;color:var(--ac);font-size:.85rem;font-weight:600;cursor:pointer;padding:0}
+@media(max-width:800px){.pl{width:100%;min-width:100%}.pr{display:none;width:100%}.app.co .pl{display:none}.app.co .pr{display:flex}.bb{display:inline-flex!important}}
+.pbox{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:8px;margin:10px 0 4px;max-width:320px}
+.pbox canvas{width:100%;height:auto;border-radius:6px;display:block}
+.plbl{font-size:.72rem;color:var(--tx3);margin-top:6px;text-align:center}
+.katex{font-size:.95em!important}.katex-display{margin:10px 0!important;overflow-x:auto}
+.abw{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:8px 12px;font-size:.78rem;color:var(--amb);margin:8px 0}
+.pin-key{width:100%;aspect-ratio:1.3;border-radius:12px;border:1px solid var(--bd);background:var(--s2);color:var(--tx);font-size:1.3rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;-webkit-user-select:none;user-select:none}
+.pin-key:active{background:var(--ac2);color:#fff;transform:scale(.95)}
+.pin-key.del{font-size:.85rem;color:var(--tx2)}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bd);transition:all .2s}
+.pin-dot.filled{background:var(--ac);border-color:var(--ac)}
+.pin-dot.wrong{border-color:var(--red);animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* Settings overlay */
+.settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+.settings-box{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px;width:90%;max-width:380px}
+.settings-box h2{font-size:1rem;font-weight:700;margin-bottom:16px;color:var(--tx)}
+.settings-box label{font-size:.8rem;color:var(--tx2);display:block;margin-bottom:6px}
+.settings-box input{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:10px;background:var(--s2);color:var(--tx);font-size:.9rem;font-family:var(--f);outline:0;margin-bottom:16px}
+.settings-box input:focus{border-color:var(--ac)}
+.settings-box .hint{font-size:.72rem;color:var(--tx3);margin:-10px 0 16px}
+.btn-primary{padding:10px 20px;border-radius:10px;border:0;background:var(--ac2);color:#fff;font-size:.85rem;font-weight:600;cursor:pointer;width:100%}
+.btn-primary:active{transform:scale(.98)}
+.btn-secondary{padding:8px 16px;border-radius:10px;border:1px solid var(--bd);background:0;color:var(--tx2);font-size:.8rem;cursor:pointer;margin-top:8px;width:100%}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login" style="display:flex;align-items:center;justify-content:center;height:100dvh;background:var(--bg)">
+  <div style="text-align:center;width:280px">
+    <div style="font-size:2.5rem;margin-bottom:16px">👩‍🏫</div>
+    <div style="font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--ac),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">Martha</div>
+    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:28px">Abitur Mathe Tutor · NRW</div>
+    <div id="pin-dots" style="display:flex;justify-content:center;gap:12px;margin-bottom:24px"></div>
+    <div id="pin-pad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto"></div>
+    <div id="pin-err" style="font-size:.78rem;color:var(--red);margin-top:14px;min-height:20px"></div>
+  </div>
+</div>
+
+<!-- APP (hidden until login) -->
+<div class="app" id="app" style="display:none">
+<div class="pl">
+  <div class="ph">
+    <h1>Martha · Abitur Tutor</h1>
+    <div class="sub">NRW Mathematik · KI-Nachhilfe</div>
+  </div>
+  <div class="status"><span class="dot" id="sd"></span><span id="st">Verbinde...</span></div>
+  <div class="fr" id="ff"></div>
+  <div class="fr">
+    <button class="fb on" onclick="sL('all',this)">Alle</button>
+    <button class="fb" onclick="sL('GK',this)">GK</button>
+    <button class="fb" onclick="sL('LK',this)">LK</button>
+  </div>
+  <div class="ts" id="tl"></div>
+</div>
+<div class="pr" id="cp">
+  <div class="ch">
+    <button class="bb" onclick="gB()">&#8592; Zurück</button>
+    <div>
+      <div class="ct" id="cht">Wähle eine Aufgabe</div>
+      <div class="cs" id="chs"></div>
+    </div>
+    <button onclick="openSettings()" style="background:0;border:0;color:var(--tx3);font-size:1.1rem;cursor:pointer;padding:4px" title="Einstellungen">⚙️</button>
+  </div>
+  <div class="cm" id="cms">
+    <div class="ec">
+      <div class="ei">👩‍🏫</div>
+      <div class="et">Hallo, ich bin Martha!</div>
+      <div class="ed">Wähle links eine Aufgabe — ich erkläre dir Schritt für Schritt.</div>
+    </div>
+  </div>
+  <div class="qa" id="qa" style="display:none">
+    <button class="qb" onclick="sQ('Gib mir einen Tipp')">💡 Tipp</button>
+    <button class="qb" onclick="sQ('Was ist der erste Schritt?')">👣 Erster Schritt</button>
+    <button class="qb" onclick="sQ('Erkläre den Lösungsweg')">🧠 Lösungsweg</button>
+    <button class="qb" onclick="sQ('Zeig mir die vollständige Lösung')">✅ Lösung</button>
+    <button class="qb" id="plotBtn" onclick="plotFromTask()" style="display:none">📈 Funktion zeichnen</button>
+  </div>
+  <div class="ci" id="cin" style="display:none">
+    <textarea id="mi" rows="1" placeholder="Frage Martha..." onkeydown="hK(event)" oninput="aG(this)"></textarea>
+    <button class="sb" id="sbt" onclick="sM()">↑</button>
+  </div>
+</div>
+</div>
+
+<!-- Settings Overlay -->
+<div class="settings-overlay" id="settingsOverlay" style="display:none" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-box">
+    <h2>⚙️ Einstellungen</h2>
+    <label>Groq API Key</label>
+    <input type="password" id="apiKeyInput" placeholder="gsk_..." autocomplete="off">
+    <div class="hint">Kostenlos auf <a href="https://console.groq.com/keys" target="_blank" style="color:var(--ac)">console.groq.com/keys</a> erstellen</div>
+    <label>Modell</label>
+    <input type="text" id="modelInput" value="llama-3.3-70b-versatile" placeholder="llama-3.3-70b-versatile">
+    <div class="hint">Empfohlen: llama-3.3-70b-versatile (kostenlos)</div>
+    <button class="btn-primary" onclick="saveSettings()">Speichern</button>
+    <button class="btn-secondary" onclick="closeSettings()">Abbrechen</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+
+const CONFIG = {
+  // PIN hash (SHA-256 of "0709") — change this to set a new PIN
+  // To generate: run in console: crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_PIN')).then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+  PIN_HASH: "53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0",
+  PIN_LEN: 4,
+  GROQ_URL: "https://api.groq.com/openai/v1/chat/completions",
+  DEFAULT_MODEL: "llama-3.3-70b-versatile",
+};
+
+const SYSTEM_PROMPT = `Du bist Martha, eine erfahrene und geduldige Mathematik-Nachhilfelehrerin fuer das NRW Abitur.
+
+DEIN NAME: Martha. Stelle dich beim ersten Kontakt kurz vor.
+
+DEINE METHODE - SOKRATISCHES LEHREN:
+1. Frage zuerst, was der Schueler bereits versucht hat
+2. Gib NIEMALS sofort die komplette Loesung
+3. Stelle gezielte Gegenfragen, die zum naechsten Schritt fuehren
+4. Erklaere Konzepte mit einfachen Beispielen und Analogien
+5. Lobe Fortschritte, auch kleine
+6. Wenn der Schueler komplett feststeckt: gib einen konkreten ersten Schritt
+
+MATHEMATISCHE FORMELN - WICHTIG:
+- Schreibe ALLE Formeln in LaTeX-Notation mit Dollar-Zeichen
+- Inline: $f(x) = x^2$ oder $\\int_0^1 f(x)\\,dx$
+- Display (eigene Zeile): $$f(x) = 4000 \\cdot x \\cdot e^{-0{,}4x}$$
+- NIEMALS Formeln als Klartext schreiben — IMMER LaTeX!
+
+FUNKTIONEN ZEICHNEN:
+Wenn der Schueler dich bittet eine Funktion zu zeichnen, schreibe GENAU:
+PLOT(ausdruck, xmin, xmax)
+
+Beispiele:
+PLOT((2*x^2-1)*exp(2*x), -2, 2)
+PLOT(4000*x*exp(-0.4*x), 0, 20)
+PLOT(x^3-3*x, -3, 3)
+
+Regeln: * fuer Multiplikation, exp() fuer e^x, ^ fuer Potenzen.
+Schreibe PLOT in eine eigene Zeile. Danach erklaere den Graph.
+
+ABBILDUNGEN: Wenn eine Aufgabe auf eine Abbildung verweist die nicht verfuegbar ist,
+sage das dem Schueler und biete an die Funktion zu zeichnen.
+
+WICHTIG: Antworte IMMER auf Deutsch. Halte Antworten fokussiert und nicht zu lang.`;
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+
+let T=[], F=[], si=-1, H={}, tp="Alle", lv="all", str=false;
+let storedPin="";
+let pinEntry="";
+let apiKey="";
+let modelName=CONFIG.DEFAULT_MODEL;
+
+// ══════════════════════════════════════════
+//  PIN LOGIN
+// ══════════════════════════════════════════
+
+async function hashPin(pin){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
+  return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+function initLogin(){
+  // Load settings
+  apiKey = localStorage.getItem("martha_api_key") || "";
+  modelName = localStorage.getItem("martha_model") || CONFIG.DEFAULT_MODEL;
+  
+  const saved = localStorage.getItem("martha_pin");
+  if(saved){ tryPin(saved); return; }
+  renderPinPad();
+}
+
+function renderPinPad(){
+  const dots=document.getElementById("pin-dots");
+  dots.innerHTML="";
+  for(let i=0;i<CONFIG.PIN_LEN;i++){
+    const d=document.createElement("div");
+    d.className="pin-dot"+(i<pinEntry.length?" filled":"");
+    dots.appendChild(d);
+  }
+  const pad=document.getElementById("pin-pad");
+  pad.innerHTML="";
+  [1,2,3,4,5,6,7,8,9,null,0,"del"].forEach(k=>{
+    if(k===null){pad.appendChild(document.createElement("div"));return;}
+    const btn=document.createElement("button");
+    btn.className="pin-key"+(k==="del"?" del":"");
+    btn.textContent=k==="del"?"\u232b":k;
+    btn.onclick=()=>handlePinKey(k);
+    pad.appendChild(btn);
+  });
+}
+
+function handlePinKey(k){
+  if(k==="del"){pinEntry=pinEntry.slice(0,-1);renderPinPad();return;}
+  if(pinEntry.length>=CONFIG.PIN_LEN)return;
+  pinEntry+=k;
+  renderPinPad();
+  if(pinEntry.length===CONFIG.PIN_LEN){setTimeout(()=>tryPin(pinEntry),200);}
+}
+
+async function tryPin(pin){
+  const hash = await hashPin(pin);
+  if(hash === CONFIG.PIN_HASH){
+    storedPin = pin;
+    localStorage.setItem("martha_pin", pin);
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="flex";
+    init();
+  } else {
+    pinEntry="";
+    localStorage.removeItem("martha_pin");
+    document.getElementById("pin-err").textContent="Falscher PIN. Versuche es nochmal.";
+    document.querySelectorAll(".pin-dot").forEach(d=>d.classList.add("wrong"));
+    setTimeout(()=>{document.getElementById("pin-err").textContent="";renderPinPad();},1200);
+  }
+}
+
+// ══════════════════════════════════════════
+//  SETTINGS
+// ══════════════════════════════════════════
+
+function openSettings(){
+  document.getElementById("apiKeyInput").value = apiKey;
+  document.getElementById("modelInput").value = modelName;
+  document.getElementById("settingsOverlay").style.display="flex";
+}
+
+function closeSettings(){
+  document.getElementById("settingsOverlay").style.display="none";
+}
+
+function saveSettings(){
+  apiKey = document.getElementById("apiKeyInput").value.trim();
+  modelName = document.getElementById("modelInput").value.trim() || CONFIG.DEFAULT_MODEL;
+  localStorage.setItem("martha_api_key", apiKey);
+  localStorage.setItem("martha_model", modelName);
+  closeSettings();
+  updateStatus();
+}
+
+function updateStatus(){
+  const dot = document.getElementById("sd");
+  const st = document.getElementById("st");
+  if(apiKey){
+    dot.className="dot ok";
+    st.textContent="Martha bereit · " + modelName;
+  } else {
+    dot.className="dot";
+    st.textContent="API Key fehlt — klicke ⚙️";
+  }
+}
+
+// ══════════════════════════════════════════
+//  APP INIT
+// ══════════════════════════════════════════
+
+async function init(){
+  try{
+    const r = await fetch("tasks.json");
+    T = await r.json();
+    updateStatus();
+    rF();
+    aF();
+  }catch(e){
+    document.getElementById("st").textContent="Fehler: tasks.json nicht gefunden";
+  }
+  
+  // Prompt for API key if missing
+  if(!apiKey){
+    setTimeout(()=>openSettings(), 500);
+  }
+}
+
+// ══════════════════════════════════════════
+//  GROQ STREAMING API
+// ══════════════════════════════════════════
+
+async function* streamGroq(messages, taskContext){
+  if(!apiKey){
+    yield "Bitte gib zuerst deinen Groq API Key in den Einstellungen (⚙️) ein. Du kannst ihn kostenlos auf console.groq.com erstellen.";
+    return;
+  }
+  
+  const fullSys = SYSTEM_PROMPT + "\n\n--- AKTUELLE AUFGABE ---\n" + taskContext;
+  const msgs = [{role:"system", content:fullSys}, ...messages];
+  
+  try{
+    const resp = await fetch(CONFIG.GROQ_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + apiKey,
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: msgs,
+        stream: true,
+        temperature: 0.4,
+        max_tokens: 1500,
+      })
+    });
+    
+    if(!resp.ok){
+      const err = await resp.json().catch(()=>({}));
+      if(resp.status === 401){
+        yield "API Key ungültig. Bitte prüfe deinen Key in den Einstellungen (⚙️).";
+      } else {
+        yield `Fehler (${resp.status}): ${err.error?.message || "Unbekannter Fehler"}`;
+      }
+      return;
+    }
+    
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = "";
+    
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      buf += decoder.decode(value, {stream:true});
+      const lines = buf.split("\n");
+      buf = lines.pop() || "";
+      
+      for(const line of lines){
+        if(line.startsWith("data: ")){
+          const data = line.slice(6).trim();
+          if(data === "[DONE]") return;
+          try{
+            const parsed = JSON.parse(data);
+            const token = parsed.choices?.[0]?.delta?.content;
+            if(token) yield token;
+          }catch(e){}
+        }
+      }
+    }
+  }catch(e){
+    yield "Verbindungsfehler: " + e.message;
+  }
+}
+
+// ══════════════════════════════════════════
+//  TASK CONTEXT BUILDER
+// ══════════════════════════════════════════
+
+function buildContext(task){
+  const parts = [
+    `AUFGABE: ${task.task_id || "Aufgabe"}`,
+    `THEMA: ${task.topic || "?"} - ${task.subtopic || "?"}`,
+    `PUNKTE: ${task.points || "?"} BE`,
+    `KURS: ${(task.source || {}).level || "?"}`,
+    `\nAUFGABENTEXT:\n${task.question || "Kein Text."}`,
+  ];
+  const ans = task.expected_answer;
+  if(ans) parts.push(`\nOFFIZIELLE MUSTERLOESUNG:\n${ans}`);
+  return parts.join("\n");
+}
+
+// ══════════════════════════════════════════
+//  TOPIC / FILTER
+// ══════════════════════════════════════════
+
+function rF(){
+  const c={};
+  T.forEach(t=>{const k=t.topic||"?";c[k]=(c[k]||0)+1;});
+  const el=document.getElementById("ff");
+  let h=`<button class="fb on" onclick="sT('Alle',this)">Alle (${T.length})</button>`;
+  Object.entries(c).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+    h+=`<button class="fb" onclick="sT('${k}',this)">${k} (${v})</button>`;
+  });
+  el.innerHTML=h;
+}
+
+function sT(t,b){tp=t;b.parentElement.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));b.classList.add("on");aF();}
+function sL(l,b){lv=l;b.parentElement.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));b.classList.add("on");aF();}
+function aF(){
+  F=T.filter(t=>{
+    if(tp!=="Alle"&&t.topic!==tp)return false;
+    if(lv!=="all"&&(t.source||{}).level!==lv)return false;
+    return true;
+  });
+  rTL();
+}
+
+function tc(t){const s=(t||"").toLowerCase();if(s.includes("analysis"))return"an";if(s.includes("stochastik"))return"st";if(s.includes("geometrie"))return"ge";return"al";}
+function ti(t){const s=(t||"").toLowerCase();if(s.includes("analysis"))return"f'";if(s.includes("stochastik"))return"P";if(s.includes("geometrie"))return"\u2192";return"\u2261";}
+function e(s){const d=document.createElement("div");d.textContent=s||"";return d.innerHTML;}
+
+function rTL(){
+  const el=document.getElementById("tl");
+  if(!F.length){el.innerHTML='<div style="padding:40px;text-align:center;color:var(--tx3)">Keine Aufgaben</div>';return;}
+  el.innerHTML=F.map(t=>{
+    const ri=T.indexOf(t),sr=t.source||{},sl=ri===si?"sel":"";
+    return`<div class="ti ${sl}" onclick="sel(${ri})"><div class="tic ${tc(t.topic)}">${ti(t.topic)}</div><div class="tit"><div class="n">${e(t.task_id||"Aufgabe")}</div><div class="m">${e(t.topic||"")} \u00b7 ${sr.level||""} \u00b7 ${sr.year||""}</div></div>${t.points?`<div class="tip">${t.points} BE</div>`:""}</div>`;
+  }).join("");
+}
+
+function renderMath(el){
+  if(typeof renderMathInElement==="function"){
+    try{
+      renderMathInElement(el||document.body,{
+        delimiters:[
+          {left:"$$",right:"$$",display:true},
+          {left:"$",right:"$",display:false},
+          {left:"\\(",right:"\\)",display:false},
+          {left:"\\[",right:"\\]",display:true}
+        ],
+        throwOnError:false
+      });
+    }catch(ex){}
+  }
+}
+
+// ══════════════════════════════════════════
+//  FUNCTION EXTRACTOR
+// ══════════════════════════════════════════
+
+function extractFunctions(text){
+  if(!text) return [];
+  let t = text;
+  t = t.replace(/\$\$?/g, " ");
+  t = t.replace(/\\cdot/g, "*").replace(/\u00b7/g, "*").replace(/\u22c5/g, "*");
+  t = t.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "($1)/($2)");
+  t = t.replace(/\\sqrt\{([^}]+)\}/g, "sqrt($1)");
+  t = t.replace(/\\left/g, "").replace(/\\right/g, "");
+  t = t.replace(/\\[,;]/g, " ");
+  t = t.replace(/\\in/g, "").replace(/\\mathbb\{R\}/g, "").replace(/\u211d/g, "");
+  t = t.replace(/\u2208/g, "").replace(/IR/g, "");
+  t = t.replace(/\u00b2/g, "^2").replace(/\u00b3/g, "^3").replace(/\u2074/g, "^4");
+  t = t.replace(/\u03c0/g, "pi");
+  t = t.replace(/(\d),(\d)/g, "$1.$2");
+  t = t.replace(/\u2212/g, "-").replace(/\u2013/g, "-");
+  t = t.replace(/e\^\{([^}]+)\}/g, "exp($1)");
+  t = t.replace(/e\^\(([^)]+)\)/g, "exp($1)");
+  t = t.replace(/e\^(-?[\w.*+\-/()]+)/g, "exp($1)");
+  const results = [];
+  const pat = /([fghDupw])\s*\(\s*x\s*\)\s*=\s*([^,;]+?)(?:\s*,\s*x|\s*\.\s|\s*$|\n)/gm;
+  let m;
+  while((m = pat.exec(t)) !== null){
+    let expr = m[2].trim();
+    if(expr.length < 3 || !expr.includes("x")) continue;
+    expr = expr.replace(/(\d)([x(])/g, "$1*$2");
+    expr = expr.replace(/([)])(\d)/g, "$1*$2");
+    expr = expr.replace(/([x)])([x(])/g, "$1*$2");
+    expr = expr.replace(/ln\(/g, "log(");
+    results.push({name: m[1], expr: expr});
+  }
+  return results;
+}
+
+function guessRange(expr){
+  let xmin=-5, xmax=5;
+  if(expr.includes("exp(-0.4")||expr.includes("exp(-0,4")){xmin=0;xmax=20;}
+  else if(expr.includes("exp(-x")||expr.includes("exp(-1")){xmin=-2;xmax=8;}
+  else if(expr.includes("exp(2")||expr.includes("exp(2*x")){xmin=-2;xmax=2;}
+  else if(expr.includes("sin")||expr.includes("cos")){xmin=0;xmax=4*Math.PI;}
+  else if(expr.includes("log(")||expr.includes("ln(")){xmin=-1;xmax=10;}
+  return [xmin,xmax];
+}
+
+// ══════════════════════════════════════════
+//  LLM PLOT DETECTION
+// ══════════════════════════════════════════
+
+function detectPlots(text){
+  let t = text.replace(/\u2212/g,"-").replace(/\u2013/g,"-");
+  const pats = [
+    /\[\s*PLOT\s*:\s*(?:f\(x\)\s*=\s*)?(.+?)\s*:\s*([-\d.]+)\s*:\s*([-\d.]+)\s*\]/gi,
+    /PLOT\s*\(\s*(?:f\(x\)\s*=\s*)?(.+?)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/gi,
+    /PLOT\s*:\s*(?:f\(x\)\s*=\s*)?(.+?)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)/gi,
+    /PLOT\s*[:(]\s*(?:f\(x\)\s*=\s*)?(.+?)\s*[,:]\s*([-\d.]+)\s*[,:]\s*([-\d.]+)/gi,
+  ];
+  const found = [];
+  for(const p of pats){
+    let m;
+    while((m=p.exec(t))!==null){
+      found.push({expr:m[1].trim(),xmin:parseFloat(m[2]),xmax:parseFloat(m[3])});
+    }
+    if(found.length) break;
+  }
+  return found;
+}
+
+// ══════════════════════════════════════════
+//  CANVAS PLOTTER
+// ══════════════════════════════════════════
+
+function drawPlot(expr, xmin, xmax, targetEl){
+  const canvas=document.createElement("canvas");
+  canvas.width=400;canvas.height=240;
+  canvas.style.cssText="width:100%;height:auto;border-radius:8px;background:#0f1117";
+  const wrap=document.createElement("div");wrap.className="pbox";
+  wrap.appendChild(canvas);
+  const lbl=document.createElement("div");lbl.className="plbl";
+  lbl.textContent="f(x) = "+expr;
+  wrap.appendChild(lbl);targetEl.appendChild(wrap);
+
+  const ctx=canvas.getContext("2d"),W=400,HH=240,pad=40;
+  let fn;
+  try{
+    const clean=expr.replace(/,/g,".");
+    const node=math.parse(clean);const code=node.compile();
+    fn=(x)=>{try{return code.evaluate({x:x,e:Math.E,pi:Math.PI,PI:Math.PI});}catch(e){return NaN;}};
+  }catch(ex){
+    ctx.fillStyle="#f87171";ctx.font="14px -apple-system,sans-serif";
+    ctx.fillText("Parse-Fehler: "+ex.message,20,HH/2);return;
+  }
+  const steps=500,dx=(xmax-xmin)/steps;
+  const pts=[];let ymin=Infinity,ymax=-Infinity;
+  for(let i=0;i<=steps;i++){const x=xmin+i*dx,y=fn(x);if(isFinite(y)&&!isNaN(y)){pts.push({x,y});if(y<ymin)ymin=y;if(y>ymax)ymax=y;}}
+  if(pts.length<2){ctx.fillStyle="#f87171";ctx.font="14px -apple-system,sans-serif";ctx.fillText("Keine darstellbaren Werte",20,HH/2);return;}
+  const yR=ymax-ymin||1;ymin-=yR*.1;ymax+=yR*.1;
+  const toX=x=>pad+(x-xmin)/(xmax-xmin)*(W-2*pad);
+  const toY=y=>HH-pad-(y-ymin)/(ymax-ymin)*(HH-2*pad);
+  ctx.fillStyle="#0f1117";ctx.fillRect(0,0,W,HH);
+  ctx.strokeStyle="#1c1f2b";ctx.lineWidth=1;
+  const xS=nS(xmax-xmin,8),xSt=Math.ceil(xmin/xS)*xS;
+  ctx.font="11px -apple-system,sans-serif";ctx.fillStyle="#555a73";ctx.textAlign="center";
+  for(let x=xSt;x<=xmax;x+=xS){const px=toX(x);ctx.beginPath();ctx.moveTo(px,pad);ctx.lineTo(px,HH-pad);ctx.stroke();ctx.fillText(nN(x),px,HH-pad+16);}
+  const yS=nS(ymax-ymin,6),ySt=Math.ceil(ymin/yS)*yS;
+  ctx.textAlign="right";
+  for(let y=ySt;y<=ymax;y+=yS){const py=toY(y);ctx.beginPath();ctx.moveTo(pad,py);ctx.lineTo(W-pad,py);ctx.stroke();ctx.fillText(nN(y),pad-8,py+4);}
+  if(xmin<=0&&xmax>=0){ctx.strokeStyle="#3a3f55";ctx.lineWidth=1.5;const ax=toX(0);ctx.beginPath();ctx.moveTo(ax,pad);ctx.lineTo(ax,HH-pad);ctx.stroke();}
+  if(ymin<=0&&ymax>=0){ctx.strokeStyle="#3a3f55";ctx.lineWidth=1.5;const ay=toY(0);ctx.beginPath();ctx.moveTo(pad,ay);ctx.lineTo(W-pad,ay);ctx.stroke();}
+  ctx.strokeStyle="rgba(124,108,255,0.15)";ctx.lineWidth=8;ctx.lineJoin="round";
+  ctx.beginPath();let st=false;
+  for(const p of pts){const px=toX(p.x),py=toY(p.y);if(py>=pad-10&&py<=HH-pad+10){if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);}else st=false;}
+  ctx.stroke();
+  ctx.strokeStyle="#7c6cff";ctx.lineWidth=2.5;
+  ctx.beginPath();st=false;
+  for(const p of pts){const px=toX(p.x),py=toY(p.y);if(py>=pad-10&&py<=HH-pad+10){if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);}else st=false;}
+  ctx.stroke();
+}
+function nS(r,m){const v=r/m,mg=Math.pow(10,Math.floor(Math.log10(v))),rs=v/mg;if(rs<=1.5)return mg;if(rs<=3)return 2*mg;if(rs<=7)return 5*mg;return 10*mg;}
+function nN(n){if(Math.abs(n)<1e-10)return"0";if(Math.abs(n)>=1000)return Math.round(n).toString();if(Number.isInteger(n))return n.toString();return n.toFixed(2).replace(/\.?0+$/,"");}
+
+// ══════════════════════════════════════════
+//  DIRECT PLOT FROM TASK
+// ══════════════════════════════════════════
+
+function plotFromTask(){
+  if(si<0)return;
+  const t=T[si];
+  const allText=(t.question||"")+" "+(t.expected_answer||"");
+  const funcs=extractFunctions(allText);
+  const el=document.getElementById("cms");
+  if(!funcs.length){sQ("Zeichne die Funktion aus der Aufgabe");return;}
+
+  funcs.forEach(f=>{
+    const msgDiv=document.createElement("div");msgDiv.className="mg a";
+    const bu=document.createElement("div");bu.className="bu";
+    bu.innerHTML=`<div class="sn">MARTHA</div>Hier ist der Graph von ${e(f.name)}(x) = ${e(f.expr)}:`;
+    msgDiv.appendChild(bu);
+    const [xmin,xmax]=guessRange(f.expr);
+    const plotWrap=document.createElement("div");
+    bu.appendChild(plotWrap);
+    try{drawPlot(f.expr,xmin,xmax,plotWrap);}catch(ex){plotWrap.innerHTML=`<div class="abw">Zeichenfehler: ${ex.message}</div>`;}
+    el.appendChild(msgDiv);
+  });
+  el.scrollTop=el.scrollHeight;renderMath(el);
+}
+
+// ══════════════════════════════════════════
+//  CHAT
+// ══════════════════════════════════════════
+
+function hasAbb(t){if(!t)return false;const l=t.toLowerCase();return l.includes("abbildung")||l.includes("dargestellt")||l.includes("histogramm");}
+
+function sel(i){
+  si=i;const t=T[i],sr=t.source||{};
+  document.getElementById("cht").textContent=t.task_id||"Aufgabe";
+  document.getElementById("chs").textContent=`${t.topic||""} \u00b7 ${sr.level||""} \u00b7 ${t.points?t.points+" BE":""}`;
+  document.getElementById("cin").style.display="flex";
+  document.getElementById("qa").style.display="flex";
+  document.getElementById("app").classList.add("co");
+  const funcs=extractFunctions((t.question||"")+" "+(t.expected_answer||""));
+  document.getElementById("plotBtn").style.display=funcs.length?"inline-block":"none";
+  if(!H[i])H[i]=[];
+  rC(i);rTL();
+  setTimeout(()=>document.getElementById("mi").focus(),300);
+}
+function gB(){document.getElementById("app").classList.remove("co");}
+
+function rC(i){
+  const el=document.getElementById("cms"),t=T[i],h=H[i]||[];
+  let html="";
+  html+=`<div class="mg s"><div class="bu"><strong>${e(t.task_id||"Aufgabe")}</strong><br><br>${e(t.question||"Kein Text.")}</div></div>`;
+  if(hasAbb(t.question))html+=`<div class="abw">\u26a0\ufe0f Diese Aufgabe verweist auf eine Abbildung. Klicke \ud83d\udcc8 um die Funktion zu zeichnen.</div>`;
+  if(!h.length)html+=`<div class="mg a"><div class="bu"><div class="sn">MARTHA</div>Hallo! \ud83d\udc4b Ich bin Martha, deine Mathe-Nachhilfelehrerin.\n\nSchau dir die Aufgabe oben an. Wie m\u00f6chtest du anfangen?\nDu kannst mir sagen, was du schon wei\u00dft, oder einen \ud83d\udca1 Tipp verlangen.</div></div>`;
+  h.forEach((m,idx)=>{
+    if(m.role==="user")html+=`<div class="mg u"><div class="bu">${e(m.content)}</div></div>`;
+    else html+=`<div class="mg a" id="hmsg_${i}_${idx}"><div class="bu"><div class="sn">MARTHA</div><span class="at">${e(m.content)}</span></div></div>`;
+  });
+  el.innerHTML=html;el.scrollTop=el.scrollHeight;renderMath(el);
+  h.forEach((m,idx)=>{if(m.role==="assistant"){const mel=document.getElementById(`hmsg_${i}_${idx}`);if(mel){const buEl=mel.querySelector(".bu");const plots=detectPlots(m.content);plots.forEach(p=>{try{drawPlot(p.expr,p.xmin,p.xmax,buEl);}catch(ex){}});}}});
+}
+
+async function sM(){
+  if(str||si<0)return;
+  const inp=document.getElementById("mi"),txt=inp.value.trim();
+  if(!txt)return;inp.value="";inp.style.height="auto";
+  
+  const dw=["zeichne","zeichnen","plot","rajzol","graph","zeig die funktion","zeig den graph","funktion zeichnen"];
+  if(dw.some(w=>txt.toLowerCase().includes(w))){
+    const t=T[si],funcs=extractFunctions((t.question||"")+" "+(t.expected_answer||""));
+    if(funcs.length){plotFromTask();return;}
+  }
+  
+  const i=si;if(!H[i])H[i]=[];H[i].push({role:"user",content:txt});
+  const el=document.getElementById("cms");
+  el.innerHTML+=`<div class="mg u"><div class="bu">${e(txt)}</div></div>`;
+  const tid="t"+Date.now();
+  el.innerHTML+=`<div class="mg a" id="${tid}"><div class="bu"><div class="sn">MARTHA</div><span class="at"><span class="tp"><span></span><span></span><span></span></span></span></div></div>`;
+  el.scrollTop=el.scrollHeight;str=true;document.getElementById("sbt").disabled=true;
+  
+  let full="";
+  const ctx = buildContext(T[i]);
+  const at=document.querySelector(`#${tid} .at`);
+  
+  try{
+    for await(const token of streamGroq(H[i], ctx)){
+      full += token;
+      at.textContent = full;
+      el.scrollTop = el.scrollHeight;
+    }
+  }catch(ex){
+    full = full || "Verbindungsfehler: " + ex.message;
+  }
+  
+  if(full){
+    H[i].push({role:"assistant",content:full});
+    const lastMsg=document.getElementById(tid);
+    if(lastMsg){
+      const atEl=lastMsg.querySelector(".at");
+      atEl.innerHTML=e(full);
+      renderMath(lastMsg);
+      const plots=detectPlots(full);
+      const buEl=lastMsg.querySelector(".bu");
+      plots.forEach(p=>{try{drawPlot(p.expr,p.xmin,p.xmax,buEl);}catch(ex){}});
+    }
+  }
+  str=false;document.getElementById("sbt").disabled=false;
+}
+
+function sQ(t){document.getElementById("mi").value=t;sM();}
+function hK(ev){if(ev.key==="Enter"&&!ev.shiftKey){ev.preventDefault();sM();}}
+function aG(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight,120)+"px";}
+
+let _kt=0;
+const _ki=setInterval(()=>{if(typeof renderMathInElement==="function"||_kt>30){clearInterval(_ki);renderMath()}_kt++;},500);
+
+document.addEventListener("DOMContentLoaded", initLogin);
+</script>
+</body>
+</html>

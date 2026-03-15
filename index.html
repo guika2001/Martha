@@ -1511,10 +1511,13 @@ Nur die natürlichsprachlichen Teile übersetzen — Formeln, f(x), x ∈ ℝ et
   finalEl.style.cssText = "line-height:1.9;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)";
   // Convert math in generated task text to LaTeX
   let aufgabeLatex = aufgabe;
-  // Wrap f(x) = ... expressions
-  aufgabeLatex = aufgabeLatex.replace(/\b([fghpk])\(x\)\s*=\s*([^.,;\n]+?)(?=[.,;]|\s{2,}|$)/gm,
-    (m, fn, expr) => '$' + fn + '(x) = ' + expr.trim() + '$');
-  // Wrap x₀ = number
+  // Wrap f(x) = ... expressions — stop at punctuation OR natural language word
+  aufgabeLatex = aufgabeLatex.replace(/\b([fghpk])\(x\)\s*=\s*([^.;\n]+?)(?=\s+[a-zA-ZáéíóöőúüűÄÖÜäöüß]{3,}|[.;]|\s*,\s*ahol|\s*$)/gm,
+    (m, fn, expr) => {
+      const trimmed = expr.trim().replace(/,$/, '');
+      return '$' + fn + '(x) = ' + trimmed + '$';
+    });
+  // Wrap x₀ = number (with optional unit like -nél, -nál, etc.)
   aufgabeLatex = aufgabeLatex.replace(/x[₀0]\s*=\s*(-?\d+(?:[,.]\d+)?)/g, '$x_0 = $1$');
   // Wrap standalone x = number
   aufgabeLatex = aufgabeLatex.replace(/\bx\s*=\s*(-?\d+(?:[,.]\d+)?)(?![\d])/g, '$x = $1$');

@@ -527,11 +527,21 @@ function extractFunctions(text) {
   t = t.replace(/e\^(-?[\w.*+\-/()]+)/g, "exp($1)");
 
   const results = [];
-  const pat = /([fghDupw])\s*\(\s*x\s*\)\s*=\s*([^,;]+?)(?:\s*,\s*x|\s*\.\s|\s*$|\n)/gm;
+  // Stop expression at first space followed by a natural-language word (2+ letters that aren't math keywords)
+  const mathWords = new Set(['exp','sin','cos','tan','log','sqrt','pi','abs','ln','max','min']);
+  const pat = /([fghDupw])\s*\(\s*x\s*\)\s*=\s*([^,;\n]+)/gm;
   let m;
   while ((m = pat.exec(t)) !== null) {
     let expr = m[2].trim();
+    // Truncate at first natural-language word (sequence of letters not a math keyword)
+    expr = expr.replace(/\s+[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰäöüÄÖÜß]{2,}.*$/, (match) => {
+      const word = match.trim().split(/\s+/)[0].toLowerCase();
+      return mathWords.has(word) ? match : "";
+    });
+    expr = expr.trim().replace(/[,;.\s]+$/, "");
     if (expr.length < 3 || !expr.includes("x")) continue;
+    // Reject if still contains natural-language patterns
+    if (/[a-zA-ZáéíóöőúüűÄÖÜäöüß]{4,}/.test(expr.replace(/exp|sin|cos|tan|log|sqrt|abs/g, ""))) continue;
     expr = expr.replace(/(\d)([x(])/g, "$1*$2");
     expr = expr.replace(/([)])(\d)/g, "$1*$2");
     expr = expr.replace(/([x)])([x(])/g, "$1*$2");

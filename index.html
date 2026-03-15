@@ -668,8 +668,28 @@ function rC(i){
     if(m.role==="user")html+=`<div class="mg u"><div class="bu">${e(m.content)}</div></div>`;
     else html+=`<div class="mg a" id="hmsg_${i}_${idx}"><div class="bu"><div class="sn">MARTHA</div><span class="at">${e(m.content)}</span></div></div>`;
   });
-  el.innerHTML=html;el.scrollTop=el.scrollHeight;renderMath(el);
-  h.forEach((m,idx)=>{if(m.role==="assistant"){const mel=document.getElementById(`hmsg_${i}_${idx}`);if(mel){const buEl=mel.querySelector(".bu");const plots=detectPlots(m.content);plots.forEach(p=>{try{drawPlot(p.expr,p.xmin,p.xmax,buEl);}catch(ex){}});}}});
+  el.innerHTML=html;el.scrollTop=el.scrollHeight;
+  // Render math only in the task bubble (it uses e() so it's safe)
+  const taskBubble=el.querySelector(".mg.s");
+  if(taskBubble) renderMath(taskBubble);
+  // For assistant messages: re-set textContent then run KaTeX to avoid duplication
+  h.forEach((m,idx)=>{
+    if(m.role==="assistant"){
+      const mel=document.getElementById(`hmsg_${i}_${idx}`);
+      if(mel){
+        const atEl=mel.querySelector(".at");
+        if(atEl){
+          atEl.textContent=m.content;
+          if(typeof renderMathInElement==="function"){
+            try{renderMathInElement(atEl,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});}catch(ex){}
+          }
+        }
+        const buEl=mel.querySelector(".bu");
+        const plots=detectPlots(m.content);
+        plots.forEach(p=>{try{drawPlot(p.expr,p.xmin,p.xmax,buEl);}catch(ex){}});
+      }
+    }
+  });
 }
 
 async function sM(){
@@ -709,8 +729,21 @@ async function sM(){
     const lastMsg=document.getElementById(tid);
     if(lastMsg){
       const atEl=lastMsg.querySelector(".at");
-      atEl.innerHTML=e(full);
-      renderMath(lastMsg);
+      // ── Fix: set textContent (not innerHTML) so KaTeX sees raw $...$ once ──
+      atEl.textContent=full;
+      if(typeof renderMathInElement==="function"){
+        try{
+          renderMathInElement(atEl,{
+            delimiters:[
+              {left:"$$",right:"$$",display:true},
+              {left:"$",right:"$",display:false},
+              {left:"\\(",right:"\\)",display:false},
+              {left:"\\[",right:"\\]",display:true}
+            ],
+            throwOnError:false
+          });
+        }catch(ex){}
+      }
       const plots=detectPlots(full);
       const buEl=lastMsg.querySelector(".bu");
       plots.forEach(p=>{try{drawPlot(p.expr,p.xmin,p.xmax,buEl);}catch(ex){}});
@@ -786,11 +819,12 @@ STRIKTE REGELN:
   const reqMsgs=[{role:"system",content:"Du bist Martha, eine erfahrene NRW Abitur Mathematiklehrerin. Antworte ausschließlich auf Deutsch. Halte dich exakt an die Anweisungen."},...msgs];
 
   let full="";
-  // Show streaming in a raw pre-element first, then render LaTeX after done
+
+  // Streaming container — pure text only, no KaTeX during stream
   const box=document.createElement("div");box.className="gen-box";
-  const streamPre=document.createElement("span");
-  streamPre.style.cssText="opacity:.7;white-space:pre-wrap";
-  box.appendChild(streamPre);
+  const streamEl=document.createElement("pre");
+  streamEl.style.cssText="white-space:pre-wrap;font-family:inherit;font-size:inherit;margin:0;opacity:.75";
+  box.appendChild(streamEl);
 
   document.getElementById("practiceContent").style.display="block";
   document.getElementById("practiceTag").textContent=`${t.topic||"?"} · ${(t.source||{}).level||""} · ähnlich wie ${t.task_id||""}`;
@@ -811,8 +845,7 @@ STRIKTE REGELN:
       for(const line of lines){
         if(line.startsWith("data: ")){const d=line.slice(6).trim();if(d==="[DONE]")break;
           try{const p=JSON.parse(d);const tok=p.choices?.[0]?.delta?.content;
-            // Stream as plain text — do NOT use textContent during streaming (breaks LaTeX later)
-            if(tok){full+=tok;streamPre.textContent=full;}
+            if(tok){full+=tok;streamEl.textContent=full;}  // textContent on <pre> = safe, no HTML
           }catch(ex){}
         }
       }
@@ -820,13 +853,30 @@ STRIKTE REGELN:
   }catch(ex){box.textContent="Verbindungsfehler: "+ex.message;btn.disabled=false;btnTxt.textContent="🔁 Újra";return;}
 
   if(full){
-    // Replace streaming span with rendered HTML + LaTeX
-    box.innerHTML="";
-    const rendered=document.createElement("div");
-    rendered.style.cssText="white-space:pre-wrap;line-height:1.7";
-    rendered.textContent=full;
-    box.appendChild(rendered);
-    renderMath(box);
+    // ── Rendering phase: wipe the raw text, render LaTeX cleanly ──
+    // KaTeX renderMathInElement needs a DOM node with textContent (not innerHTML)
+    // We create a fresh wrapper so there is NO prior raw text visible alongside rendered math
+    box.innerHTML="";  // remove the streaming <pre> entirely
+
+    const finalEl=document.createElement("div");
+    finalEl.style.cssText="line-height:1.8";
+    finalEl.textContent=full;   // set as textContent → KaTeX will find $...$ tokens
+    box.appendChild(finalEl);
+
+    // Run KaTeX — it replaces $...$ spans IN PLACE without duplicating surrounding text
+    if(typeof renderMathInElement==="function"){
+      try{
+        renderMathInElement(finalEl,{
+          delimiters:[
+            {left:"$$",right:"$$",display:true},
+            {left:"$",right:"$",display:false},
+            {left:"\\(",right:"\\)",display:false},
+            {left:"\\[",right:"\\]",display:true}
+          ],
+          throwOnError:false
+        });
+      }catch(ex){}
+    }
 
     generatedTask={
       task_id:"🔁 Üben · "+(t.task_id||"?"),

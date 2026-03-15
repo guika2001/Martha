@@ -195,23 +195,23 @@ const CONFIG = {
 
 const LANGUAGES = {
   de: {
-    label: "\U0001f1e9\U0001f1ea DE",
+    label: "DE",
     ui: {
       title: "Martha \u00b7 Abitur Tutor", subtitle: "NRW Mathematik \u00b7 KI-Nachhilfe",
       ready: "Martha bereit", placeholder: "Frage Martha...", back: "\u2190 Zur\u00fcck",
-      tip: "\U0001f4a1 Tipp", step: "\U0001f463 Erster Schritt", solpath: "\U0001f9e0 L\u00f6sungsweg",
-      solution: "\u2705 L\u00f6sung", plot: "\U0001f4c8 Funktion zeichnen", practice: "\U0001f501 \u00dcben",
-      difficulty: "SCHWIERIGKEITSGRAD", easier: "\U0001f7e2 Leichter", similar: "\U0001f7e1 \u00c4hnlich", harder: "\U0001f534 Schwerer",
+      tip: "\ud83d\udca1 Tipp", step: "\ud83d\udc63 Erster Schritt", solpath: "\ud83e\udde0 L\u00f6sungsweg",
+      solution: "\u2705 L\u00f6sung", plot: "\ud83d\udcc8 Funktion zeichnen", practice: "\ud83d\udd01 \u00dcben",
+      difficulty: "SCHWIERIGKEITSGRAD", easier: "\ud83d\udfe2 Leichter", similar: "\ud83d\udfe1 \u00c4hnlich", harder: "\ud83d\udd34 Schwerer",
       easier_desc: "Einfachere Zahlen, weniger Schritte.", similar_desc: "\u00c4hnlicher Schwierigkeitsgrad wie das Original.", harder_desc: "Komplexere Funktion, zus\u00e4tzliche Teilaufgaben.",
-      generate: "\u2728 Generieren", regenerate: "\U0001f504 Neu generieren",
-      load_practice: "\U0001f4da Mit Martha \u00f6ffnen", load_photo: "\U0001f4da Mit Martha \u00f6ffnen",
-      close: "Schlie\u00dfen", practice_modal_title: "\U0001f501 \u00c4hnliche Aufgabe generieren",
-      upload_modal_title: "\U0001f4ce Aufgabe hochladen", upload_hint: "Klicken oder Dateien hierher ziehen",
-      upload_sub: "\U0001f4f7 Foto \u00b7 \U0001f4c4 PDF \u00b7 \U0001f4dd Word \u00b7 max 10 Dateien",
+      generate: "\u2728 Generieren", regenerate: "\ud83d\udd04 Neu generieren",
+      load_practice: "\ud83d\udcda Mit Martha \u00f6ffnen", load_photo: "\ud83d\udcda Mit Martha \u00f6ffnen",
+      close: "Schlie\u00dfen", practice_modal_title: "\ud83d\udd01 \u00c4hnliche Aufgabe generieren",
+      upload_modal_title: "\ud83d\udcce Aufgabe hochladen", upload_hint: "Klicken oder Dateien hierher ziehen",
+      upload_sub: "\ud83d\udcf7 Foto \u00b7 \ud83d\udcc4 PDF \u00b7 \ud83d\udcdd Word \u00b7 max 10 Dateien",
       analyzing: "Martha liest die Aufgabe...", no_task: "\u26a0\ufe0f Keine Mathematikaufgabe gefunden.",
       solution_page_title: "Das ist eine L\u00f6sungsseite", solution_page_hint: "Bitte eine Aufgabenseite hochladen.",
       wrong_pin: "Falscher PIN. Versuche es nochmal.",
-      greeting: "Hallo! \U0001f44b Ich bin Martha, deine Mathe-Nachhilfelehrerin.\n\nSchau dir die Aufgabe oben an. Wie m\u00f6chtest du anfangen?\nDu kannst mir sagen, was du schon wei\u00dft, oder einen \U0001f4a1 Tipp verlangen.",
+      greeting: "Hallo! \ud83d\udc4b Ich bin Martha, deine Mathe-Nachhilfelehrerin.\n\nSchau dir die Aufgabe oben an. Wie m\u00f6chtest du anfangen?\nDu kannst mir sagen, was du schon wei\u00dft, oder einen \ud83d\udca1 Tipp verlangen.",
       verified: "\u2713 Mathematisch verifiziert", math_error: "Mathematischer Fehler, erneuter Versuch...",
       all_failed: " Versuche ohne Erfolg.", all_failed_hint: "Versuche eine andere Aufgabe oder \u00e4ndere den Schwierigkeitsgrad.",
     },
@@ -220,63 +220,61 @@ METHODE: Sokratisches Lehren. Frage zuerst was der Schueler versucht hat. Gib NI
 FORMELN: Immer LaTeX. Inline $f(x)=x^2$ Display $$f(x)=x^3$$
 PLOT: PLOT(ausdruck, xmin, xmax) auf eigener Zeile.
 WICHTIG: Antworte IMMER auf Deutsch.`,
-    practice_system: `Du bist Martha, praezise NRW Abitur Mathematiklehrerin.
-Erstelle Uebungsaufgaben und verifiziere mathematisch.
+    practice_system: `Du bist Martha, praezise NRW Abitur Mathematiklehrerin. Erstelle Uebungsaufgaben und verifiziere mathematisch.
 PROZESS: (1) f(x) waehlen (2) f'(x0)=0 pruefen (3) f''(x0) Vorzeichen pruefen (4) erst dann formulieren.
 NUR JSON: {"aufgabe":"...","verifikation":{"f_prime":"...","f_prime_at_x0":"...","f_double_prime_at_x0":"...","urteil":"OK"}}
 Aufgabe auf Deutsch.`,
   },
   hu: {
-    label: "\U0001f1ed\U0001f1fa HU",
+    label: "HU",
     ui: {
-      title: "Martha \u00b7 \u00c9rettségi Tutor", subtitle: "NRW Matematika \u00b7 AI-korrepet\u00e1l\u00e1s",
-      ready: "Martha k\u00e9szen \u00e1ll", placeholder: "K\u00e9rdezd Marth\u00e1t...", back: "\u2190 Vissza",
-      tip: "\U0001f4a1 Tipp", step: "\U0001f463 Els\u0151 l\u00e9p\u00e9s", solpath: "\U0001f9e0 Megold\u00e1s menete",
-      solution: "\u2705 Megold\u00e1s", plot: "\U0001f4c8 F\u00fcggv\u00e9ny rajzol\u00e1sa", practice: "\U0001f501 Gyakorl\u00e1s",
-      difficulty: "NEH\u00c9ZS\u00c9G", easier: "\U0001f7e2 K\u00f6nnyebb", similar: "\U0001f7e1 Hasonl\u00f3", harder: "\U0001f534 Nehezebb",
-      easier_desc: "Egyszer\u0171bb sz\u00e1mok, kevesebb l\u00e9p\u00e9s.", similar_desc: "Az eredeti feladathoz hasonl\u00f3 neh\u00e9zs\u00e9g.", harder_desc: "\u00d6szetettebb f\u00fcggv\u00e9ny, extra r\u00e9szfeladat.",
-      generate: "\u2728 Gener\u00e1l\u00e1s", regenerate: "\U0001f504 \u00dajra gener\u00e1l\u00e1s",
-      load_practice: "\U0001f4da Bet\u00f6lt\u00e9s Marth\u00e1nak", load_photo: "\U0001f4da Megnyit\u00e1s Marth\u00e1val",
-      close: "Bez\u00e1r\u00e1s", practice_modal_title: "\U0001f501 Hasonl\u00f3 feladat gener\u00e1l\u00e1sa",
-      upload_modal_title: "\U0001f4ce Feladat bet\u00f6lt\u00e9se", upload_hint: "Kattints vagy h\u00fazz ide f\u00e1jlokat",
-      upload_sub: "\U0001f4f7 Fot\u00f3 \u00b7 \U0001f4c4 PDF \u00b7 \U0001f4dd Word \u00b7 max 10 f\u00e1jl",
-      analyzing: "Martha olvassa a feladatot...", no_task: "\u26a0\ufe0f Nem tal\u00e1ltam matematikai feladatot.",
-      solution_page_title: "Ez egy megold\u00e1soldal", solution_page_hint: "K\u00e9rlek egy feladatoldalt t\u00f6lts fel!",
-      wrong_pin: "Hib\u00e1s PIN. Pr\u00f3b\u00e1ld \u00fajra.",
-      greeting: "Szia! \U0001f44b Martha vagyok, a matektanárod.\n\nNézd meg a fenti feladatot. Hogyan szeretnéd elkezdeni?\nMondhatod, mit tudsz már, vagy kérhetsz \U0001f4a1 tippet.",
-      verified: "\u2713 Matematikailag ellen\u0151rz\u00f6tt", math_error: "Matematikai hiba, \u00fajrapr\u00f3b\u00e1l\u00e1s...",
-      all_failed: " pr\u00f3b\u00e1lkoz\u00e1s sikertelen.", all_failed_hint: "Pr\u00f3b\u00e1lj m\u00e1sik feladatot, vagy v\u00e1ltozz a neh\u00e9zs\u00e9gen.",
+      title: "Martha \u00b7 \u00c9rettségi Tutor", subtitle: "NRW Matematika \u00b7 AI-korrepetálás",
+      ready: "Martha készen áll", placeholder: "Kérdezd Marthát...", back: "\u2190 Vissza",
+      tip: "\ud83d\udca1 Tipp", step: "\ud83d\udc63 Els\u0151 lépés", solpath: "\ud83e\udde0 Megoldás menete",
+      solution: "\u2705 Megoldás", plot: "\ud83d\udcc8 Függvény rajzolása", practice: "\ud83d\udd01 Gyakorlás",
+      difficulty: "NEHÉZSÉG", easier: "\ud83d\udfe2 Könnyebb", similar: "\ud83d\udfe1 Hasonló", harder: "\ud83d\udd34 Nehezebb",
+      easier_desc: "Egyszerűbb számok, kevesebb lépés.", similar_desc: "Az eredeti feladathoz hasonló nehézség.", harder_desc: "Összetettebb függvény, extra részfeladat.",
+      generate: "\u2728 Generálás", regenerate: "\ud83d\udd04 Újra generálás",
+      load_practice: "\ud83d\udcda Betöltés Marthának", load_photo: "\ud83d\udcda Megnyitás Marthával",
+      close: "Bezárás", practice_modal_title: "\ud83d\udd01 Hasonló feladat generálása",
+      upload_modal_title: "\ud83d\udcce Feladat betöltése", upload_hint: "Kattints vagy húzz ide fájlokat",
+      upload_sub: "\ud83d\udcf7 Fotó \u00b7 \ud83d\udcc4 PDF \u00b7 \ud83d\udcdd Word \u00b7 max 10 fájl",
+      analyzing: "Martha olvassa a feladatot...", no_task: "\u26a0\ufe0f Nem találtam matematikai feladatot.",
+      solution_page_title: "Ez egy megoldásoldal", solution_page_hint: "Kérlek egy feladatoldalt tölts fel!",
+      wrong_pin: "Hibás PIN. Próbáld újra.",
+      greeting: "Szia! \ud83d\udc4b Martha vagyok, a matektanárod.\n\nNézd meg a fenti feladatot. Hogyan szeretnéd elkezdeni?\nMondhatod, mit tudsz már, vagy kérhetsz \ud83d\udca1 tippet.",
+      verified: "\u2713 Matematikailag ellenőrzött", math_error: "Matematikai hiba, újrapróbálás...",
+      all_failed: " próbálkozás sikertelen.", all_failed_hint: "Próbálj másik feladatot, vagy változtass a nehézségen.",
     },
     system: `Te Martha vagy, egy tapasztalt matematika-felkészítő tanár az NRW Abiturhoz.
 MÓDSZER: Szókratészi tanítás. Először kérdezd meg mit próbált. SOHA ne add meg rögtön a megoldást.
 KÉPLETEK: Mindig LaTeX. Inline $f(x)=x^2$ Display $$f(x)=x^3$$
 PLOT PARANCS: PLOT(kifejezés, xmin, xmax) saját sorban.
 FONTOS: MINDIG magyarul válaszolj.`,
-    practice_system: `Te Martha vagy, precíz NRW Abitur matematika tanár.
-Feladatokat generálsz és matematikailag ellenőrzöl.
+    practice_system: `Te Martha vagy, precíz NRW Abitur matematika tanár. Feladatokat generálsz és matematikailag ellenőrzöl.
 FOLYAMAT: (1) f(x) kiválasztása (2) f'(x0)=0 ellenőrzés (3) f''(x0) előjel (4) csak ekkor fogalmazz.
 CSAK JSON: {"aufgabe":"...","verifikation":{"f_prime":"...","f_prime_at_x0":"...","f_double_prime_at_x0":"...","urteil":"OK"}}
 A feladatot magyarul fogalmazd meg.`,
   },
   en: {
-    label: "\U0001f1ec\U0001f1e7 EN",
+    label: "EN",
     ui: {
       title: "Martha \u00b7 Abitur Tutor", subtitle: "NRW Mathematics \u00b7 AI Tutoring",
       ready: "Martha ready", placeholder: "Ask Martha...", back: "\u2190 Back",
-      tip: "\U0001f4a1 Hint", step: "\U0001f463 First Step", solpath: "\U0001f9e0 Solution Path",
-      solution: "\u2705 Solution", plot: "\U0001f4c8 Plot Function", practice: "\U0001f501 Practice",
-      difficulty: "DIFFICULTY", easier: "\U0001f7e2 Easier", similar: "\U0001f7e1 Similar", harder: "\U0001f534 Harder",
+      tip: "\ud83d\udca1 Hint", step: "\ud83d\udc63 First Step", solpath: "\ud83e\udde0 Solution Path",
+      solution: "\u2705 Solution", plot: "\ud83d\udcc8 Plot Function", practice: "\ud83d\udd01 Practice",
+      difficulty: "DIFFICULTY", easier: "\ud83d\udfe2 Easier", similar: "\ud83d\udfe1 Similar", harder: "\ud83d\udd34 Harder",
       easier_desc: "Simpler numbers, fewer steps.", similar_desc: "Similar difficulty to the original.", harder_desc: "More complex function, extra sub-tasks.",
-      generate: "\u2728 Generate", regenerate: "\U0001f504 Regenerate",
-      load_practice: "\U0001f4da Open with Martha", load_photo: "\U0001f4da Open with Martha",
-      close: "Close", practice_modal_title: "\U0001f501 Generate Similar Task",
-      upload_modal_title: "\U0001f4ce Upload Task", upload_hint: "Click or drag files here",
-      upload_sub: "\U0001f4f7 Photo \u00b7 \U0001f4c4 PDF \u00b7 \U0001f4dd Word \u00b7 max 10 files",
+      generate: "\u2728 Generate", regenerate: "\ud83d\udd04 Regenerate",
+      load_practice: "\ud83d\udcda Open with Martha", load_photo: "\ud83d\udcda Open with Martha",
+      close: "Close", practice_modal_title: "\ud83d\udd01 Generate Similar Task",
+      upload_modal_title: "\ud83d\udcce Upload Task", upload_hint: "Click or drag files here",
+      upload_sub: "\ud83d\udcf7 Photo \u00b7 \ud83d\udcc4 PDF \u00b7 \ud83d\udcdd Word \u00b7 max 10 files",
       analyzing: "Martha is reading the task...", no_task: "\u26a0\ufe0f No math task found.",
       solution_page_title: "This is a solutions page", solution_page_hint: "Please upload a task page instead.",
       wrong_pin: "Wrong PIN. Please try again.",
-      greeting: "Hello! \U0001f44b I'm Martha, your math tutor.\n\nTake a look at the task above. How would you like to start?\nYou can tell me what you already know, or ask for a \U0001f4a1 hint.",
-      verified: "\u2713 Mathematically verified", math_error: "Math error detected, retrying...",
+      greeting: "Hello! \ud83d\udc4b I'm Martha, your math tutor.\n\nTake a look at the task above. How would you like to start?\nYou can tell me what you already know, or ask for a \ud83d\udca1 hint.",
+      verified: "\u2713 Mathematically verified", math_error: "Math error, retrying...",
       all_failed: " attempts failed.", all_failed_hint: "Try a different task or change the difficulty level.",
     },
     system: `You are Martha, an experienced mathematics tutor for the NRW Abitur exam.
@@ -284,31 +282,30 @@ METHOD: Socratic teaching. First ask what the student tried. NEVER give the comp
 FORMULAS: Always LaTeX. Inline $f(x)=x^2$ Display $$f(x)=x^3$$
 PLOT COMMAND: PLOT(expression, xmin, xmax) on its own line.
 IMPORTANT: ALWAYS respond in English.`,
-    practice_system: `You are Martha, a precise NRW Abitur mathematics teacher.
-Create practice tasks and verify mathematically.
+    practice_system: `You are Martha, a precise NRW Abitur mathematics teacher. Create practice tasks and verify mathematically.
 PROCESS: (1) choose f(x) (2) verify f'(x0)=0 (3) check sign f''(x0) (4) only then write.
 ONLY JSON: {"aufgabe":"...","verifikation":{"f_prime":"...","f_prime_at_x0":"...","f_double_prime_at_x0":"...","urteil":"OK"}}
 Write the task in English.`,
   },
   es: {
-    label: "\U0001f1ea\U0001f1f8 ES",
+    label: "ES",
     ui: {
-      title: "Martha \u00b7 Tutor Abitur", subtitle: "NRW Matem\u00e1ticas \u00b7 Tutor\u00eda IA",
+      title: "Martha \u00b7 Tutor Abitur", subtitle: "NRW Matemáticas \u00b7 Tutoría IA",
       ready: "Martha lista", placeholder: "Pregunta a Martha...", back: "\u2190 Volver",
-      tip: "\U0001f4a1 Pista", step: "\U0001f463 Primer paso", solpath: "\U0001f9e0 Procedimiento",
-      solution: "\u2705 Soluci\u00f3n", plot: "\U0001f4c8 Dibujar funci\u00f3n", practice: "\U0001f501 Practicar",
-      difficulty: "DIFICULTAD", easier: "\U0001f7e2 M\u00e1s f\u00e1cil", similar: "\U0001f7e1 Similar", harder: "\U0001f534 M\u00e1s dif\u00edcil",
-      easier_desc: "N\u00fameros m\u00e1s simples, menos pasos.", similar_desc: "Dificultad similar al original.", harder_desc: "Funci\u00f3n m\u00e1s compleja, subtareas adicionales.",
-      generate: "\u2728 Generar", regenerate: "\U0001f504 Regenerar",
-      load_practice: "\U0001f4da Abrir con Martha", load_photo: "\U0001f4da Abrir con Martha",
-      close: "Cerrar", practice_modal_title: "\U0001f501 Generar ejercicio similar",
-      upload_modal_title: "\U0001f4ce Cargar ejercicio", upload_hint: "Haz clic o arrastra archivos aqu\u00ed",
-      upload_sub: "\U0001f4f7 Foto \u00b7 \U0001f4c4 PDF \u00b7 \U0001f4dd Word \u00b7 m\u00e1x 10 archivos",
-      analyzing: "Martha est\u00e1 leyendo el ejercicio...", no_task: "\u26a0\ufe0f No se encontr\u00f3 ning\u00fan ejercicio.",
-      solution_page_title: "Esta es una p\u00e1gina de soluciones", solution_page_hint: "Por favor sube una p\u00e1gina de ejercicios.",
+      tip: "\ud83d\udca1 Pista", step: "\ud83d\udc63 Primer paso", solpath: "\ud83e\udde0 Procedimiento",
+      solution: "\u2705 Solución", plot: "\ud83d\udcc8 Dibujar función", practice: "\ud83d\udd01 Practicar",
+      difficulty: "DIFICULTAD", easier: "\ud83d\udfe2 Más fácil", similar: "\ud83d\udfe1 Similar", harder: "\ud83d\udd34 Más difícil",
+      easier_desc: "Números más simples, menos pasos.", similar_desc: "Dificultad similar al original.", harder_desc: "Función más compleja, subtareas adicionales.",
+      generate: "\u2728 Generar", regenerate: "\ud83d\udd04 Regenerar",
+      load_practice: "\ud83d\udcda Abrir con Martha", load_photo: "\ud83d\udcda Abrir con Martha",
+      close: "Cerrar", practice_modal_title: "\ud83d\udd01 Generar ejercicio similar",
+      upload_modal_title: "\ud83d\udcce Cargar ejercicio", upload_hint: "Haz clic o arrastra archivos aquí",
+      upload_sub: "\ud83d\udcf7 Foto \u00b7 \ud83d\udcc4 PDF \u00b7 \ud83d\udcdd Word \u00b7 máx 10 archivos",
+      analyzing: "Martha está leyendo el ejercicio...", no_task: "\u26a0\ufe0f No se encontró ningún ejercicio.",
+      solution_page_title: "Esta es una página de soluciones", solution_page_hint: "Por favor sube una página de ejercicios.",
       wrong_pin: "PIN incorrecto. Inténtalo de nuevo.",
-      greeting: "\u00a1Hola! \U0001f44b Soy Martha, tu profesora de matem\u00e1ticas.\n\nMira el ejercicio de arriba. \u00bfC\u00f3mo quieres empezar?\nPuedes decirme lo que ya sabes o pedir una \U0001f4a1 pista.",
-      verified: "\u2713 Verificado matem\u00e1ticamente", math_error: "Error matem\u00e1tico detectado, reintentando...",
+      greeting: "¡Hola! \ud83d\udc4b Soy Martha, tu profesora de matemáticas.\n\nMira el ejercicio de arriba. ¿Cómo quieres empezar?\nPuedes decirme lo que ya sabes o pedir una \ud83d\udca1 pista.",
+      verified: "\u2713 Verificado matemáticamente", math_error: "Error matemático, reintentando...",
       all_failed: " intentos fallidos.", all_failed_hint: "Prueba con otro ejercicio o cambia el nivel de dificultad.",
     },
     system: `Eres Martha, una profesora de matemáticas experimentada para el Abitur de NRW.
@@ -316,8 +313,7 @@ MÉTODO: Enseñanza socrática. Primero pregunta qué intentó. NUNCA des la sol
 FÓRMULAS: Siempre LaTeX. Inline $f(x)=x^2$ Display $$f(x)=x^3$$
 COMANDO PLOT: PLOT(expresión, xmin, xmax) en su propia línea.
 IMPORTANTE: Responde SIEMPRE en español.`,
-    practice_system: `Eres Martha, una profesora precisa de matemáticas del Abitur NRW.
-Crea ejercicios y verifica matemáticamente.
+    practice_system: `Eres Martha, una profesora precisa de matemáticas del Abitur NRW. Crea ejercicios y verifica matemáticamente.
 PROCESO: (1) elegir f(x) (2) verificar f'(x0)=0 (3) comprobar signo f''(x0) (4) solo entonces formular.
 SOLO JSON: {"aufgabe":"...","verifikation":{"f_prime":"...","f_prime_at_x0":"...","f_double_prime_at_x0":"...","urteil":"OK"}}
 Escribe el ejercicio en español.`,
@@ -327,7 +323,6 @@ Escribe el ejercicio en español.`,
 let _currentLang = "de";
 function getLang()                 { return LANGUAGES[_currentLang]; }
 function getUI()                   { return getLang().ui; }
-function t(key)                    { return getUI()[key] || key; }
 function getSystemPrompt()         { return getLang().system; }
 function getPracticeSystemPrompt() { return getLang().practice_system; }
 
@@ -349,26 +344,23 @@ function loadSavedLanguage() {
 function applyUILanguage() {
   const ui = getUI();
   const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-  const setph = (id, txt) => { const el = document.getElementById(id); if (el) el.placeholder = txt; };
   set("martha-title", ui.title);       set("martha-subtitle", ui.subtitle);
   set("btn-tip", ui.tip);              set("btn-step", ui.step);
   set("btn-solpath", ui.solpath);      set("btn-sol", ui.solution);
   set("btn-plot", ui.plot);            set("btn-practice", ui.practice);
   set("btn-back", ui.back);
   set("diff-label", ui.difficulty);
-  set("diff-easy", ui.easier);         set("diff-same", ui.similar);   set("diff-hard", ui.harder);
+  set("diff-easy", ui.easier);         set("diff-same", ui.similar);         set("diff-hard", ui.harder);
   set("practice-modal-title", ui.practice_modal_title);
   set("upload-modal-title", ui.upload_modal_title);
   set("uz-txt", ui.upload_hint);       set("uz-sub", ui.upload_sub);
   set("genBtnTxt", ui.generate);
-  const lpb = document.getElementById("loadPracticeBtn"); if (lpb && !lpb.style.display || lpb) { if(lpb) lpb.textContent = ui.load_practice; }
+  const lpb = document.getElementById("loadPracticeBtn"); if (lpb) lpb.textContent = ui.load_practice;
   const lphb = document.getElementById("loadPhotoBtn");   if (lphb) lphb.textContent = ui.load_photo;
-  const cb1 = document.getElementById("practice-close-btn"); if(cb1) cb1.textContent = ui.close;
-  const cb2 = document.getElementById("upload-close-btn");   if(cb2) cb2.textContent = ui.close;
-  setph("mi", ui.placeholder);
+  const mi = document.getElementById("mi");               if (mi) mi.placeholder = ui.placeholder;
   const st = document.getElementById("st");
-  if (st && (st.textContent.includes("bereit") || st.textContent.includes("készen") || st.textContent.includes("ready") || st.textContent.includes("lista"))) {
-    st.textContent = ui.ready + " · " + CONFIG.MODEL;
+  if (st && st.textContent && (st.textContent.includes("bereit") || st.textContent.includes("készen") || st.textContent.includes("ready") || st.textContent.includes("lista"))) {
+    st.textContent = ui.ready + " \u00b7 " + CONFIG.MODEL;
   }
   document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === _currentLang));
   if (typeof currentDifficulty !== "undefined") {
@@ -928,8 +920,8 @@ window._sL = (level, btn) => {
   btn.classList.add("on");
   applyFilters();
 };
-// window._sel is set by chat.js — tasks.js must not import chat.js (circular)
-window._sel = window._sel || ((i) => console.warn("_sel not ready yet, idx:", i));
+// window._sel is set by chat.js — use lazy lookup so it always finds the latest binding
+window._sel = (i) => { if (typeof sel === "function") sel(i); };
 
 
 // ══ chat.js ══

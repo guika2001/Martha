@@ -268,69 +268,18 @@ function esc(s) {
  * Handles patterns like: (1/2)·x³, f(x) = ..., x ∈ ℝ, etc.
  * Returns the string with $...$ wrapped LaTeX expressions.
  */
-function plainMathToLatex(text) {
-  if (!text) return text;
-  let t = text;
 
-  // Already has LaTeX — don't double-process
-  if (t.includes("$")) return t;
-
-  // Protect inline code blocks
-  // Step 1: normalize unicode math chars to ASCII equivalents first
-  t = t.replace(/·/g, "*").replace(/⋅/g, "*");
-  t = t.replace(/−/g, "-").replace(/–/g, "-");
-
-  // Step 2: convert superscripts
-  t = t.replace(/x²/g, "x^2").replace(/x³/g, "x^3").replace(/x⁴/g, "x^4");
-  t = t.replace(/(\w)²/g, "$1^2").replace(/(\w)³/g, "$1^3").replace(/(\w)⁴/g, "$1^4");
-
-  // Step 3: convert f(x) = ... expressions to LaTeX inline
-  // Match: f(x) = <expression>, x ∈ ℝ  or  f(x) = <expression>.
-  t = t.replace(
-    /\b([fghp])\(x\)\s*=\s*([^,.\n]+?)(\s*[,.]|\s*,\s*x\s*∈|\s*$)/gm,
-    (match, fn, expr, tail) => {
-      const latexExpr = exprToLatex(expr.trim());
-      const latexTail = tail.replace(/x\s*∈\s*ℝ/, ", x \\in \\mathbb{R}");
-      return `$${fn}(x) = ${latexExpr}$${latexTail}`;
-    }
-  );
-
-  // Step 4: standalone "x ∈ ℝ"
-  t = t.replace(/\bx\s*∈\s*ℝ\b/g, "$x \\in \\mathbb{R}$");
-  t = t.replace(/\bt\s*∈\s*ℝ\b/g, "$t \\in \\mathbb{R}$");
-
-  // Step 5: "x = <number>" standalone (e.g. "an der Stelle x = 0")
-  t = t.replace(/\bx\s*=\s*(-?\d+(?:[.,]\d+)?)\b/g, "$x = $1$");
-
-  // Step 6: wrap remaining (a/b) fractions not yet in $
-  t = t.replace(/(?<!\$[^$]*)\((\d+)\/(\d+)\)(?![^$]*\$)/g, "$\\frac{$1}{$2}$");
-
-  return t;
-}
-
-/**
- * Convert a plain expression string like "(1/2)*x^3 - (6/28)*x^2"
- * to LaTeX like "\frac{1}{2}x^3 - \frac{6}{28}x^2"
- */
 function exprToLatex(expr) {
   let e = expr;
-  // (a/b) → \frac{a}{b}
   e = e.replace(/\((\d+)\/(\d+)\)/g, "\\frac{$1}{$2}");
-  // bare a/b fractions
   e = e.replace(/\b(\d+)\/(\d+)\b/g, "\\frac{$1}{$2}");
-  // e^(...) → e^{...}  (but keep it readable for KaTeX)
   e = e.replace(/e\^\(([^)]+)\)/g, "e^{$1}");
-  // remove explicit * between number/closing-paren and x
   e = e.replace(/\*x/g, "x");
   e = e.replace(/\*e\^/g, " e^");
   e = e.replace(/(\d)\s*x/g, "$1x");
   return e;
 }
 
-/**
- * Convert plain-text math notation (as found in tasks.json) to LaTeX $...$
- * Only activates when no $ signs are present (avoids double-processing).
- */
 function plainMathToLatex(text) {
   if (!text) return text;
   // Already has LaTeX — don't double-process
@@ -613,7 +562,6 @@ function renderPlotsFromText(text, containerEl, label = "📈 Függvény:") {
 // All network communication with the Groq API proxy.
 // No DOM access here — pure data in, data out.
 
-
 /** Build task context string for the system prompt */
 function buildContext(task) {
   const question = plainMathToLatex(task.question || "Kein Text.");
@@ -631,7 +579,7 @@ function buildContext(task) {
 }
 
 /** Async generator — streams tokens from Groq */
-export async function* streamGroq(messages, taskContext) {
+async function* streamGroq(messages, taskContext) {
   const fullSys = SYSTEM_PROMPT + "\n\n--- AKTUELLE AUFGABE ---\n" + taskContext;
   const msgs = [{ role: "system", content: fullSys }, ...messages];
 
@@ -741,7 +689,6 @@ async function streamToElement({ systemPrompt, userContent, model, targetEl, tem
 // ── tasks.js ─────────────────────────────────────────────────────────────────
 // Task loading, topic/level filtering, and sidebar list rendering.
 
-
 async function init() {
   try {
     const r = await fetch("tasks.json");
@@ -843,7 +790,6 @@ window._sel = window._sel || ((i) => console.warn("_sel not ready yet, idx:", i)
 // ── chat.js ──────────────────────────────────────────────────────────────────
 // Chat panel: task selection, message rendering, streaming responses,
 // and the direct plot-from-task feature.
-
 
 /** Select a task by index — populates the chat panel */
 function sel(i) {
@@ -1048,7 +994,6 @@ window._autoGrow = autoGrow;
 // ── login.js ─────────────────────────────────────────────────────────────────
 // PIN login screen logic. No business logic here, only auth flow.
 
-
 let pinEntry = "";
 
 async function hashPin(pin) {
@@ -1112,7 +1057,6 @@ function initLogin() {
 // ── practice.js ───────────────────────────────────────────────────────────────
 // Practice modal: generates a similar task, verifies it mathematically,
 // then displays the result. Uses a two-step non-streaming API call.
-
 
 let generatedTask = null;
 let currentDifficulty = "same"; // "easy" | "same" | "hard"
@@ -1221,8 +1165,14 @@ async function generatePractice() {
   pb.innerHTML = "";
   const errBox = document.createElement("div");
   errBox.className = "gen-box";
-  errBox.innerHTML = \`<div style="color:var(--amb);font-weight:600;margin-bottom:8px">⚠️ \${MAX_RETRIES} próbálkozás után sem sikerült matematikailag helyes feladatot generálni.</div>
-    <div style="font-size:.82rem;color:var(--tx2)">Próbálj másik feladatot kiválasztani, vagy változtass a nehézségi szinten.</div>\`;
+  const errTitle = document.createElement("div");
+  errTitle.style.cssText = "color:var(--amb);font-weight:600;margin-bottom:8px";
+  errTitle.textContent = "⚠️ " + MAX_RETRIES + " próbálkozás után sem sikerült matematikailag helyes feladatot generálni.";
+  const errHint = document.createElement("div");
+  errHint.style.cssText = "font-size:.82rem;color:var(--tx2)";
+  errHint.textContent = "Próbálj másik feladatot kiválasztani, vagy változz a nehézségi szinten.";
+  errBox.appendChild(errTitle);
+  errBox.appendChild(errHint);
   document.getElementById("practiceContent").style.display = "block";
   pb.appendChild(errBox);
   btn.disabled = false;
@@ -1414,7 +1364,6 @@ window._setDiff = setDifficulty;
 // ── upload.js ─────────────────────────────────────────────────────────────────
 // Upload modal: handles image (vision), PDF (PDF.js), and Word (mammoth.js)
 // task extraction and optional function plotting.
-
 
 // Multi-file state: arrays of file objects ready for processing
 let uploadedFiles = [];     // [{base64, mimeType, name, type, text}]
@@ -1911,17 +1860,11 @@ window._loadExtractedTask = loadExtractedTask;
 
 // ── Startup ──
 initLogin();
-
-// Poll until KaTeX is ready, then flush render queue
-let _katexPoll = 0;
-const _katexTimer = setInterval(() => {
-  _katexPoll++;
-  if (typeof renderMathInElement === "function") {
-    clearInterval(_katexTimer);
-    onKatexReady();
-  } else if (_katexPoll > 80) {
-    clearInterval(_katexTimer);
-  }
+let _kp = 0;
+const _kt = setInterval(() => {
+  _kp++;
+  if (typeof renderMathInElement === "function") { clearInterval(_kt); onKatexReady(); }
+  else if (_kp > 80) clearInterval(_kt);
 }, 100);
 </script>
 </body>

@@ -1083,7 +1083,11 @@ function plotFromTask() {
     const msgDiv = document.createElement('div'); msgDiv.className = 'mg a';
     const bu = document.createElement('div'); bu.className = 'bu';
     const sn = document.createElement('div'); sn.className = 'sn'; sn.textContent = 'MARTHA'; bu.appendChild(sn);
-    const lbl = document.createElement('span'); lbl.textContent = 'f(x) = ' + f.expr + ':'; bu.appendChild(lbl);
+    const lbl = document.createElement('span');
+    lbl.textContent = '$f(x) = ' + f.expr + '$';
+    bu.appendChild(lbl);
+    renderMath(lbl);
+    setTimeout(() => renderMath(lbl), 400);
     msgDiv.appendChild(bu);
     const [xmin, xmax] = guessRange(f.expr);
     const pw = document.createElement('div'); bu.appendChild(pw);
@@ -1496,9 +1500,11 @@ Nur die natürlichsprachlichen Teile übersetzen — Formeln, f(x), x ∈ ℝ et
 
   const finalEl = document.createElement("div");
   finalEl.style.cssText = "line-height:1.9;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)";
-  finalEl.textContent = aufgabe;
+  finalEl.textContent = plainMathToLatex(aufgabe);
   box.appendChild(finalEl);
   renderMath(finalEl);
+  setTimeout(() => renderMath(finalEl), 400);
+  setTimeout(() => renderMath(finalEl), 1000);
 
   generatedTask = {
     task_id: "🔁 Üben · " + (t.task_id || "?"),

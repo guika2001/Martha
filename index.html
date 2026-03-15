@@ -18,7 +18,13 @@
   <div style="text-align:center;width:280px">
     <div style="font-size:2.5rem;margin-bottom:16px">👩‍🏫</div>
     <div style="font-size:1.2rem;font-weight:700;background:linear-gradient(135deg,var(--ac),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">Martha</div>
-    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:28px">Abitur Mathe Tutor · NRW</div>
+    <div style="font-size:.8rem;color:var(--tx2);margin-bottom:16px">Abitur Mathe Tutor · NRW</div>
+    <div style="display:flex;justify-content:center;gap:6px;margin-bottom:24px;flex-wrap:wrap">
+      <button class="lang-btn active" data-lang="de" onclick="window._setLang('de')">🇩🇪 DE</button>
+      <button class="lang-btn" data-lang="hu" onclick="window._setLang('hu')">🇭🇺 HU</button>
+      <button class="lang-btn" data-lang="en" onclick="window._setLang('en')">🇬🇧 EN</button>
+      <button class="lang-btn" data-lang="es" onclick="window._setLang('es')">🇪🇸 ES</button>
+    </div>
     <div id="pin-dots" style="display:flex;justify-content:center;gap:12px;margin-bottom:24px"></div>
     <div id="pin-pad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto"></div>
     <div id="pin-err" style="font-size:.78rem;color:var(--red);margin-top:14px;min-height:20px"></div>
@@ -31,10 +37,24 @@
   <!-- Sidebar -->
   <div class="pl">
     <div class="ph">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
       <h1>Martha · Abitur Tutor</h1>
-      <div class="sub">NRW Mathematik · KI-Nachhilfe</div>
+      <div style="display:flex;gap:3px" id="langPicker">
+        <button class="lang-btn active" data-lang="de" onclick="setLanguage('de')" title="Deutsch">🇩🇪</button>
+        <button class="lang-btn" data-lang="hu" onclick="setLanguage('hu')" title="Magyar">🇭🇺</button>
+        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')" title="English">🇬🇧</button>
+        <button class="lang-btn" data-lang="es" onclick="setLanguage('es')" title="Español">🇪🇸</button>
+      </div>
     </div>
-    <div class="status"><span class="dot" id="sd"></span><span id="st">Verbinde...</span></div>
+    <div class="sub">NRW Mathematik · KI-Nachhilfe</div>
+    </div>
+    <div style="display:flex;gap:5px;padding:8px 16px 0;flex-wrap:wrap">
+    <button class="lang-btn active" data-lang="de" onclick="window._setLang('de')">🇩🇪 DE</button>
+    <button class="lang-btn" data-lang="hu" onclick="window._setLang('hu')">🇭🇺 HU</button>
+    <button class="lang-btn" data-lang="en" onclick="window._setLang('en')">🇬🇧 EN</button>
+    <button class="lang-btn" data-lang="es" onclick="window._setLang('es')">🇪🇸 ES</button>
+  </div>
+  <div class="status"><span class="dot" id="sd"></span><span id="st">Verbinde...</span></div>
     <div class="fr" id="ff"></div>
     <div class="fr">
       <button class="fb on" onclick="window._sL('all',this)">Alle</button>
@@ -47,7 +67,7 @@
   <!-- Chat panel -->
   <div class="pr" id="cp">
     <div class="ch">
-      <button class="bb" onclick="window._goBack()">&#8592; Zurück</button>
+      <button class="bb" id="btn-back" onclick="window._goBack()">← Zurück</button>
       <div>
         <div class="ct" id="cht">Wähle eine Aufgabe</div>
         <div class="cs" id="chs"></div>
@@ -63,12 +83,12 @@
     </div>
 
     <div class="qa" id="qa" style="display:none">
-      <button class="qb" onclick="window._quickSend('Gib mir einen Tipp')">💡 Tipp</button>
-      <button class="qb" onclick="window._quickSend('Was ist der erste Schritt?')">👣 Erster Schritt</button>
-      <button class="qb" onclick="window._quickSend('Erkläre den Lösungsweg')">🧠 Lösungsweg</button>
-      <button class="qb" onclick="window._quickSend('Zeig mir die vollständige Lösung')">✅ Lösung</button>
-      <button class="qb" id="plotBtn" onclick="window._plotFromTask()" style="display:none">📈 Funktion zeichnen</button>
-      <button class="qb" id="practiceBtn" onclick="window._openPracticeModal()" style="display:none">🔁 Üben</button>
+      <button class="qb" id="btn-tip" onclick="window._quickSend(getUI().tip.replace(/^\S+\s/,''))">💡 Tipp</button>
+      <button class="qb" id="btn-step" onclick="window._quickSend(getUI().step.replace(/^\S+\s/,''))">👣 Erster Schritt</button>
+      <button class="qb" id="btn-solpath" onclick="window._quickSend(getUI().solpath.replace(/^\S+\s/,''))">🧠 Lösungsweg</button>
+      <button class="qb" id="btn-sol" onclick="window._quickSend(getUI().solution.replace(/^\S+\s/,''))">✅ Lösung</button>
+      <button class="qb" id="btn-plot" onclick="window._plotFromTask()" style="display:none">📈 Funktion zeichnen</button>
+      <button class="qb" id="btn-practice" onclick="window._openPracticeModal()" style="display:none">🔁 Üben</button>
     </div>
 
     <div class="ci" id="cin" style="display:none">
@@ -86,18 +106,18 @@
      onclick="if(event.target===this)window._closePracticeModal()">
   <div class="modal">
     <div class="mh">
-      <h2>🔁 Hasonló feladat generálása</h2>
-      <button class="mx" onclick="window._closePracticeModal()">✕</button>
+      <h2><span id="practice-modal-title">🔁 Hasonló feladat generálása</span></h2>
+      <button class="mx" id="practice-close-btn" onclick="window._closePracticeModal()">✕</button>
     </div>
     <div class="mb" id="practiceBody">
 
       <!-- Difficulty selector -->
       <div style="margin-bottom:16px">
-        <div style="font-size:.75rem;color:var(--tx3);font-weight:600;margin-bottom:8px;letter-spacing:.04em">NEHÉZSÉG</div>
+        <div id="diff-label" style="font-size:.75rem;color:var(--tx3);font-weight:600;margin-bottom:8px;letter-spacing:.04em">NEHÉZSÉG</div>
         <div style="display:flex;gap:8px">
-          <button class="diff-btn" id="diff-easy"   onclick="window._setDiff('easy')"   title="Egyszerűbb számok, egyértelmű feladatstruktúra">🟢 Könnyebb</button>
-          <button class="diff-btn active" id="diff-same" onclick="window._setDiff('same')" title="Az eredeti feladathoz hasonló nehézség">🟡 Hasonló</button>
-          <button class="diff-btn" id="diff-hard"   onclick="window._setDiff('hard')"   title="Összetettebb függvény, extra részfeladat">🔴 Nehezebb</button>
+          <button class="diff-btn" id="diff-easy"   onclick="window._setDiff('easy')"   title="Egyszerűbb számok, egyértelmű feladatstruktúra" id="diffLabelEasy">🟢 Könnyebb</button>
+          <button class="diff-btn active" id="diff-same" onclick="window._setDiff('same')" title="Az eredeti feladathoz hasonló nehézség" id="diffLabelSame">🟡 Hasonló</button>
+          <button class="diff-btn" id="diff-hard"   onclick="window._setDiff('hard')"   title="Összetettebb függvény, extra részfeladat" id="diffLabelHard">🔴 Nehezebb</button>
         </div>
         <div id="diffDesc" style="font-size:.75rem;color:var(--tx2);margin-top:8px;min-height:16px">
           Az eredeti feladathoz hasonló nehézségű feladatot generál.
@@ -117,8 +137,8 @@
         <span id="genBtnTxt">✨ Generálás</span>
       </button>
       <button class="btn-pri" id="loadPracticeBtn" onclick="window._loadGeneratedTask()"
-        style="display:none;background:var(--grn);color:#000">📚 Betöltés Marthának</button>
-      <button class="btn-sec" onclick="window._closePracticeModal()">Bezárás</button>
+        style="display:none;background:var(--grn);color:#000" id="loadPracticeBtnTxt">📚 Betöltés Marthának</button>
+      <button class="btn-sec" onclick="window._closePracticeModal()" class="btn-close-txt">Bezárás</button>
     </div>
   </div>
 </div>
@@ -128,8 +148,8 @@
      onclick="if(event.target===this)window._closeUploadModal()">
   <div class="modal">
     <div class="mh">
-      <h2>📎 Feladat betöltése</h2>
-      <button class="mx" onclick="window._closeUploadModal()">✕</button>
+      <h2><span id="upload-modal-title">📎 Feladat betöltése</span></h2>
+      <button class="mx" id="upload-close-btn" onclick="window._closeUploadModal()">✕</button>
     </div>
     <div class="mb">
       <div id="uploadZone" class="upload-zone"
@@ -140,8 +160,8 @@
         <input type="file" id="photoInput" accept="image/*,.pdf,.doc,.docx"
                multiple onchange="window._handleFileInput(event)">
         <div class="uz-icon">📎</div>
-        <div class="uz-txt">Kattints vagy húzz ide a fájlokat</div>
-        <div class="uz-sub">📷 Fotó &nbsp;·&nbsp; 📄 PDF &nbsp;·&nbsp; 📝 Word (.docx) &nbsp;·&nbsp; max 10 fájl · 20 MB/fájl</div>
+        <div class="uz-txt" id="uz-txt">Kattints vagy húzz ide a fájlokat</div>
+        <div class="uz-sub" id="uz-sub">📷 Fotó · 📄 PDF · 📝 Word (.docx) · max 10 fájl</div>
       </div>
       <div id="fileQueue" style="display:none;margin-top:10px"></div>
       <div id="fileTypeBadge" style="display:none;margin-top:8px;padding:4px 12px;border-radius:100px;font-size:.75rem;font-weight:600;background:rgba(124,108,255,.15);color:var(--ac);width:fit-content"></div>
@@ -165,9 +185,6 @@
 
 // ══ config.js ══
 // ── config.js ──────────────────────────────────────────────────────────────
-// All static configuration, constants and prompts.
-// Edit this file to change PIN, API URL, model, or system prompt.
-
 const CONFIG = {
   PIN_HASH: "53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0",
   PIN_LEN: 4,
@@ -176,62 +193,191 @@ const CONFIG = {
   VISION_MODEL: "meta-llama/llama-4-scout-17b-16e-instruct",
 };
 
-const SYSTEM_PROMPT = `Du bist Martha, eine erfahrene und geduldige Mathematik-Nachhilfelehrerin fuer das NRW Abitur.
+const LANGUAGES = {
+  de: {
+    label: "\U0001f1e9\U0001f1ea DE",
+    ui: {
+      title: "Martha \u00b7 Abitur Tutor", subtitle: "NRW Mathematik \u00b7 KI-Nachhilfe",
+      ready: "Martha bereit", placeholder: "Frage Martha...", back: "\u2190 Zur\u00fcck",
+      tip: "\U0001f4a1 Tipp", step: "\U0001f463 Erster Schritt", solpath: "\U0001f9e0 L\u00f6sungsweg",
+      solution: "\u2705 L\u00f6sung", plot: "\U0001f4c8 Funktion zeichnen", practice: "\U0001f501 \u00dcben",
+      difficulty: "SCHWIERIGKEITSGRAD", easier: "\U0001f7e2 Leichter", similar: "\U0001f7e1 \u00c4hnlich", harder: "\U0001f534 Schwerer",
+      easier_desc: "Einfachere Zahlen, weniger Schritte.", similar_desc: "\u00c4hnlicher Schwierigkeitsgrad wie das Original.", harder_desc: "Komplexere Funktion, zus\u00e4tzliche Teilaufgaben.",
+      generate: "\u2728 Generieren", regenerate: "\U0001f504 Neu generieren",
+      load_practice: "\U0001f4da Mit Martha \u00f6ffnen", load_photo: "\U0001f4da Mit Martha \u00f6ffnen",
+      close: "Schlie\u00dfen", practice_modal_title: "\U0001f501 \u00c4hnliche Aufgabe generieren",
+      upload_modal_title: "\U0001f4ce Aufgabe hochladen", upload_hint: "Klicken oder Dateien hierher ziehen",
+      upload_sub: "\U0001f4f7 Foto \u00b7 \U0001f4c4 PDF \u00b7 \U0001f4dd Word \u00b7 max 10 Dateien",
+      analyzing: "Martha liest die Aufgabe...", no_task: "\u26a0\ufe0f Keine Mathematikaufgabe gefunden.",
+      solution_page_title: "Das ist eine L\u00f6sungsseite", solution_page_hint: "Bitte eine Aufgabenseite hochladen.",
+      wrong_pin: "Falscher PIN. Versuche es nochmal.",
+      greeting: "Hallo! \U0001f44b Ich bin Martha, deine Mathe-Nachhilfelehrerin.\n\nSchau dir die Aufgabe oben an. Wie m\u00f6chtest du anfangen?\nDu kannst mir sagen, was du schon wei\u00dft, oder einen \U0001f4a1 Tipp verlangen.",
+      verified: "\u2713 Mathematisch verifiziert", math_error: "Mathematischer Fehler, erneuter Versuch...",
+      all_failed: " Versuche ohne Erfolg.", all_failed_hint: "Versuche eine andere Aufgabe oder \u00e4ndere den Schwierigkeitsgrad.",
+    },
+    system: `Du bist Martha, eine erfahrene Mathematik-Nachhilfelehrerin fuer das NRW Abitur.
+METHODE: Sokratisches Lehren. Frage zuerst was der Schueler versucht hat. Gib NIEMALS sofort die Loesung.
+FORMELN: Immer LaTeX. Inline $f(x)=x^2$ Display $$f(x)=x^3$$
+PLOT: PLOT(ausdruck, xmin, xmax) auf eigener Zeile.
+WICHTIG: Antworte IMMER auf Deutsch.`,
+    practice_system: `Du bist Martha, praezise NRW Abitur Mathematiklehrerin.
+Erstelle Uebungsaufgaben und verifiziere mathematisch.
+PROZESS: (1) f(x) waehlen (2) f'(x0)=0 pruefen (3) f''(x0) Vorzeichen pruefen (4) erst dann formulieren.
+NUR JSON: {"aufgabe":"...","verifikation":{"f_prime":"...","f_prime_at_x0":"...","f_double_prime_at_x0":"...","urteil":"OK"}}
+Aufgabe auf Deutsch.`,
+  },
+  hu: {
+    label: "\U0001f1ed\U0001f1fa HU",
+    ui: {
+      title: "Martha \u00b7 \u00c9rettségi Tutor", subtitle: "NRW Matematika \u00b7 AI-korrepet\u00e1l\u00e1s",
+      ready: "Martha k\u00e9szen \u00e1ll", placeholder: "K\u00e9rdezd Marth\u00e1t...", back: "\u2190 Vissza",
+      tip: "\U0001f4a1 Tipp", step: "\U0001f463 Els\u0151 l\u00e9p\u00e9s", solpath: "\U0001f9e0 Megold\u00e1s menete",
+      solution: "\u2705 Megold\u00e1s", plot: "\U0001f4c8 F\u00fcggv\u00e9ny rajzol\u00e1sa", practice: "\U0001f501 Gyakorl\u00e1s",
+      difficulty: "NEH\u00c9ZS\u00c9G", easier: "\U0001f7e2 K\u00f6nnyebb", similar: "\U0001f7e1 Hasonl\u00f3", harder: "\U0001f534 Nehezebb",
+      easier_desc: "Egyszer\u0171bb sz\u00e1mok, kevesebb l\u00e9p\u00e9s.", similar_desc: "Az eredeti feladathoz hasonl\u00f3 neh\u00e9zs\u00e9g.", harder_desc: "\u00d6szetettebb f\u00fcggv\u00e9ny, extra r\u00e9szfeladat.",
+      generate: "\u2728 Gener\u00e1l\u00e1s", regenerate: "\U0001f504 \u00dajra gener\u00e1l\u00e1s",
+      load_practice: "\U0001f4da Bet\u00f6lt\u00e9s Marth\u00e1nak", load_photo: "\U0001f4da Megnyit\u00e1s Marth\u00e1val",
+      close: "Bez\u00e1r\u00e1s", practice_modal_title: "\U0001f501 Hasonl\u00f3 feladat gener\u00e1l\u00e1sa",
+      upload_modal_title: "\U0001f4ce Feladat bet\u00f6lt\u00e9se", upload_hint: "Kattints vagy h\u00fazz ide f\u00e1jlokat",
+      upload_sub: "\U0001f4f7 Fot\u00f3 \u00b7 \U0001f4c4 PDF \u00b7 \U0001f4dd Word \u00b7 max 10 f\u00e1jl",
+      analyzing: "Martha olvassa a feladatot...", no_task: "\u26a0\ufe0f Nem tal\u00e1ltam matematikai feladatot.",
+      solution_page_title: "Ez egy megold\u00e1soldal", solution_page_hint: "K\u00e9rlek egy feladatoldalt t\u00f6lts fel!",
+      wrong_pin: "Hib\u00e1s PIN. Pr\u00f3b\u00e1ld \u00fajra.",
+      greeting: "Szia! \U0001f44b Martha vagyok, a matektanárod.\n\nNézd meg a fenti feladatot. Hogyan szeretnéd elkezdeni?\nMondhatod, mit tudsz már, vagy kérhetsz \U0001f4a1 tippet.",
+      verified: "\u2713 Matematikailag ellen\u0151rz\u00f6tt", math_error: "Matematikai hiba, \u00fajrapr\u00f3b\u00e1l\u00e1s...",
+      all_failed: " pr\u00f3b\u00e1lkoz\u00e1s sikertelen.", all_failed_hint: "Pr\u00f3b\u00e1lj m\u00e1sik feladatot, vagy v\u00e1ltozz a neh\u00e9zs\u00e9gen.",
+    },
+    system: `Te Martha vagy, egy tapasztalt matematika-felkészítő tanár az NRW Abiturhoz.
+MÓDSZER: Szókratészi tanítás. Először kérdezd meg mit próbált. SOHA ne add meg rögtön a megoldást.
+KÉPLETEK: Mindig LaTeX. Inline $f(x)=x^2$ Display $$f(x)=x^3$$
+PLOT PARANCS: PLOT(kifejezés, xmin, xmax) saját sorban.
+FONTOS: MINDIG magyarul válaszolj.`,
+    practice_system: `Te Martha vagy, precíz NRW Abitur matematika tanár.
+Feladatokat generálsz és matematikailag ellenőrzöl.
+FOLYAMAT: (1) f(x) kiválasztása (2) f'(x0)=0 ellenőrzés (3) f''(x0) előjel (4) csak ekkor fogalmazz.
+CSAK JSON: {"aufgabe":"...","verifikation":{"f_prime":"...","f_prime_at_x0":"...","f_double_prime_at_x0":"...","urteil":"OK"}}
+A feladatot magyarul fogalmazd meg.`,
+  },
+  en: {
+    label: "\U0001f1ec\U0001f1e7 EN",
+    ui: {
+      title: "Martha \u00b7 Abitur Tutor", subtitle: "NRW Mathematics \u00b7 AI Tutoring",
+      ready: "Martha ready", placeholder: "Ask Martha...", back: "\u2190 Back",
+      tip: "\U0001f4a1 Hint", step: "\U0001f463 First Step", solpath: "\U0001f9e0 Solution Path",
+      solution: "\u2705 Solution", plot: "\U0001f4c8 Plot Function", practice: "\U0001f501 Practice",
+      difficulty: "DIFFICULTY", easier: "\U0001f7e2 Easier", similar: "\U0001f7e1 Similar", harder: "\U0001f534 Harder",
+      easier_desc: "Simpler numbers, fewer steps.", similar_desc: "Similar difficulty to the original.", harder_desc: "More complex function, extra sub-tasks.",
+      generate: "\u2728 Generate", regenerate: "\U0001f504 Regenerate",
+      load_practice: "\U0001f4da Open with Martha", load_photo: "\U0001f4da Open with Martha",
+      close: "Close", practice_modal_title: "\U0001f501 Generate Similar Task",
+      upload_modal_title: "\U0001f4ce Upload Task", upload_hint: "Click or drag files here",
+      upload_sub: "\U0001f4f7 Photo \u00b7 \U0001f4c4 PDF \u00b7 \U0001f4dd Word \u00b7 max 10 files",
+      analyzing: "Martha is reading the task...", no_task: "\u26a0\ufe0f No math task found.",
+      solution_page_title: "This is a solutions page", solution_page_hint: "Please upload a task page instead.",
+      wrong_pin: "Wrong PIN. Please try again.",
+      greeting: "Hello! \U0001f44b I'm Martha, your math tutor.\n\nTake a look at the task above. How would you like to start?\nYou can tell me what you already know, or ask for a \U0001f4a1 hint.",
+      verified: "\u2713 Mathematically verified", math_error: "Math error detected, retrying...",
+      all_failed: " attempts failed.", all_failed_hint: "Try a different task or change the difficulty level.",
+    },
+    system: `You are Martha, an experienced mathematics tutor for the NRW Abitur exam.
+METHOD: Socratic teaching. First ask what the student tried. NEVER give the complete solution immediately.
+FORMULAS: Always LaTeX. Inline $f(x)=x^2$ Display $$f(x)=x^3$$
+PLOT COMMAND: PLOT(expression, xmin, xmax) on its own line.
+IMPORTANT: ALWAYS respond in English.`,
+    practice_system: `You are Martha, a precise NRW Abitur mathematics teacher.
+Create practice tasks and verify mathematically.
+PROCESS: (1) choose f(x) (2) verify f'(x0)=0 (3) check sign f''(x0) (4) only then write.
+ONLY JSON: {"aufgabe":"...","verifikation":{"f_prime":"...","f_prime_at_x0":"...","f_double_prime_at_x0":"...","urteil":"OK"}}
+Write the task in English.`,
+  },
+  es: {
+    label: "\U0001f1ea\U0001f1f8 ES",
+    ui: {
+      title: "Martha \u00b7 Tutor Abitur", subtitle: "NRW Matem\u00e1ticas \u00b7 Tutor\u00eda IA",
+      ready: "Martha lista", placeholder: "Pregunta a Martha...", back: "\u2190 Volver",
+      tip: "\U0001f4a1 Pista", step: "\U0001f463 Primer paso", solpath: "\U0001f9e0 Procedimiento",
+      solution: "\u2705 Soluci\u00f3n", plot: "\U0001f4c8 Dibujar funci\u00f3n", practice: "\U0001f501 Practicar",
+      difficulty: "DIFICULTAD", easier: "\U0001f7e2 M\u00e1s f\u00e1cil", similar: "\U0001f7e1 Similar", harder: "\U0001f534 M\u00e1s dif\u00edcil",
+      easier_desc: "N\u00fameros m\u00e1s simples, menos pasos.", similar_desc: "Dificultad similar al original.", harder_desc: "Funci\u00f3n m\u00e1s compleja, subtareas adicionales.",
+      generate: "\u2728 Generar", regenerate: "\U0001f504 Regenerar",
+      load_practice: "\U0001f4da Abrir con Martha", load_photo: "\U0001f4da Abrir con Martha",
+      close: "Cerrar", practice_modal_title: "\U0001f501 Generar ejercicio similar",
+      upload_modal_title: "\U0001f4ce Cargar ejercicio", upload_hint: "Haz clic o arrastra archivos aqu\u00ed",
+      upload_sub: "\U0001f4f7 Foto \u00b7 \U0001f4c4 PDF \u00b7 \U0001f4dd Word \u00b7 m\u00e1x 10 archivos",
+      analyzing: "Martha est\u00e1 leyendo el ejercicio...", no_task: "\u26a0\ufe0f No se encontr\u00f3 ning\u00fan ejercicio.",
+      solution_page_title: "Esta es una p\u00e1gina de soluciones", solution_page_hint: "Por favor sube una p\u00e1gina de ejercicios.",
+      wrong_pin: "PIN incorrecto. Inténtalo de nuevo.",
+      greeting: "\u00a1Hola! \U0001f44b Soy Martha, tu profesora de matem\u00e1ticas.\n\nMira el ejercicio de arriba. \u00bfC\u00f3mo quieres empezar?\nPuedes decirme lo que ya sabes o pedir una \U0001f4a1 pista.",
+      verified: "\u2713 Verificado matem\u00e1ticamente", math_error: "Error matem\u00e1tico detectado, reintentando...",
+      all_failed: " intentos fallidos.", all_failed_hint: "Prueba con otro ejercicio o cambia el nivel de dificultad.",
+    },
+    system: `Eres Martha, una profesora de matemáticas experimentada para el Abitur de NRW.
+MÉTODO: Enseñanza socrática. Primero pregunta qué intentó. NUNCA des la solución inmediatamente.
+FÓRMULAS: Siempre LaTeX. Inline $f(x)=x^2$ Display $$f(x)=x^3$$
+COMANDO PLOT: PLOT(expresión, xmin, xmax) en su propia línea.
+IMPORTANTE: Responde SIEMPRE en español.`,
+    practice_system: `Eres Martha, una profesora precisa de matemáticas del Abitur NRW.
+Crea ejercicios y verifica matemáticamente.
+PROCESO: (1) elegir f(x) (2) verificar f'(x0)=0 (3) comprobar signo f''(x0) (4) solo entonces formular.
+SOLO JSON: {"aufgabe":"...","verifikation":{"f_prime":"...","f_prime_at_x0":"...","f_double_prime_at_x0":"...","urteil":"OK"}}
+Escribe el ejercicio en español.`,
+  },
+};
 
-DEIN NAME: Martha. Stelle dich beim ersten Kontakt kurz vor.
+let _currentLang = "de";
+function getLang()                 { return LANGUAGES[_currentLang]; }
+function getUI()                   { return getLang().ui; }
+function t(key)                    { return getUI()[key] || key; }
+function getSystemPrompt()         { return getLang().system; }
+function getPracticeSystemPrompt() { return getLang().practice_system; }
 
-DEINE METHODE - SOKRATISCHES LEHREN:
-1. Frage zuerst, was der Schueler bereits versucht hat
-2. Gib NIEMALS sofort die komplette Loesung
-3. Stelle gezielte Gegenfragen, die zum naechsten Schritt fuehren
-4. Erklaere Konzepte mit einfachen Beispielen und Analogien
-5. Lobe Fortschritte, auch kleine
-6. Wenn der Schueler komplett feststeckt: gib einen konkreten ersten Schritt
-
-MATHEMATISCHE FORMELN - WICHTIG:
-- Schreibe ALLE Formeln in LaTeX-Notation mit Dollar-Zeichen
-- Inline: $f(x) = x^2$ oder $\\int_0^1 f(x)\\,dx$
-- Display (eigene Zeile): $$f(x) = 4000 \\cdot x \\cdot e^{-0{,}4x}$$
-- NIEMALS Formeln als Klartext schreiben — IMMER LaTeX!
-
-FUNKTIONEN ZEICHNEN:
-Wenn der Schueler dich bittet eine Funktion zu zeichnen, schreibe GENAU:
-PLOT(ausdruck, xmin, xmax)
-
-Beispiele:
-PLOT((2*x^2-1)*exp(2*x), -2, 2)
-PLOT(4000*x*exp(-0.4*x), 0, 20)
-PLOT(x^3-3*x, -3, 3)
-
-Regeln: * fuer Multiplikation, exp() fuer e^x, ^ fuer Potenzen.
-Schreibe PLOT in eine eigene Zeile. Danach erklaere den Graph.
-
-ABBILDUNGEN: Wenn eine Aufgabe auf eine Abbildung verweist die nicht verfuegbar ist,
-sage das dem Schueler und biete an die Funktion zu zeichnen.
-
-WICHTIG: Antworte IMMER auf Deutsch. Halte Antworten fokussiert und nicht zu lang.`;
-
-const PRACTICE_SYSTEM_PROMPT = `Du bist Martha, eine praezise NRW Abitur Mathematiklehrerin.
-Du erstellst Uebungsaufgaben und verifizierst sie mathematisch, bevor du sie ausgibst.
-
-PROZESS (intern, vor jeder Ausgabe):
-1. Waehle die Funktion f(x) gemaess den Vorgaben.
-2. Berechne f'(x) symbolisch.
-3. Setze x=x0 ein: Ist f'(x0) = 0? Falls nicht → andere Koeffizienten waehlen.
-4. Berechne f''(x0): Vorzeichen pruefen (>0 Tiefpunkt, <0 Hochpunkt, =0 kein Test).
-5. Nur wenn Schritte 3 UND 4 bestaetigt: Aufgabentext formulieren.
-6. Loesung intern durchrechnen — Ergebnis als Verifikation.
-
-Antworte AUSSCHLIESSLICH mit einem JSON-Objekt (kein Markdown, kein Praefix):
-{
-  "aufgabe": "<vollstaendiger Aufgabentext mit LaTeX-Formeln>",
-  "verifikation": {
-    "f_prime": "<f'(x) als LaTeX>",
-    "f_prime_at_x0": "<berechneter Wert — muss 0 sein>",
-    "f_double_prime_at_x0": "<berechneter Wert und Vorzeichen>",
-    "urteil": "OK" oder "FEHLER: <Grund>"
+function setLanguage(code) {
+  if (!LANGUAGES[code]) return;
+  _currentLang = code;
+  try { localStorage.setItem("martha_lang", code); } catch(_) {}
+  applyUILanguage();
+  if (typeof state !== "undefined" && state.selectedIdx >= 0) {
+    state.history[state.selectedIdx] = [];
+    if (typeof renderChat === "function") renderChat(state.selectedIdx);
   }
-}`;
+}
+
+function loadSavedLanguage() {
+  try { const s = localStorage.getItem("martha_lang"); if (s && LANGUAGES[s]) _currentLang = s; } catch(_) {}
+}
+
+function applyUILanguage() {
+  const ui = getUI();
+  const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  const setph = (id, txt) => { const el = document.getElementById(id); if (el) el.placeholder = txt; };
+  set("martha-title", ui.title);       set("martha-subtitle", ui.subtitle);
+  set("btn-tip", ui.tip);              set("btn-step", ui.step);
+  set("btn-solpath", ui.solpath);      set("btn-sol", ui.solution);
+  set("btn-plot", ui.plot);            set("btn-practice", ui.practice);
+  set("btn-back", ui.back);
+  set("diff-label", ui.difficulty);
+  set("diff-easy", ui.easier);         set("diff-same", ui.similar);   set("diff-hard", ui.harder);
+  set("practice-modal-title", ui.practice_modal_title);
+  set("upload-modal-title", ui.upload_modal_title);
+  set("uz-txt", ui.upload_hint);       set("uz-sub", ui.upload_sub);
+  set("genBtnTxt", ui.generate);
+  const lpb = document.getElementById("loadPracticeBtn"); if (lpb && !lpb.style.display || lpb) { if(lpb) lpb.textContent = ui.load_practice; }
+  const lphb = document.getElementById("loadPhotoBtn");   if (lphb) lphb.textContent = ui.load_photo;
+  const cb1 = document.getElementById("practice-close-btn"); if(cb1) cb1.textContent = ui.close;
+  const cb2 = document.getElementById("upload-close-btn");   if(cb2) cb2.textContent = ui.close;
+  setph("mi", ui.placeholder);
+  const st = document.getElementById("st");
+  if (st && (st.textContent.includes("bereit") || st.textContent.includes("készen") || st.textContent.includes("ready") || st.textContent.includes("lista"))) {
+    st.textContent = ui.ready + " · " + CONFIG.MODEL;
+  }
+  document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === _currentLang));
+  if (typeof currentDifficulty !== "undefined") {
+    const descs = { easy: ui.easier_desc, same: ui.similar_desc, hard: ui.harder_desc };
+    set("diffDesc", descs[currentDifficulty] || ui.similar_desc);
+  }
+}
+
+window._setLang = setLanguage;
 
 
 // ══ state.js ══
@@ -580,7 +726,7 @@ function buildContext(task) {
 
 /** Async generator — streams tokens from Groq */
 async function* streamGroq(messages, taskContext) {
-  const fullSys = SYSTEM_PROMPT + "\n\n--- AKTUELLE AUFGABE ---\n" + taskContext;
+  const fullSys = getSystemPrompt() + "\n\n--- AKTUELLE AUFGABE ---\n" + taskContext;
   const msgs = [{ role: "system", content: fullSys }, ...messages];
 
   const resp = await fetch(CONFIG.API_URL, {
@@ -844,11 +990,11 @@ function renderChat(i) {
 
   const q = (t.question || "").toLowerCase();
   if (q.includes("abbildung") || q.includes("dargestellt") || q.includes("histogramm")) {
-    html += `<div class="abw">⚠️ Diese Aufgabe verweist auf eine Abbildung. Klicke 📈 um die Funktion zu zeichnen.</div>`;
+    html += `<div class="abw">⚠️ Diese Aufgabe verweist auf eine Abbildung / This task refers to a figure. Click 📈</div>`;
   }
 
   if (!h.length) {
-    html += `<div class="mg a"><div class="bu"><div class="sn">MARTHA</div>Hallo! 👋 Ich bin Martha, deine Mathe-Nachhilfelehrerin.\n\nSchau dir die Aufgabe oben an. Wie möchtest du anfangen?\nDu kannst mir sagen, was du schon weißt, oder einen 💡 Tipp verlangen.</div></div>`;
+    html += `<div class="mg a"><div class="bu"><div class="sn">MARTHA</div>${esc(t("greeting"))}</div></div>`;
   }
 
   h.forEach((m, idx) => {
@@ -906,9 +1052,16 @@ function plotFromTask() {
   renderMath(el);
 }
 
-/** Send a quick-action message */
-function quickSend(text) {
-  document.getElementById("mi").value = text;
+/** Send a quick-action message — accepts a key or literal text */
+function quickSend(keyOrText) {
+  const ui = getUI();
+  const map = {
+    tip: ui.tip.replace(/^[^\w]+/, '').trim() || 'Gib mir einen Tipp',
+    step: ui.step.replace(/^[^\w]+/, '').trim() || 'Was ist der erste Schritt?',
+    solpath: ui.solution_path.replace(/^[^\w]+/, '').trim() || 'Erkläre den Lösungsweg',
+    sol: ui.solution.replace(/^[^\w]+/, '').trim() || 'Zeig mir die vollständige Lösung',
+  };
+  document.getElementById("mi").value = map[keyOrText] || keyOrText;
   sendMessage();
 }
 
@@ -985,6 +1138,7 @@ window._sel = sel;
 window._goBack = goBack;
 window._plotFromTask = plotFromTask;
 window._quickSend = quickSend;
+window._quickSendTip = () => quickSend(getUI().tip.replace(/^\S+\s/, ''));
 window._sendMessage = sendMessage;
 window._handleKeydown = handleKeydown;
 window._autoGrow = autoGrow;
@@ -1039,7 +1193,7 @@ async function tryPin(pin) {
     init();
   } else {
     pinEntry = "";
-    document.getElementById("pin-err").textContent = "Falscher PIN. Versuche es nochmal.";
+    document.getElementById("pin-err").textContent = getUI().wrong_pin;
     document.querySelectorAll(".pin-dot").forEach(d => d.classList.add("wrong"));
     setTimeout(() => {
       document.getElementById("pin-err").textContent = "";
@@ -1049,6 +1203,8 @@ async function tryPin(pin) {
 }
 
 function initLogin() {
+  loadSavedLanguage();
+  applyUILanguage();
   renderPinPad();
 }
 
@@ -1108,7 +1264,7 @@ function setDifficulty(level) {
   ["easy", "same", "hard"].forEach(l => {
     document.getElementById(`diff-${l}`).classList.toggle("active", l === level);
   });
-  document.getElementById("diffDesc").textContent = DIFF_CONFIG[level].desc;
+  document.getElementById("diffDesc").textContent = ({"easy": getUI().easier_desc, "same": getUI().similar_desc, "hard": getUI().harder_desc}[level]) || "";
   // Reset generated content when difficulty changes
   generatedTask = null;
   document.getElementById("practiceContent").style.display = "none";
@@ -1126,7 +1282,7 @@ function openPracticeModal() {
   ["easy","same","hard"].forEach(l =>
     document.getElementById(`diff-${l}`).classList.toggle("active", l === "same")
   );
-  document.getElementById("diffDesc").textContent = DIFF_CONFIG["same"].desc;
+  document.getElementById("diffDesc").textContent = getUI().similar_desc || "";
   document.getElementById("practiceContent").style.display = "none";
   document.getElementById("practicePlaceholder").style.display = "block";
   document.getElementById("loadPracticeBtn").style.display = "none";
@@ -1279,7 +1435,7 @@ NIEMALS falsche Extremstelle behaupten.`;
   statusEl.style.cssText = "color:var(--tx3);font-size:.8rem;margin-bottom:10px";
   statusEl.textContent = attempt > 1
     ? `⚙️ Újrapróbálás (${attempt}/${MAX_RETRIES})...`
-    : "⚙️ Generálás és matematikai ellenőrzés...";
+    : "⚙️ " + ui("generate") + "...";
   box.appendChild(statusEl);
 
   document.getElementById("practiceContent").style.display = "block";
@@ -1292,7 +1448,7 @@ NIEMALS falsche Extremstelle behaupten.`;
   let rawJSON = "";
   try {
     rawJSON = await callGroq({
-      systemPrompt: PRACTICE_SYSTEM_PROMPT,
+      systemPrompt: getPracticeSystemPrompt(),
       userPrompt,
       temperature: 0.7,
       maxTokens: 900,
@@ -1342,7 +1498,7 @@ NIEMALS falsche Extremstelle behaupten.`;
     points: t.points, question: aufgabe, expected_answer: "",
   };
   document.getElementById("loadPracticeBtn").style.display = "inline-flex";
-  btn.disabled = false; btnTxt.textContent = "🔄 Újra generálás";
+  btn.disabled = false; btnTxt.textContent = "🔄 " + ui("generate");
   return true; // success
 }
 
@@ -1607,7 +1763,7 @@ async function analyzeUpload() {
 
   const resultEl = _el("photoResult");
   resultEl.style.display = "block";
-  resultEl.textContent = "Martha olvassa a feladatot...";
+  resultEl.textContent = t("analyzing");
   _el("loadPhotoBtn").style.display = "none";
 
   const sysMsg = "Du bist Martha, eine NRW Abitur Mathematiklehrerin. Antworte auf Deutsch.";
@@ -1675,7 +1831,7 @@ async function analyzeUpload() {
       Kérlek egy <strong>feladatoldalt</strong> tölts fel!</div>
     </div>`;
   } else if (full.includes("KEIN_AUFGABE")) {
-    resultEl.textContent = "⚠️ Nem találtam matematikai feladatot ebben a fájlban.";
+    resultEl.textContent = t("no_task");
   }
 
   btn.disabled = false; btnTxt.textContent = "🔄 Újra";
@@ -1859,6 +2015,8 @@ window._loadExtractedTask = loadExtractedTask;
 
 
 // ── Startup ──
+loadSavedLanguage();
+applyUILanguage();
 initLogin();
 let _kp = 0;
 const _kt = setInterval(() => {

@@ -97,3 +97,11 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
 .diff-btn#diff-easy.active{border-color:#34d399;color:#34d399;background:rgba(52,211,153,.12);opacity:1;font-weight:700;box-shadow:0 0 0 1px #34d399}
 .diff-btn#diff-same.active{border-color:#fbbf24;color:#fbbf24;background:rgba(251,191,36,.12);opacity:1;font-weight:700;box-shadow:0 0 0 1px #fbbf24}
 .diff-btn#diff-hard.active{border-color:#f87171;color:#f87171;background:rgba(248,113,113,.12);opacity:1;font-weight:700;box-shadow:0 0 0 1px #f87171}
+
+.lang-btn{padding:5px 8px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);font-size:.82rem;cursor:pointer;transition:all .15s;opacity:.55}
+.lang-btn:hover{opacity:.85;border-color:var(--tx2);color:var(--tx)}
+.lang-btn.active{opacity:1;background:rgba(124,108,255,.15);border-color:var(--ac);color:var(--tx);font-weight:700}
+
+.lang-btn{padding:4px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--tx3);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s}
+.lang-btn:hover{border-color:var(--tx2);color:var(--tx)}
+.lang-btn.active{background:var(--ac2);color:#fff;border-color:var(--ac2)}

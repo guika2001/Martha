@@ -4,7 +4,6 @@
 import { CONFIG } from "./config.js";
 import { state } from "./state.js";
 import { esc } from "./math.js";
-import { sel } from "./chat.js";
 
 export async function init() {
   try {
@@ -99,4 +98,5 @@ window._sL = (level, btn) => {
   btn.classList.add("on");
   applyFilters();
 };
-window._sel = (i) => sel(i);
+// window._sel is set by chat.js — tasks.js must not import chat.js (circular)
+window._sel = window._sel || ((i) => console.warn("_sel not ready yet, idx:", i));

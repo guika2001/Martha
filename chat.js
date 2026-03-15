@@ -197,6 +197,7 @@ export function autoGrow(el) {
 }
 
 // Expose to inline HTML handlers
+window._sel = sel;
 window._goBack = goBack;
 window._plotFromTask = plotFromTask;
 window._quickSend = quickSend;

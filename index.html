@@ -5,111 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Martha · Abitur Mathe Tutor</title>
+<link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs" type="module" id="pdfjs-cdn"></script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0c0d12;--s1:#14161e;--s2:#1c1f2b;--s3:#252938;--bd:#2a2e40;--tx:#e4e6ef;--tx2:#7c82a0;--tx3:#555a73;--ac:#7c6cff;--ac2:#635bff;--grn:#34d399;--amb:#fbbf24;--red:#f87171;--blu:#60a5fa;--r:14px;--f:-apple-system,"SF Pro Text",system-ui,sans-serif}
-html{font-family:var(--f);font-size:16px;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased;height:100%}
-body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.app{display:flex;height:100%}
-.pl{width:340px;min-width:340px;border-right:1px solid var(--bd);display:flex;flex-direction:column;background:var(--s1)}
-.ph{padding:18px 16px 12px;border-bottom:1px solid var(--bd)}
-.ph h1{font-size:1.15rem;font-weight:700;background:linear-gradient(135deg,var(--ac),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.ph .sub{font-size:.75rem;color:var(--tx2);margin-top:2px}
-.status{padding:6px 16px;background:var(--s2);font-size:.7rem;color:var(--tx3);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--red)}.dot.ok{background:var(--grn)}
-.fr{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;border-bottom:1px solid var(--bd);scrollbar-width:none}.fr::-webkit-scrollbar{display:none}
-.fb{flex-shrink:0;padding:6px 14px;border-radius:100px;border:1px solid var(--bd);background:0;color:var(--tx2);font-size:.78rem;font-weight:500;cursor:pointer}
-.fb.on{background:var(--ac2);color:#fff;border-color:var(--ac2)}
-.ts{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.ti{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s}
-.ti:active,.ti.sel{background:var(--s2)}.ti.sel{border-left:3px solid var(--ac)}
-.tic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
-.tic.an{background:rgba(96,165,250,.12);color:var(--blu)}
-.tic.st{background:rgba(251,191,36,.12);color:var(--amb)}
-.tic.ge{background:rgba(52,211,153,.12);color:var(--grn)}
-.tic.al{background:rgba(248,113,113,.12);color:var(--red)}
-.tit{flex:1;min-width:0}.tit .n{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tit .m{font-size:.7rem;color:var(--tx2);margin-top:1px}
-.tip{font-size:.7rem;color:var(--tx3);font-weight:600;padding:3px 8px;background:var(--s3);border-radius:6px}
-.pr{flex:1;display:flex;flex-direction:column;background:var(--bg)}
-.ch{padding:14px 20px;border-bottom:1px solid var(--bd);background:var(--s1);display:flex;align-items:center;gap:10px}
-.ch .ct{font-size:.95rem;font-weight:700;flex:1}.ch .cs{font-size:.75rem;color:var(--tx2)}
-.cm{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
-.mg{max-width:85%;margin-bottom:16px;animation:mi .25s ease-out}
-@keyframes mi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.mg.u{margin-left:auto}.mg.u .bu{background:var(--ac2);color:#fff;border-radius:var(--r) var(--r) 4px var(--r);padding:12px 16px;font-size:.9rem;line-height:1.55}
-.mg.a .bu{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r) var(--r) var(--r) 4px;padding:14px 16px;font-size:.9rem;line-height:1.65;white-space:pre-wrap}
-.mg.a .sn{font-size:.7rem;color:var(--ac);font-weight:600;margin-bottom:6px;letter-spacing:.03em}
-.mg.s .bu{background:var(--s1);border:1px dashed var(--bd);border-radius:var(--r);padding:14px 16px;font-size:.85rem;color:var(--tx2);line-height:1.6;max-width:100%}
-.tp{display:inline-flex;gap:4px;padding:4px 0}
-.tp span{width:7px;height:7px;background:var(--tx3);border-radius:50%;animation:bl 1.4s infinite}
-.tp span:nth-child(2){animation-delay:.2s}.tp span:nth-child(3){animation-delay:.4s}
-@keyframes bl{0%,80%,100%{opacity:.3}40%{opacity:1}}
-.qa{display:flex;gap:6px;padding:8px 16px 0;flex-wrap:wrap}
-.qb{padding:7px 14px;border-radius:100px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);font-size:.78rem;cursor:pointer}
-.qb:active{background:var(--s3);color:var(--tx)}
-.ci{padding:12px 16px;border-top:1px solid var(--bd);background:var(--s1);display:flex;gap:10px;align-items:flex-end}
-.ci textarea{flex:1;resize:none;border:1px solid var(--bd);border-radius:12px;background:var(--s2);color:var(--tx);padding:12px 14px;font-size:.9rem;font-family:var(--f);line-height:1.4;max-height:120px;outline:0}
-.ci textarea::placeholder{color:var(--tx3)}.ci textarea:focus{border-color:var(--ac)}
-.sb{width:44px;height:44px;border-radius:12px;border:0;background:var(--ac2);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb:disabled{opacity:.4}.sb:active:not(:disabled){transform:scale(.95)}
-.ec{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;color:var(--tx2)}
-.ec .ei{font-size:3rem;margin-bottom:12px}.ec .et{font-size:1.1rem;font-weight:600;color:var(--tx)}
-.ec .ed{font-size:.85rem;margin-top:6px;max-width:300px}
-.bb{display:none;background:0;border:0;color:var(--ac);font-size:.85rem;font-weight:600;cursor:pointer;padding:0}
-@media(max-width:800px){.pl{width:100%;min-width:100%}.pr{display:none;width:100%}.app.co .pl{display:none}.app.co .pr{display:flex}.bb{display:inline-flex!important}}
-.pbox{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:8px;margin:10px 0 4px;max-width:320px}
-.pbox canvas{width:100%;height:auto;border-radius:6px;display:block}
-.plbl{font-size:.72rem;color:var(--tx3);margin-top:6px;text-align:center}
-.katex{font-size:.95em!important}.katex-display{margin:10px 0!important;overflow-x:auto}
-.abw{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:8px 12px;font-size:.78rem;color:var(--amb);margin:8px 0}
-.pin-key{width:100%;aspect-ratio:1.3;border-radius:12px;border:1px solid var(--bd);background:var(--s2);color:var(--tx);font-size:1.3rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;-webkit-user-select:none;user-select:none}
-.pin-key:active{background:var(--ac2);color:#fff;transform:scale(.95)}
-.pin-key.del{font-size:.85rem;color:var(--tx2)}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bd);transition:all .2s}
-.pin-dot.filled{background:var(--ac);border-color:var(--ac)}
-.pin-dot.wrong{border-color:var(--red);animation:shake .4s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-
-/* ── MODAL ── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;animation:mfade .2s ease-out}
-@keyframes mfade{from{opacity:0}to{opacity:1}}
-.modal{background:var(--s1);border:1px solid var(--bd);border-radius:20px;width:100%;max-width:560px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;animation:mslide .25s ease-out}
-@keyframes mslide{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.mh{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--bd)}
-.mh h2{font-size:1rem;font-weight:700}
-.mx{width:32px;height:32px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.mx:active{background:var(--s3)}
-.mb{flex:1;overflow-y:auto;padding:20px;min-height:0}
-.mf{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:10px;flex-wrap:wrap}
-.btn-pri{padding:10px 20px;border-radius:10px;border:0;background:var(--ac2);color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
-.btn-pri:active{opacity:.85}.btn-pri:disabled{opacity:.4;cursor:not-allowed}
-.btn-sec{padding:10px 20px;border-radius:10px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);font-size:.88rem;font-weight:600;cursor:pointer}
-.btn-sec:active{background:var(--s3)}
-.gen-box{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:16px;font-size:.88rem;line-height:1.7;color:var(--tx);white-space:pre-wrap;min-height:80px}
-.gen-tag{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.72rem;font-weight:600;background:rgba(124,108,255,.15);color:var(--ac);margin-bottom:10px}
-/* photo upload zone */
-.upload-zone{border:2px dashed var(--bd);border-radius:14px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--ac);background:rgba(124,108,255,.06)}
-.upload-zone input{display:none}
-.uz-icon{font-size:2.2rem;margin-bottom:10px}
-.uz-txt{font-size:.88rem;color:var(--tx2)}
-.uz-sub{font-size:.75rem;color:var(--tx3);margin-top:4px}
-.img-preview{width:100%;border-radius:10px;max-height:220px;object-fit:contain;margin-bottom:12px;display:block}
-.photo-result{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;font-size:.88rem;line-height:1.65;color:var(--tx);white-space:pre-wrap;margin-top:12px;max-height:none}
-.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-</style>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js" defer></script>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- ── LOGIN ── -->
 <div id="login" style="display:flex;align-items:center;justify-content:center;height:100dvh;background:var(--bg)">
   <div style="text-align:center;width:280px">
     <div style="font-size:2.5rem;margin-bottom:16px">👩‍🏫</div>
@@ -121,1171 +26,144 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
   </div>
 </div>
 
-<!-- APP (hidden until login) -->
+<!-- ── APP ── -->
 <div class="app" id="app" style="display:none">
-<div class="pl">
-  <div class="ph">
-    <h1>Martha · Abitur Tutor</h1>
-    <div class="sub">NRW Mathematik · KI-Nachhilfe</div>
+
+  <!-- Sidebar -->
+  <div class="pl">
+    <div class="ph">
+      <h1>Martha · Abitur Tutor</h1>
+      <div class="sub">NRW Mathematik · KI-Nachhilfe</div>
+    </div>
+    <div class="status"><span class="dot" id="sd"></span><span id="st">Verbinde...</span></div>
+    <div class="fr" id="ff"></div>
+    <div class="fr">
+      <button class="fb on" onclick="window._sL('all',this)">Alle</button>
+      <button class="fb" onclick="window._sL('GK',this)">GK</button>
+      <button class="fb" onclick="window._sL('LK',this)">LK</button>
+    </div>
+    <div class="ts" id="tl"></div>
   </div>
-  <div class="status"><span class="dot" id="sd"></span><span id="st">Verbinde...</span></div>
-  <div class="fr" id="ff"></div>
-  <div class="fr">
-    <button class="fb on" onclick="sL('all',this)">Alle</button>
-    <button class="fb" onclick="sL('GK',this)">GK</button>
-    <button class="fb" onclick="sL('LK',this)">LK</button>
-  </div>
-  <div class="ts" id="tl"></div>
-</div>
-<div class="pr" id="cp">
-  <div class="ch">
-    <button class="bb" onclick="gB()">&#8592; Zurück</button>
-    <div>
-      <div class="ct" id="cht">Wähle eine Aufgabe</div>
-      <div class="cs" id="chs"></div>
+
+  <!-- Chat panel -->
+  <div class="pr" id="cp">
+    <div class="ch">
+      <button class="bb" onclick="window._goBack()">&#8592; Zurück</button>
+      <div>
+        <div class="ct" id="cht">Wähle eine Aufgabe</div>
+        <div class="cs" id="chs"></div>
+      </div>
     </div>
 
-  </div>
-  <div class="cm" id="cms">
-    <div class="ec">
-      <div class="ei">👩‍🏫</div>
-      <div class="et">Hallo, ich bin Martha!</div>
-      <div class="ed">Wähle links eine Aufgabe — ich erkläre dir Schritt für Schritt.</div>
+    <div class="cm" id="cms">
+      <div class="ec">
+        <div class="ei">👩‍🏫</div>
+        <div class="et">Hallo, ich bin Martha!</div>
+        <div class="ed">Wähle links eine Aufgabe — ich erkläre dir Schritt für Schritt.</div>
+      </div>
     </div>
-  </div>
-  <div class="qa" id="qa" style="display:none">
-    <button class="qb" onclick="sQ('Gib mir einen Tipp')">💡 Tipp</button>
-    <button class="qb" onclick="sQ('Was ist der erste Schritt?')">👣 Erster Schritt</button>
-    <button class="qb" onclick="sQ('Erkläre den Lösungsweg')">🧠 Lösungsweg</button>
-    <button class="qb" onclick="sQ('Zeig mir die vollständige Lösung')">✅ Lösung</button>
-    <button class="qb" id="plotBtn" onclick="plotFromTask()" style="display:none">📈 Funktion zeichnen</button>
-    <button class="qb" id="practiceBtn" onclick="openPracticeModal()" style="display:none">🔁 Üben</button>
-  </div>
-  <div class="ci" id="cin" style="display:none">
-    <button class="sb" id="photoBtn" onclick="openPhotoModal()" title="Feladat fotóból" style="background:var(--s2);border:1px solid var(--bd);color:var(--tx2);font-size:1rem">📷</button>
-    <textarea id="mi" rows="1" placeholder="Frage Martha..." onkeydown="hK(event)" oninput="aG(this)"></textarea>
-    <button class="sb" id="sbt" onclick="sM()">↑</button>
-  </div><!-- /.ci -->
+
+    <div class="qa" id="qa" style="display:none">
+      <button class="qb" onclick="window._quickSend('Gib mir einen Tipp')">💡 Tipp</button>
+      <button class="qb" onclick="window._quickSend('Was ist der erste Schritt?')">👣 Erster Schritt</button>
+      <button class="qb" onclick="window._quickSend('Erkläre den Lösungsweg')">🧠 Lösungsweg</button>
+      <button class="qb" onclick="window._quickSend('Zeig mir die vollständige Lösung')">✅ Lösung</button>
+      <button class="qb" id="plotBtn" onclick="window._plotFromTask()" style="display:none">📈 Funktion zeichnen</button>
+      <button class="qb" id="practiceBtn" onclick="window._openPracticeModal()" style="display:none">🔁 Üben</button>
+    </div>
+
+    <div class="ci" id="cin" style="display:none">
+      <button class="sb" onclick="window._openUploadModal()" title="Feladat feltöltése"
+        style="background:var(--s2);border:1px solid var(--bd);color:var(--tx2);font-size:1rem">📎</button>
+      <textarea id="mi" rows="1" placeholder="Frage Martha..."
+        onkeydown="window._handleKeydown(event)" oninput="window._autoGrow(this)"></textarea>
+      <button class="sb" id="sbt" onclick="window._sendMessage()">↑</button>
+    </div>
   </div><!-- /.pr -->
 </div><!-- /.app -->
 
-<!-- ── PRACTICE MODAL — outside .app, in body ── -->
-<div id="practiceModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closePracticeModal()">
+<!-- ── PRACTICE MODAL ── -->
+<div id="practiceModal" class="modal-bg" style="display:none"
+     onclick="if(event.target===this)window._closePracticeModal()">
   <div class="modal">
     <div class="mh">
       <h2>🔁 Hasonló feladat generálása</h2>
-      <button class="mx" onclick="closePracticeModal()">✕</button>
+      <button class="mx" onclick="window._closePracticeModal()">✕</button>
     </div>
     <div class="mb" id="practiceBody">
-      <div style="color:var(--tx2);font-size:.85rem;margin-bottom:14px">Martha egy hasonló típusú, de új feladatot generál a kiválasztott témából. Kattints a gombra!</div>
+      <div style="color:var(--tx2);font-size:.85rem;margin-bottom:14px">
+        Martha egy hasonló típusú, de új, matematikailag ellenőrzött feladatot generál.
+      </div>
       <div id="practiceContent" style="display:none">
         <div class="gen-tag" id="practiceTag"></div>
         <div class="gen-box" id="practiceText"></div>
       </div>
-      <div id="practicePlaceholder" style="color:var(--tx3);font-size:.85rem;text-align:center;padding:30px">Nyomj a „Generálás" gombra</div>
+      <div id="practicePlaceholder" style="color:var(--tx3);font-size:.85rem;text-align:center;padding:30px">
+        Nyomj a „Generálás" gombra
+      </div>
     </div>
     <div class="mf">
-      <button class="btn-pri" id="genBtn" onclick="generatePractice()"><span id="genBtnTxt">✨ Generálás</span></button>
-      <button class="btn-pri" id="loadPracticeBtn" onclick="loadGeneratedTask()" style="display:none;background:var(--grn);color:#000">📚 Betöltés Marthának</button>
-      <button class="btn-sec" onclick="closePracticeModal()">Bezárás</button>
+      <button class="btn-pri" id="genBtn" onclick="window._generatePractice()">
+        <span id="genBtnTxt">✨ Generálás</span>
+      </button>
+      <button class="btn-pri" id="loadPracticeBtn" onclick="window._loadGeneratedTask()"
+        style="display:none;background:var(--grn);color:#000">📚 Betöltés Marthának</button>
+      <button class="btn-sec" onclick="window._closePracticeModal()">Bezárás</button>
     </div>
   </div>
 </div>
 
-<!-- ── PHOTO MODAL — outside .app, in body ── -->
-<div id="photoModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closePhotoModal()">
+<!-- ── UPLOAD MODAL ── -->
+<div id="photoModal" class="modal-bg" style="display:none"
+     onclick="if(event.target===this)window._closeUploadModal()">
   <div class="modal">
     <div class="mh">
       <h2>📎 Feladat betöltése</h2>
-      <button class="mx" onclick="closePhotoModal()">✕</button>
+      <button class="mx" onclick="window._closeUploadModal()">✕</button>
     </div>
     <div class="mb">
-      <div id="uploadZone" class="upload-zone" onclick="document.getElementById('photoInput').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
-        <input type="file" id="photoInput" accept="image/*,.pdf,.doc,.docx" onchange="handlePhotoFile(event)">
-        <div class="uz-icon" id="uzIcon">📎</div>
+      <div id="uploadZone" class="upload-zone"
+           onclick="document.getElementById('photoInput').click()"
+           ondragover="event.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="window._handleDrop(event)">
+        <input type="file" id="photoInput" accept="image/*,.pdf,.doc,.docx"
+               onchange="window._handleFileInput(event)">
+        <div class="uz-icon">📎</div>
         <div class="uz-txt">Kattints vagy húzz ide a fájlt</div>
-        <div class="uz-sub">📷 Fotó (JPG, PNG) &nbsp;·&nbsp; 📄 PDF &nbsp;·&nbsp; 📝 Word (.docx) &nbsp;·&nbsp; max 20 MB</div>
+        <div class="uz-sub">📷 Fotó &nbsp;·&nbsp; 📄 PDF &nbsp;·&nbsp; 📝 Word (.docx) &nbsp;·&nbsp; max 20 MB</div>
       </div>
-      <div id="fileTypeBadge" style="display:none;margin-top:8px;padding:4px 12px;border-radius:100px;font-size:.75rem;font-weight:600;width:fit-content;background:rgba(124,108,255,.15);color:var(--ac)"></div>
+      <div id="fileTypeBadge" style="display:none;margin-top:8px;padding:4px 12px;border-radius:100px;font-size:.75rem;font-weight:600;background:rgba(124,108,255,.15);color:var(--ac);width:fit-content"></div>
       <div id="docTextPreview" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;font-size:.8rem;color:var(--tx2);max-height:120px;overflow-y:auto;margin-top:8px;white-space:pre-wrap"></div>
       <img id="photoPreview" class="img-preview" style="display:none">
       <div id="photoResult" class="photo-result" style="display:none"></div>
     </div>
     <div class="mf">
-      <button class="btn-pri" id="analyzeBtn" onclick="analyzePhoto()" style="display:none"><span id="analyzeBtnTxt">🔍 Elemzés</span></button>
-      <button class="btn-pri" id="loadPhotoBtn" onclick="loadPhotoTask()" style="display:none;background:var(--grn);color:#000">📚 Megnyitás Marthával</button>
-      <button class="btn-sec" onclick="closePhotoModal()">Bezárás</button>
+      <button class="btn-pri" id="analyzeBtn" onclick="window._analyzeUpload()" style="display:none">
+        <span id="analyzeBtnTxt">🔍 Elemzés</span>
+      </button>
+      <button class="btn-pri" id="loadPhotoBtn" onclick="window._loadExtractedTask()"
+        style="display:none;background:var(--grn);color:#000">📚 Megnyitás Marthával</button>
+      <button class="btn-sec" onclick="window._closeUploadModal()">Bezárás</button>
     </div>
   </div>
 </div>
 
-
-
-<script>
-// ══════════════════════════════════════════
-//  CONFIG
-// ══════════════════════════════════════════
-
-const CONFIG = {
-  PIN_HASH: "53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0",
-  PIN_LEN: 4,
-  // ← IDE ÍRD BE A CLOUDFLARE WORKER URL-T (lásd README)
-  API_URL: "https://martha-proxy.98ktndkptv.workers.dev",
-  MODEL: "llama-3.3-70b-versatile",
-};
-
-const SYSTEM_PROMPT = `Du bist Martha, eine erfahrene und geduldige Mathematik-Nachhilfelehrerin fuer das NRW Abitur.
-
-DEIN NAME: Martha. Stelle dich beim ersten Kontakt kurz vor.
-
-DEINE METHODE - SOKRATISCHES LEHREN:
-1. Frage zuerst, was der Schueler bereits versucht hat
-2. Gib NIEMALS sofort die komplette Loesung
-3. Stelle gezielte Gegenfragen, die zum naechsten Schritt fuehren
-4. Erklaere Konzepte mit einfachen Beispielen und Analogien
-5. Lobe Fortschritte, auch kleine
-6. Wenn der Schueler komplett feststeckt: gib einen konkreten ersten Schritt
-
-MATHEMATISCHE FORMELN - WICHTIG:
-- Schreibe ALLE Formeln in LaTeX-Notation mit Dollar-Zeichen
-- Inline: $f(x) = x^2$ oder $\\int_0^1 f(x)\\,dx$
-- Display (eigene Zeile): $$f(x) = 4000 \\cdot x \\cdot e^{-0{,}4x}$$
-- NIEMALS Formeln als Klartext schreiben — IMMER LaTeX!
-
-FUNKTIONEN ZEICHNEN:
-Wenn der Schueler dich bittet eine Funktion zu zeichnen, schreibe GENAU:
-PLOT(ausdruck, xmin, xmax)
-
-Beispiele:
-PLOT((2*x^2-1)*exp(2*x), -2, 2)
-PLOT(4000*x*exp(-0.4*x), 0, 20)
-PLOT(x^3-3*x, -3, 3)
-
-Regeln: * fuer Multiplikation, exp() fuer e^x, ^ fuer Potenzen.
-Schreibe PLOT in eine eigene Zeile. Danach erklaere den Graph.
-
-ABBILDUNGEN: Wenn eine Aufgabe auf eine Abbildung verweist die nicht verfuegbar ist,
-sage das dem Schueler und biete an die Funktion zu zeichnen.
-
-WICHTIG: Antworte IMMER auf Deutsch. Halte Antworten fokussiert und nicht zu lang.`;
-
-// ══════════════════════════════════════════
-//  STATE
-// ══════════════════════════════════════════
-
-let T=[], F=[], si=-1, H={}, tp="Alle", lv="all", str=false;
-let storedPin="";
-let pinEntry="";
-
-// ══════════════════════════════════════════
-//  PIN LOGIN
-// ══════════════════════════════════════════
-
-async function hashPin(pin){
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
-  return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
-}
-
-function initLogin(){
-  renderPinPad();
-}
-
-function renderPinPad(){
-  const dots=document.getElementById("pin-dots");
-  dots.innerHTML="";
-  for(let i=0;i<CONFIG.PIN_LEN;i++){
-    const d=document.createElement("div");
-    d.className="pin-dot"+(i<pinEntry.length?" filled":"");
-    dots.appendChild(d);
-  }
-  const pad=document.getElementById("pin-pad");
-  pad.innerHTML="";
-  [1,2,3,4,5,6,7,8,9,null,0,"del"].forEach(k=>{
-    if(k===null){pad.appendChild(document.createElement("div"));return;}
-    const btn=document.createElement("button");
-    btn.className="pin-key"+(k==="del"?" del":"");
-    btn.textContent=k==="del"?"\u232b":k;
-    btn.onclick=()=>handlePinKey(k);
-    pad.appendChild(btn);
-  });
-}
-
-function handlePinKey(k){
-  if(k==="del"){pinEntry=pinEntry.slice(0,-1);renderPinPad();return;}
-  if(pinEntry.length>=CONFIG.PIN_LEN)return;
-  pinEntry+=k;
-  renderPinPad();
-  if(pinEntry.length===CONFIG.PIN_LEN){setTimeout(()=>tryPin(pinEntry),200);}
-}
-
-async function tryPin(pin){
-  const hash = await hashPin(pin);
-  if(hash === CONFIG.PIN_HASH){
-    storedPin = pin;
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="flex";
-    init();
-  } else {
-    pinEntry="";
-    document.getElementById("pin-err").textContent="Falscher PIN. Versuche es nochmal.";
-    document.querySelectorAll(".pin-dot").forEach(d=>d.classList.add("wrong"));
-    setTimeout(()=>{document.getElementById("pin-err").textContent="";renderPinPad();},1200);
-  }
-}
-
-// ══════════════════════════════════════════
-//  STATUS
-// ══════════════════════════════════════════
-
-function updateStatus(){
-  document.getElementById("sd").className="dot ok";
-  document.getElementById("st").textContent="Martha bereit · " + CONFIG.MODEL;
-}
-
-// ══════════════════════════════════════════
-//  APP INIT
-// ══════════════════════════════════════════
-
-async function init(){
-  try{
-    const r = await fetch("tasks.json");
-    T = await r.json();
-    updateStatus();
-    rF();
-    aF();
-  }catch(e){
-    document.getElementById("st").textContent="Fehler: tasks.json nicht gefunden";
-  }
-}
-
-// ══════════════════════════════════════════
-//  GROQ STREAMING API
-// ══════════════════════════════════════════
-
-async function* streamGroq(messages, taskContext){
-  const fullSys = SYSTEM_PROMPT + "\n\n--- AKTUELLE AUFGABE ---\n" + taskContext;
-  const msgs = [{role:"system", content:fullSys}, ...messages];
-  
-  try{
-    const resp = await fetch(CONFIG.API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: CONFIG.MODEL,
-        messages: msgs,
-        stream: true,
-        temperature: 0.4,
-        max_tokens: 1500,
-      })
-    });
-    
-    if(!resp.ok){
-      const err = await resp.json().catch(()=>({}));
-      if(resp.status === 401){
-        yield "API Key ungültig. Bitte kontaktiere deinen Lehrer.";
-      } else {
-        yield `Fehler (${resp.status}): ${err.error?.message || "Unbekannter Fehler"}`;
-      }
-      return;
-    }
-    
-    const reader = resp.body.getReader();
-    const decoder = new TextDecoder();
-    let buf = "";
-    
-    while(true){
-      const {done, value} = await reader.read();
-      if(done) break;
-      buf += decoder.decode(value, {stream:true});
-      const lines = buf.split("\n");
-      buf = lines.pop() || "";
-      
-      for(const line of lines){
-        if(line.startsWith("data: ")){
-          const data = line.slice(6).trim();
-          if(data === "[DONE]") return;
-          try{
-            const parsed = JSON.parse(data);
-            const token = parsed.choices?.[0]?.delta?.content;
-            if(token) yield token;
-          }catch(e){}
-        }
-      }
-    }
-  }catch(e){
-    yield "Verbindungsfehler: " + e.message;
-  }
-}
-
-// ══════════════════════════════════════════
-//  TASK CONTEXT BUILDER
-// ══════════════════════════════════════════
-
-function buildContext(task){
-  const parts = [
-    `AUFGABE: ${task.task_id || "Aufgabe"}`,
-    `THEMA: ${task.topic || "?"} - ${task.subtopic || "?"}`,
-    `PUNKTE: ${task.points || "?"} BE`,
-    `KURS: ${(task.source || {}).level || "?"}`,
-    `\nAUFGABENTEXT:\n${task.question || "Kein Text."}`,
-  ];
-  const ans = task.expected_answer;
-  if(ans) parts.push(`\nOFFIZIELLE MUSTERLOESUNG:\n${ans}`);
-  return parts.join("\n");
-}
-
-// ══════════════════════════════════════════
-//  TOPIC / FILTER
-// ══════════════════════════════════════════
-
-function rF(){
-  const c={};
-  T.forEach(t=>{const k=t.topic||"?";c[k]=(c[k]||0)+1;});
-  const el=document.getElementById("ff");
-  let h=`<button class="fb on" onclick="sT('Alle',this)">Alle (${T.length})</button>`;
-  Object.entries(c).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
-    h+=`<button class="fb" onclick="sT('${k}',this)">${k} (${v})</button>`;
-  });
-  el.innerHTML=h;
-}
-
-function sT(t,b){tp=t;b.parentElement.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));b.classList.add("on");aF();}
-function sL(l,b){lv=l;b.parentElement.querySelectorAll(".fb").forEach(x=>x.classList.remove("on"));b.classList.add("on");aF();}
-function aF(){
-  F=T.filter(t=>{
-    if(tp!=="Alle"&&t.topic!==tp)return false;
-    if(lv!=="all"&&(t.source||{}).level!==lv)return false;
-    return true;
-  });
-  rTL();
-}
-
-function tc(t){const s=(t||"").toLowerCase();if(s.includes("analysis"))return"an";if(s.includes("stochastik"))return"st";if(s.includes("geometrie"))return"ge";return"al";}
-function ti(t){const s=(t||"").toLowerCase();if(s.includes("analysis"))return"f'";if(s.includes("stochastik"))return"P";if(s.includes("geometrie"))return"\u2192";return"\u2261";}
-function e(s){const d=document.createElement("div");d.textContent=s||"";return d.innerHTML;}
-
-function rTL(){
-  const el=document.getElementById("tl");
-  if(!F.length){el.innerHTML='<div style="padding:40px;text-align:center;color:var(--tx3)">Keine Aufgaben</div>';return;}
-  el.innerHTML=F.map(t=>{
-    const ri=T.indexOf(t),sr=t.source||{},sl=ri===si?"sel":"";
-    return`<div class="ti ${sl}" onclick="sel(${ri})"><div class="tic ${tc(t.topic)}">${ti(t.topic)}</div><div class="tit"><div class="n">${e(t.task_id||"Aufgabe")}</div><div class="m">${e(t.topic||"")} \u00b7 ${sr.level||""} \u00b7 ${sr.year||""}</div></div>${t.points?`<div class="tip">${t.points} BE</div>`:""}</div>`;
-  }).join("");
-}
-
-function renderMath(el){
-  if(typeof renderMathInElement==="function"){
-    try{
-      renderMathInElement(el||document.body,{
-        delimiters:[
-          {left:"$$",right:"$$",display:true},
-          {left:"$",right:"$",display:false},
-          {left:"\\(",right:"\\)",display:false},
-          {left:"\\[",right:"\\]",display:true}
-        ],
-        throwOnError:false
-      });
-    }catch(ex){}
-  }
-}
-
-// ══════════════════════════════════════════
-//  FUNCTION EXTRACTOR
-// ══════════════════════════════════════════
-
-function extractFunctions(text){
-  if(!text) return [];
-  let t = text;
-  t = t.replace(/\$\$?/g, " ");
-  t = t.replace(/\\cdot/g, "*").replace(/\u00b7/g, "*").replace(/\u22c5/g, "*");
-  t = t.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, "($1)/($2)");
-  t = t.replace(/\\sqrt\{([^}]+)\}/g, "sqrt($1)");
-  t = t.replace(/\\left/g, "").replace(/\\right/g, "");
-  t = t.replace(/\\[,;]/g, " ");
-  t = t.replace(/\\in/g, "").replace(/\\mathbb\{R\}/g, "").replace(/\u211d/g, "");
-  t = t.replace(/\u2208/g, "").replace(/IR/g, "");
-  t = t.replace(/\u00b2/g, "^2").replace(/\u00b3/g, "^3").replace(/\u2074/g, "^4");
-  t = t.replace(/\u03c0/g, "pi");
-  t = t.replace(/(\d),(\d)/g, "$1.$2");
-  t = t.replace(/\u2212/g, "-").replace(/\u2013/g, "-");
-  t = t.replace(/e\^\{([^}]+)\}/g, "exp($1)");
-  t = t.replace(/e\^\(([^)]+)\)/g, "exp($1)");
-  t = t.replace(/e\^(-?[\w.*+\-/()]+)/g, "exp($1)");
-  const results = [];
-  const pat = /([fghDupw])\s*\(\s*x\s*\)\s*=\s*([^,;]+?)(?:\s*,\s*x|\s*\.\s|\s*$|\n)/gm;
-  let m;
-  while((m = pat.exec(t)) !== null){
-    let expr = m[2].trim();
-    if(expr.length < 3 || !expr.includes("x")) continue;
-    expr = expr.replace(/(\d)([x(])/g, "$1*$2");
-    expr = expr.replace(/([)])(\d)/g, "$1*$2");
-    expr = expr.replace(/([x)])([x(])/g, "$1*$2");
-    expr = expr.replace(/ln\(/g, "log(");
-    results.push({name: m[1], expr: expr});
-  }
-  return results;
-}
-
-function guessRange(expr){
-  let xmin=-5, xmax=5;
-  if(expr.includes("exp(-0.4")||expr.includes("exp(-0,4")){xmin=0;xmax=20;}
-  else if(expr.includes("exp(-x")||expr.includes("exp(-1")){xmin=-2;xmax=8;}
-  else if(expr.includes("exp(2")||expr.includes("exp(2*x")){xmin=-2;xmax=2;}
-  else if(expr.includes("sin")||expr.includes("cos")){xmin=0;xmax=4*Math.PI;}
-  else if(expr.includes("log(")||expr.includes("ln(")){xmin=-1;xmax=10;}
-  return [xmin,xmax];
-}
-
-// ══════════════════════════════════════════
-//  LLM PLOT DETECTION
-// ══════════════════════════════════════════
-
-function detectPlots(text){
-  let t = text.replace(/\u2212/g,"-").replace(/\u2013/g,"-");
-  const pats = [
-    /\[\s*PLOT\s*:\s*(?:f\(x\)\s*=\s*)?(.+?)\s*:\s*([-\d.]+)\s*:\s*([-\d.]+)\s*\]/gi,
-    /PLOT\s*\(\s*(?:f\(x\)\s*=\s*)?(.+?)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/gi,
-    /PLOT\s*:\s*(?:f\(x\)\s*=\s*)?(.+?)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)/gi,
-    /PLOT\s*[:(]\s*(?:f\(x\)\s*=\s*)?(.+?)\s*[,:]\s*([-\d.]+)\s*[,:]\s*([-\d.]+)/gi,
-  ];
-  const found = [];
-  for(const p of pats){
-    let m;
-    while((m=p.exec(t))!==null){
-      found.push({expr:m[1].trim(),xmin:parseFloat(m[2]),xmax:parseFloat(m[3])});
-    }
-    if(found.length) break;
-  }
-  return found;
-}
-
-// ══════════════════════════════════════════
-//  CANVAS PLOTTER
-// ══════════════════════════════════════════
-
-function drawPlot(expr, xmin, xmax, targetEl){
-  const canvas=document.createElement("canvas");
-  canvas.width=400;canvas.height=240;
-  canvas.style.cssText="width:100%;height:auto;border-radius:8px;background:#0f1117";
-  const wrap=document.createElement("div");wrap.className="pbox";
-  wrap.appendChild(canvas);
-  const lbl=document.createElement("div");lbl.className="plbl";
-  lbl.textContent="f(x) = "+expr;
-  wrap.appendChild(lbl);targetEl.appendChild(wrap);
-
-  const ctx=canvas.getContext("2d"),W=400,HH=240,pad=40;
-  let fn;
-  try{
-    const clean=expr.replace(/,/g,".");
-    const node=math.parse(clean);const code=node.compile();
-    fn=(x)=>{try{return code.evaluate({x:x,e:Math.E,pi:Math.PI,PI:Math.PI});}catch(e){return NaN;}};
-  }catch(ex){
-    ctx.fillStyle="#f87171";ctx.font="14px -apple-system,sans-serif";
-    ctx.fillText("Parse-Fehler: "+ex.message,20,HH/2);return;
-  }
-  const steps=500,dx=(xmax-xmin)/steps;
-  const pts=[];let ymin=Infinity,ymax=-Infinity;
-  for(let i=0;i<=steps;i++){const x=xmin+i*dx,y=fn(x);if(isFinite(y)&&!isNaN(y)){pts.push({x,y});if(y<ymin)ymin=y;if(y>ymax)ymax=y;}}
-  if(pts.length<2){ctx.fillStyle="#f87171";ctx.font="14px -apple-system,sans-serif";ctx.fillText("Keine darstellbaren Werte",20,HH/2);return;}
-  const yR=ymax-ymin||1;ymin-=yR*.1;ymax+=yR*.1;
-  const toX=x=>pad+(x-xmin)/(xmax-xmin)*(W-2*pad);
-  const toY=y=>HH-pad-(y-ymin)/(ymax-ymin)*(HH-2*pad);
-  ctx.fillStyle="#0f1117";ctx.fillRect(0,0,W,HH);
-  ctx.strokeStyle="#1c1f2b";ctx.lineWidth=1;
-  const xS=nS(xmax-xmin,8),xSt=Math.ceil(xmin/xS)*xS;
-  ctx.font="11px -apple-system,sans-serif";ctx.fillStyle="#555a73";ctx.textAlign="center";
-  for(let x=xSt;x<=xmax;x+=xS){const px=toX(x);ctx.beginPath();ctx.moveTo(px,pad);ctx.lineTo(px,HH-pad);ctx.stroke();ctx.fillText(nN(x),px,HH-pad+16);}
-  const yS=nS(ymax-ymin,6),ySt=Math.ceil(ymin/yS)*yS;
-  ctx.textAlign="right";
-  for(let y=ySt;y<=ymax;y+=yS){const py=toY(y);ctx.beginPath();ctx.moveTo(pad,py);ctx.lineTo(W-pad,py);ctx.stroke();ctx.fillText(nN(y),pad-8,py+4);}
-  if(xmin<=0&&xmax>=0){ctx.strokeStyle="#3a3f55";ctx.lineWidth=1.5;const ax=toX(0);ctx.beginPath();ctx.moveTo(ax,pad);ctx.lineTo(ax,HH-pad);ctx.stroke();}
-  if(ymin<=0&&ymax>=0){ctx.strokeStyle="#3a3f55";ctx.lineWidth=1.5;const ay=toY(0);ctx.beginPath();ctx.moveTo(pad,ay);ctx.lineTo(W-pad,ay);ctx.stroke();}
-  ctx.strokeStyle="rgba(124,108,255,0.15)";ctx.lineWidth=8;ctx.lineJoin="round";
-  ctx.beginPath();let st=false;
-  for(const p of pts){const px=toX(p.x),py=toY(p.y);if(py>=pad-10&&py<=HH-pad+10){if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);}else st=false;}
-  ctx.stroke();
-  ctx.strokeStyle="#7c6cff";ctx.lineWidth=2.5;
-  ctx.beginPath();st=false;
-  for(const p of pts){const px=toX(p.x),py=toY(p.y);if(py>=pad-10&&py<=HH-pad+10){if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);}else st=false;}
-  ctx.stroke();
-}
-function nS(r,m){const v=r/m,mg=Math.pow(10,Math.floor(Math.log10(v))),rs=v/mg;if(rs<=1.5)return mg;if(rs<=3)return 2*mg;if(rs<=7)return 5*mg;return 10*mg;}
-function nN(n){if(Math.abs(n)<1e-10)return"0";if(Math.abs(n)>=1000)return Math.round(n).toString();if(Number.isInteger(n))return n.toString();return n.toFixed(2).replace(/\.?0+$/,"");}
-
-// ══════════════════════════════════════════
-//  DIRECT PLOT FROM TASK
-// ══════════════════════════════════════════
-
-function plotFromTask(){
-  if(si<0)return;
-  const t=T[si];
-  const allText=(t.question||"")+" "+(t.expected_answer||"");
-  const funcs=extractFunctions(allText);
-  const el=document.getElementById("cms");
-  if(!funcs.length){sQ("Zeichne die Funktion aus der Aufgabe");return;}
-
-  funcs.forEach(f=>{
-    const msgDiv=document.createElement("div");msgDiv.className="mg a";
-    const bu=document.createElement("div");bu.className="bu";
-    bu.innerHTML=`<div class="sn">MARTHA</div>Hier ist der Graph von ${e(f.name)}(x) = ${e(f.expr)}:`;
-    msgDiv.appendChild(bu);
-    const [xmin,xmax]=guessRange(f.expr);
-    const plotWrap=document.createElement("div");
-    bu.appendChild(plotWrap);
-    try{drawPlot(f.expr,xmin,xmax,plotWrap);}catch(ex){plotWrap.innerHTML=`<div class="abw">Zeichenfehler: ${ex.message}</div>`;}
-    el.appendChild(msgDiv);
-  });
-  el.scrollTop=el.scrollHeight;renderMath(el);
-}
-
-// ══════════════════════════════════════════
-//  CHAT
-// ══════════════════════════════════════════
-
-function hasAbb(t){if(!t)return false;const l=t.toLowerCase();return l.includes("abbildung")||l.includes("dargestellt")||l.includes("histogramm");}
-
-function sel(i){
-  si=i;const t=T[i],sr=t.source||{};
-  document.getElementById("cht").textContent=t.task_id||"Aufgabe";
-  document.getElementById("chs").textContent=`${t.topic||""} \u00b7 ${sr.level||""} \u00b7 ${t.points?t.points+" BE":""}`;
-  document.getElementById("cin").style.display="flex";
-  document.getElementById("qa").style.display="flex";
-  document.getElementById("app").classList.add("co");
-  const funcs=extractFunctions((t.question||"")+" "+(t.expected_answer||""));
-  document.getElementById("plotBtn").style.display=funcs.length?"inline-block":"none";
-  document.getElementById("practiceBtn").style.display="inline-block";
-  if(!H[i])H[i]=[];
-  rC(i);rTL();
-  setTimeout(()=>document.getElementById("mi").focus(),300);
-}
-function gB(){document.getElementById("app").classList.remove("co");}
-
-function rC(i){
-  const el=document.getElementById("cms"),t=T[i],h=H[i]||[];
-  let html="";
-  html+=`<div class="mg s"><div class="bu"><strong>${e(t.task_id||"Aufgabe")}</strong><br><br>${e(t.question||"Kein Text.")}</div></div>`;
-  if(hasAbb(t.question))html+=`<div class="abw">\u26a0\ufe0f Diese Aufgabe verweist auf eine Abbildung. Klicke \ud83d\udcc8 um die Funktion zu zeichnen.</div>`;
-  if(!h.length)html+=`<div class="mg a"><div class="bu"><div class="sn">MARTHA</div>Hallo! \ud83d\udc4b Ich bin Martha, deine Mathe-Nachhilfelehrerin.\n\nSchau dir die Aufgabe oben an. Wie m\u00f6chtest du anfangen?\nDu kannst mir sagen, was du schon wei\u00dft, oder einen \ud83d\udca1 Tipp verlangen.</div></div>`;
-  h.forEach((m,idx)=>{
-    if(m.role==="user")html+=`<div class="mg u"><div class="bu">${e(m.content)}</div></div>`;
-    else html+=`<div class="mg a" id="hmsg_${i}_${idx}"><div class="bu"><div class="sn">MARTHA</div><span class="at">${e(m.content)}</span></div></div>`;
-  });
-  el.innerHTML=html;el.scrollTop=el.scrollHeight;
-  // Render math only in the task bubble (it uses e() so it's safe)
-  const taskBubble=el.querySelector(".mg.s");
-  if(taskBubble) renderMath(taskBubble);
-  // For assistant messages: re-set textContent then run KaTeX to avoid duplication
-  h.forEach((m,idx)=>{
-    if(m.role==="assistant"){
-      const mel=document.getElementById(`hmsg_${i}_${idx}`);
-      if(mel){
-        const atEl=mel.querySelector(".at");
-        if(atEl){
-          atEl.textContent=m.content;
-          if(typeof renderMathInElement==="function"){
-            try{renderMathInElement(atEl,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});}catch(ex){}
-          }
-        }
-        const buEl=mel.querySelector(".bu");
-        const plots=detectPlots(m.content);
-        plots.forEach(p=>{try{drawPlot(p.expr,p.xmin,p.xmax,buEl);}catch(ex){}});
-      }
-    }
-  });
-}
-
-async function sM(){
-  if(str||si<0)return;
-  const inp=document.getElementById("mi"),txt=inp.value.trim();
-  if(!txt)return;inp.value="";inp.style.height="auto";
-  
-  const dw=["zeichne","zeichnen","plot","rajzol","graph","zeig die funktion","zeig den graph","funktion zeichnen"];
-  if(dw.some(w=>txt.toLowerCase().includes(w))){
-    const t=T[si],funcs=extractFunctions((t.question||"")+" "+(t.expected_answer||""));
-    if(funcs.length){plotFromTask();return;}
-  }
-  
-  const i=si;if(!H[i])H[i]=[];H[i].push({role:"user",content:txt});
-  const el=document.getElementById("cms");
-  el.innerHTML+=`<div class="mg u"><div class="bu">${e(txt)}</div></div>`;
-  const tid="t"+Date.now();
-  el.innerHTML+=`<div class="mg a" id="${tid}"><div class="bu"><div class="sn">MARTHA</div><span class="at"><span class="tp"><span></span><span></span><span></span></span></span></div></div>`;
-  el.scrollTop=el.scrollHeight;str=true;document.getElementById("sbt").disabled=true;
-  
-  let full="";
-  const ctx = buildContext(T[i]);
-  const at=document.querySelector(`#${tid} .at`);
-  
-  try{
-    for await(const token of streamGroq(H[i], ctx)){
-      full += token;
-      at.textContent = full;
-      el.scrollTop = el.scrollHeight;
-    }
-  }catch(ex){
-    full = full || "Verbindungsfehler: " + ex.message;
-  }
-  
-  if(full){
-    H[i].push({role:"assistant",content:full});
-    const lastMsg=document.getElementById(tid);
-    if(lastMsg){
-      const atEl=lastMsg.querySelector(".at");
-      // ── Fix: set textContent (not innerHTML) so KaTeX sees raw $...$ once ──
-      atEl.textContent=full;
-      if(typeof renderMathInElement==="function"){
-        try{
-          renderMathInElement(atEl,{
-            delimiters:[
-              {left:"$$",right:"$$",display:true},
-              {left:"$",right:"$",display:false},
-              {left:"\\(",right:"\\)",display:false},
-              {left:"\\[",right:"\\]",display:true}
-            ],
-            throwOnError:false
-          });
-        }catch(ex){}
-      }
-      const plots=detectPlots(full);
-      const buEl=lastMsg.querySelector(".bu");
-      plots.forEach(p=>{try{drawPlot(p.expr,p.xmin,p.xmax,buEl);}catch(ex){}});
-    }
-  }
-  str=false;document.getElementById("sbt").disabled=false;
-}
-
-function sQ(t){document.getElementById("mi").value=t;sM();}
-function hK(ev){if(ev.key==="Enter"&&!ev.shiftKey){ev.preventDefault();sM();}}
-function aG(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight,120)+"px";}
-
-// ══════════════════════════════════════════
-//  PRACTICE MODAL — hasonló feladat
-// ══════════════════════════════════════════
-
-let generatedTask = null;
-
-function openPracticeModal(){
-  if(si<0)return;
-  generatedTask=null;
-  document.getElementById("practiceContent").style.display="none";
-  document.getElementById("practicePlaceholder").style.display="block";
-  document.getElementById("loadPracticeBtn").style.display="none";
-  document.getElementById("genBtnTxt").textContent="✨ Generálás";
-  document.getElementById("genBtn").disabled=false;
-  document.getElementById("practiceModal").style.display="flex";
-}
-
-function closePracticeModal(){
-  document.getElementById("practiceModal").style.display="none";
-}
-
-async function generatePractice(){
-  if(si<0)return;
-  const t=T[si];
-  const btn=document.getElementById("genBtn");
-  const btnTxt=document.getElementById("genBtnTxt");
-  btn.disabled=true;
-  btnTxt.innerHTML='<span class="spin"></span> Generálás...';
-  document.getElementById("practicePlaceholder").style.display="none";
-  document.getElementById("practiceContent").style.display="none";
-  document.getElementById("loadPracticeBtn").style.display="none";
-
-  const r = Math.random();
-
-  const contexts = [
-    "rein abstrakt, ohne Anwendungskontext",
-    "Kontext: Kostenfunktion — Verlauf der Produktionskosten einer Firma",
-    "Kontext: Physik — Bewegung (Höhe, Geschwindigkeit oder Energie)",
-    "Kontext: Natur — Bevölkerungswachstum oder Temperaturverlauf",
-    "Kontext: Wasserstand oder Füllmenge eines Behälters",
-    "Kontext: Sportwissenschaft — Leistungskurve oder Erschöpfungsmodell",
-  ];
-  const taskAngles = [
-    "Nachweis eines lokalen HOCHPUNKTS (nicht Tiefpunkt)",
-    "Nachweis eines lokalen TIEFPUNKTS an einer negativen Stelle x < 0",
-    "Nachweis, dass eine Stelle ein Sattelpunkt ist (kein Extrempunkt)",
-    "Bestimme ALLE lokalen Extrempunkte und klassifiziere sie (Hoch- oder Tiefpunkt)",
-    "Nachweis eines lokalen Tiefpunkts mit Interpretation im Sachkontext",
-    "Nachweis eines lokalen Hochpunkts + berechne den zugehörigen Funktionswert",
-  ];
-  const funcTypes = [
-    "ganzrationale Funktion Grad 3: f(x) = ax³ + bx² + cx",
-    "ganzrationale Funktion Grad 3 mit Konstante: f(x) = ax³ + bx² + c",
-    "ganzrationale Funktion Grad 4 mit kubischem Term: f(x) = ax⁴ + bx³ + cx",
-    "ganzrationale Funktion Grad 3, alle Koeffizienten ungewöhnliche Brüche",
-    "ganzrationale Funktion Grad 4: f(x) = ax⁴ + bx³ + cx²",
-    "Grad 3, symmetrielos, alle vier Terme vorhanden (inkl. Konstante)",
-  ];
-
-  const ctx   = contexts[   Math.floor(r * 6.7) % contexts.length];
-  const angle = taskAngles[ Math.floor(r * 5.3) % taskAngles.length];
-  const ftype = funcTypes[  Math.floor(r * 7.1) % funcTypes.length];
-  const xVals = [-3, -2, -1.5, 0.5, 1.5, 2, 3, -0.5];
-  const xVal  = xVals[Math.floor(r * xVals.length)];
-
-  const origSnippet = (t.question||"").slice(0,120).replace(/`/g,"'");
-  const topicStr    = (t.topic||"Analysis") + " · " + (t.subtopic||"Extremstellen");
-  const levelStr    = (t.source||{}).level||"GK";
-
-  const prompt = `Du bist eine erfahrene NRW Abitur Mathematiklehrerin (${levelStr}).
-Erstelle eine kreative, originelle Übungsaufgabe zum Thema "${topicStr}".
-
-KONKRETE VORGABEN:
-* Aufgabenstellung: ${angle}
-* Funktionstyp: ${ftype}
-* Gesuchte Stelle: x = ${xVal}
-* Kontext: ${ctx}
-* Koeffizienten: Wähle UNGEWÖHNLICHE rationale Zahlen — keine einfachen ganzen Zahlen wie 1,2,3.
-  Gute Beispiele: 3/8, -5/6, 7/4, 2/9, -11/6
-
-VERBOTEN:
-* Die Funktion oder Zahlen aus dem Original: "${origSnippet}"
-* x = 0 oder x = 1 als Extremstelle
-* Koeffizient 1/2, 1/3 oder 2/5 (zu häufig im Original)
-
-MATHEMATISCHE PFLICHTPRUEFUNG (intern, vor dem Schreiben):
-Waehle die Koeffizienten so, dass f'(x₀) = 0 exakt gilt (x₀ = vorgegebene Stelle).
-Pruefe f''(x₀): positiv → Tiefpunkt, negativ → Hochpunkt.
-Stimmt die Mathematik nicht: andere Koeffizienten oder andere Stelle waehlen.
-NIEMALS eine Extremstelle behaupten, die rechnerisch nicht stimmt.
-
-AUSGABE:
-Schreibe NUR den vollständigen, mathematisch verifizierten Aufgabentext auf Deutsch.
-Formeln ausschliesslich in LaTeX: inline $f(x)=...$, Display $$f(x)=$$.
-Kein Praefix, keine Loesung, keine Erklaerung.`;
-
-  const msgs=[{role:"user",content:prompt}];
-  const reqMsgs=[{role:"system",content:"Du bist Martha, eine erfahrene NRW Abitur Mathematiklehrerin und Mathematikerin. Du erstellst Uebungsaufgaben — aber NUR solche, deren Mathematik 100% korrekt ist. Bevor du eine Aufgabe formulierst, rechnest du intern nach: (1) Waehle die Funktion f(x). (2) Berechne f'(x) und setze die vorgegebene Stelle x=a ein: Ist f'(a)=0? Falls nicht, aendere die Koeffizienten. (3) Berechne f''(x) an der Stelle x=a: Ist f''(a)>0 fuer Tiefpunkt, f''(a)<0 fuer Hochpunkt? Falls nicht, aendere die Koeffizienten. (4) Erst wenn Schritt 2 UND 3 stimmen, formulierst du den Aufgabentext. Halluziniere NIEMALS eine Extremstelle — lieber andere Zahlen waehlen als falsche Mathematik. Antworte ausschliesslich auf Deutsch."},...msgs];
-
-  // ── Prepare UI ──
-  const box=document.createElement("div");box.className="gen-box";
-  const statusEl=document.createElement("div");
-  statusEl.style.cssText="color:var(--tx3);font-size:.8rem;margin-bottom:10px";
-  const streamEl=document.createElement("pre");
-  streamEl.style.cssText="white-space:pre-wrap;font-family:inherit;font-size:inherit;margin:0;opacity:.75";
-  box.appendChild(statusEl);box.appendChild(streamEl);
-
-  document.getElementById("practiceContent").style.display="block";
-  document.getElementById("practiceTag").textContent=`${t.topic||"?"} · ${(t.source||{}).level||""} · ähnlich wie ${t.task_id||""}`;
-  const pb=document.getElementById("practiceText");
-  pb.innerHTML="";pb.appendChild(box);
-
-  // ══ STEP 1: Generate + verify in one non-streaming call (JSON response) ══
-  // The model generates the task, solves it internally, and returns structured JSON.
-  // This prevents hallucinated extrema from ever reaching the user.
-  statusEl.textContent="⚙️ 1/2 · Feladat generálása és matematikai ellenőrzés...";
-
-  const verifySystemPrompt = `Du bist Martha, eine praezise NRW Abitur Mathematiklehrerin.
-Du erstellst Uebungsaufgaben und verifizierst sie mathematisch, bevor du sie ausgibst.
-
-PROZESS (intern, vor jeder Ausgabe):
-1. Waehle die Funktion f(x) gemaess den Vorgaben.
-2. Berechne f'(x) symbolisch.
-3. Setze x=x0 ein: Ist f'(x0) = 0? Falls nicht → andere Koeffizienten waehlen.
-4. Berechne f''(x0): Vorzeichen pruefen (>0 Tiefpunkt, <0 Hochpunkt, =0 kein Test).
-5. Nur wenn Schritte 3 UND 4 bestaetigt: Aufgabentext formulieren.
-6. Loesung intern durchrechnen — Ergebnis als Verifikation.
-
-Antworte AUSSCHLIESSLICH mit einem JSON-Objekt (kein Markdown, kein Praefix):
-{
-  "aufgabe": "<vollstaendiger Aufgabentext mit LaTeX-Formeln>",
-  "verifikation": {
-    "f_prime": "<f'(x) als LaTeX>",
-    "f_prime_at_x0": "<berechneter Wert — muss 0 sein>",
-    "f_double_prime_at_x0": "<berechneter Wert und Vorzeichen>",
-    "urteil": "OK" oder "FEHLER: <Grund>"
-  }
-}`;
-
-  let rawJSON="";
-  try{
-    const resp1=await fetch(CONFIG.API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:CONFIG.MODEL,
-        messages:[{role:"system",content:verifySystemPrompt},{role:"user",content:prompt}],
-        stream:false,temperature:0.7,max_tokens:900
-      })
-    });
-    if(!resp1.ok){box.textContent="Hiba a generálás során. Próbáld újra!";btn.disabled=false;btnTxt.textContent="✨ Generálás";return;}
-    const d=await resp1.json();
-    rawJSON=d.choices?.[0]?.message?.content||"";
-  }catch(ex){box.textContent="Verbindungsfehler: "+ex.message;btn.disabled=false;btnTxt.textContent="🔁 Újra";return;}
-
-  // Parse JSON response
-  let aufgabe="";
-  let verDict={};
-  try{
-    const clean=rawJSON.replace(/^```json\s*/,"").replace(/```\s*$/,"").trim();
-    const parsed=JSON.parse(clean);
-    aufgabe=parsed.aufgabe||"";
-    verDict=parsed.verifikation||{};
-  }catch(ex){
-    // Fallback: try to extract aufgabe from raw text if JSON parsing fails
-    const m=rawJSON.match(/"aufgabe"\s*:\s*"([\s\S]+?)(?:",\s*"verifikation|"\s*})/);
-    aufgabe=m?m[1].replace(/\\n/g,"\n"):"";
-    verDict={urteil:"JSON_PARSE_ERROR"};
-  }
-
-  // Check verdict
-  const verdict=(verDict.urteil||"").toUpperCase();
-  if(verdict==="FEHLER"||verdict.startsWith("FEHLER")||!aufgabe){
-    // Retry once automatically
-    statusEl.textContent="⚠️ Matematikai hiba észlelve, újragenerálás...";
-    streamEl.textContent=verDict.urteil||"Ismeretlen hiba";
-    btn.disabled=false;btnTxt.textContent="🔄 Próbáld újra";
-    return;
-  }
-
-  // ══ STEP 2: Show verification badge + stream the final task for display ══
-  statusEl.innerHTML=
-    `<span style="color:var(--grn);font-weight:600">✓ Matematikailag ellenőrzött</span>` +
-    (verDict.f_prime?` &nbsp;·&nbsp; f'(x) = ${verDict.f_prime}`:"") +
-    (verDict.f_prime_at_x0?` &nbsp;·&nbsp; f'(x₀) = ${verDict.f_prime_at_x0}`:"");
-
-  // Render the verified task
-  box.removeChild(streamEl);
-  const finalEl=document.createElement("div");
-  finalEl.style.cssText="line-height:1.9;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)";
-  finalEl.textContent=aufgabe;
-  box.appendChild(finalEl);
-  if(typeof renderMathInElement==="function"){
-    try{renderMathInElement(finalEl,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});}catch(ex){}
-  }
-
-  generatedTask={
-    task_id:"🔁 Üben · "+(t.task_id||"?"),
-    topic:t.topic,subtopic:t.subtopic,
-    source:{level:(t.source||{}).level,year:"generiert"},
-    points:t.points,question:aufgabe,expected_answer:""
-  };
-  document.getElementById("loadPracticeBtn").style.display="inline-flex";
-  btn.disabled=false;btnTxt.textContent="🔄 Újra generálás";
-}
-
-function loadGeneratedTask(){
-  if(!generatedTask)return;
-  // Inject at beginning of T and select it
-  T.unshift(generatedTask);
-  if(si>=0)si++;// shift existing index
-  H[0]=[];
-  closePracticeModal();
-  rF();aF();
-  sel(0);
-}
-
-// ══════════════════════════════════════════
-//  UPLOAD MODAL — kép / PDF / Word
-// ══════════════════════════════════════════
-
-let photoBase64=null;
-let photoMimeType="image/jpeg";
-let extractedPhotoTask=null;
-let docExtractedText=null;   // for PDF / Word text content
-let currentFileType=null;    // "image" | "pdf" | "docx"
-
-function openPhotoModal(){
-  photoBase64=null;extractedPhotoTask=null;docExtractedText=null;currentFileType=null;
-  document.getElementById("photoPreview").style.display="none";
-  document.getElementById("photoResult").style.display="none";
-  document.getElementById("analyzeBtn").style.display="none";
-  document.getElementById("loadPhotoBtn").style.display="none";
-  document.getElementById("uploadZone").style.display="block";
-  document.getElementById("fileTypeBadge").style.display="none";
-  document.getElementById("docTextPreview").style.display="none";
-  document.getElementById("photoInput").value="";
-  document.getElementById("photoModal").style.display="flex";
-}
-
-function closePhotoModal(){document.getElementById("photoModal").style.display="none";}
-
-function handleDrop(ev){
-  ev.preventDefault();
-  document.getElementById("uploadZone").classList.remove("drag");
-  const file=ev.dataTransfer.files[0];
-  if(file)processUploadFile(file);
-}
-
-function handlePhotoFile(ev){
-  const file=ev.target.files[0];
-  if(file)processUploadFile(file);
-}
-
-async function processUploadFile(file){
-  if(file.size>20*1024*1024){alert("A fájl túl nagy (max 20 MB)!");return;}
-  const name=file.name.toLowerCase();
-  const isPDF=file.type==="application/pdf"||name.endsWith(".pdf");
-  const isDocx=name.endsWith(".docx")||name.endsWith(".doc")||
-    file.type==="application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-  const isImage=file.type.startsWith("image/");
-
-  // Reset UI
-  document.getElementById("uploadZone").style.display="none";
-  document.getElementById("photoPreview").style.display="none";
-  document.getElementById("docTextPreview").style.display="none";
-  document.getElementById("photoResult").style.display="none";
-  document.getElementById("loadPhotoBtn").style.display="none";
-  extractedPhotoTask=null;docExtractedText=null;
-
-  const badge=document.getElementById("fileTypeBadge");
-
-  if(isImage){
-    currentFileType="image";
-    badge.textContent="📷 Kép";badge.style.display="block";
-    photoMimeType=file.type||"image/jpeg";
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      const dataUrl=ev.target.result;
-      photoBase64=dataUrl.split(",")[1];
-      const prev=document.getElementById("photoPreview");
-      prev.src=dataUrl;prev.style.display="block";
-      document.getElementById("analyzeBtn").style.display="inline-flex";
-      document.getElementById("analyzeBtnTxt").textContent="🔍 Feladat kiolvasása";
-      document.getElementById("analyzeBtn").disabled=false;
-    };
-    reader.readAsDataURL(file);
-
-  } else if(isPDF){
-    currentFileType="pdf";
-    badge.textContent="📄 PDF";badge.style.display="block";
-    const preview=document.getElementById("docTextPreview");
-    preview.textContent="PDF feldolgozása...";preview.style.display="block";
-    try{
-      const arrayBuf=await file.arrayBuffer();
-      // Load PDF.js dynamically
-      if(!window.pdfjsLib){
-        await new Promise((res,rej)=>{
-          const s=document.createElement("script");
-          s.src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs";
-          s.type="module";
-          // Fallback: use legacy build
-          s.onerror=()=>{
-            const s2=document.createElement("script");
-            s2.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-            s2.onload=()=>{window.pdfjsLib=window["pdfjs-dist/build/pdf"];window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";res();};
-            s2.onerror=rej;document.head.appendChild(s2);
-          };
-          s.onload=res;document.head.appendChild(s);
-        });
-      }
-      // Use simpler approach: read with FileReader as text fallback, or use PDF.js
-      // Most reliable: cdnjs legacy PDF.js
-      if(!window.pdfjsLib||!window.pdfjsLib.getDocument){
-        // Direct CDN load
-        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
-        window.pdfjsLib=window["pdfjs-dist/build/pdf"];
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-      }
-      const pdf=await window.pdfjsLib.getDocument({data:arrayBuf}).promise;
-      let text="";
-      for(let i=1;i<=Math.min(pdf.numPages,8);i++){
-        const page=await pdf.getPage(i);
-        const tc=await page.getTextContent();
-        text+=tc.items.map(it=>it.str).join(" ")+"\n";
-      }
-      text=text.trim();
-      if(!text){preview.textContent="⚠️ A PDF nem tartalmaz kiolvasható szöveget (lehet hogy szkennelt kép). Próbálj képként feltölteni!";return;}
-      docExtractedText=text;
-      preview.textContent=text.slice(0,500)+(text.length>500?"…":"");
-      document.getElementById("analyzeBtn").style.display="inline-flex";
-      document.getElementById("analyzeBtnTxt").textContent="🔍 Feladat elemzése";
-      document.getElementById("analyzeBtn").disabled=false;
-    }catch(ex){
-      preview.textContent="PDF hiba: "+ex.message;
-    }
-
-  } else if(isDocx){
-    currentFileType="docx";
-    badge.textContent="📝 Word";badge.style.display="block";
-    const preview=document.getElementById("docTextPreview");
-    preview.textContent="Word fájl feldolgozása...";preview.style.display="block";
-    try{
-      if(!window.mammoth){
-        await loadScript("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js");
-      }
-      const arrayBuf=await file.arrayBuffer();
-      const result=await window.mammoth.extractRawText({arrayBuffer:arrayBuf});
-      const text=result.value.trim();
-      if(!text){preview.textContent="⚠️ Nem sikerült szöveget kinyerni a Word fájlból.";return;}
-      docExtractedText=text;
-      preview.textContent=text.slice(0,500)+(text.length>500?"…":"");
-      document.getElementById("analyzeBtn").style.display="inline-flex";
-      document.getElementById("analyzeBtnTxt").textContent="🔍 Feladat elemzése";
-      document.getElementById("analyzeBtn").disabled=false;
-    }catch(ex){
-      preview.textContent="Word hiba: "+ex.message;
-    }
-  } else {
-    alert("Nem támogatott fájlformátum. Kérlek JPG, PNG, PDF vagy DOCX fájlt tölts fel!");
-    document.getElementById("uploadZone").style.display="block";
-  }
-}
-
-function loadScript(src){
-  return new Promise((res,rej)=>{
-    const s=document.createElement("script");s.src=src;
-    s.onload=res;s.onerror=rej;document.head.appendChild(s);
-  });
-}
-
-async function analyzePhoto(){
-  const btn=document.getElementById("analyzeBtn");
-  const btnTxt=document.getElementById("analyzeBtnTxt");
-  btn.disabled=true;
-  btnTxt.innerHTML='<span class="spin"></span> Elemzés...';
-  const resultEl=document.getElementById("photoResult");
-  resultEl.style.display="block";
-  resultEl.textContent="Martha olvassa a feladatot...";
-  document.getElementById("loadPhotoBtn").style.display="none";
-
-  const VISION_MODEL="meta-llama/llama-4-scout-17b-16e-instruct";
-  const sysMsg="Du bist Martha, eine NRW Abitur Mathematiklehrerin. Antworte auf Deutsch.";
-  const extractPrompt=`Lies diese Mathematikaufgabe und schreibe sie vollstaendig als Text.
-
-REGELN:
-1. Alle Formeln in LaTeX: inline $f(x)=...$, Display $$f(x)=...$$
-2. NUR den Aufgabentext — keine Loesung, keine Erklaerung
-3. Falls keine Matheaufgabe erkennbar: schreibe nur "KEIN_AUFGABE"
-4. Starte direkt mit dem Aufgabentext, kein Praefix
-
-GRAFIKEN UND ABBILDUNGEN — SEHR WICHTIG:
-Falls die Aufgabe eine Funktion enthaelt (explizit genannt ODER in einer Abbildung sichtbar):
-- Schreibe den Funktionsterm als LaTeX in den Aufgabentext
-- Zusaetzlich: schreibe auf einer eigenen Zeile: PLOT(ausdruck, xmin, xmax)
-  Beispiele: PLOT(x^3-3*x, -3, 3) oder PLOT(0.5*x^2-2*x, -1, 5)
-- Nutze JavaScript-Syntax: * fuer Multiplikation, exp() fuer e^x, ^ fuer Potenzen
-- Schaetze xmin/xmax sinnvoll basierend auf der Aufgabe (z.B. Definitionsbereich)
-- Falls mehrere Funktionen: je eine PLOT-Zeile pro Funktion
-- Falls eine Abbildung vorhanden aber die Funktion nicht ablesbar: schreibe "ABBILDUNG_NICHT_LESBAR"`;
-
-  let userMsg;
-  if(currentFileType==="image"){
-    if(!photoBase64){btn.disabled=false;btnTxt.textContent="🔍 Újra";return;}
-    userMsg={role:"user",content:[
-      {type:"image_url",image_url:{url:`data:${photoMimeType};base64,${photoBase64}`}},
-      {type:"text",text:extractPrompt}
-    ]};
-  } else {
-    // PDF or DOCX — text already extracted, use text model
-    if(!docExtractedText){btn.disabled=false;btnTxt.textContent="🔍 Újra";return;}
-    userMsg={role:"user",content:
-      `${extractPrompt}
-
-EXTRAHIERTER TEXT AUS DEM DOKUMENT:
-"""
-${docExtractedText.slice(0,4000)}
-"""`
-    };
-  }
-
-  const model=currentFileType==="image"?VISION_MODEL:CONFIG.MODEL;
-  let full="";
-  try{
-    const resp=await fetch(CONFIG.API_URL,{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model,messages:[{role:"system",content:sysMsg},userMsg],stream:true,temperature:0.1,max_tokens:1000})
-    });
-    if(!resp.ok){
-      const err=await resp.json().catch(()=>({}));
-      resultEl.textContent="Hiba: "+(err.error?.message||resp.status);
-      btn.disabled=false;btnTxt.textContent="🔍 Újra";return;
-    }
-    const reader=resp.body.getReader(),dec=new TextDecoder();let buf="";
-    resultEl.textContent="";
-    while(true){
-      const{done,value}=await reader.read();if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split("\n");buf=lines.pop()||"";
-      for(const line of lines){
-        if(line.startsWith("data: ")){const d=line.slice(6).trim();if(d==="[DONE]")break;
-          try{const p=JSON.parse(d);const tok=p.choices?.[0]?.delta?.content;if(tok){full+=tok;resultEl.textContent=full;}}catch(ex){}
-        }
-      }
-    }
-  }catch(ex){resultEl.textContent="Verbindungsfehler: "+ex.message;btn.disabled=false;btnTxt.textContent="🔍 Újra";return;}
-
-  if(full&&!full.includes("KEIN_AUFGABE")){
-    // ── Render text + LaTeX ──
-    resultEl.textContent=full;
-    if(typeof renderMathInElement==="function"){
-      try{renderMathInElement(resultEl,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});}catch(ex){}
-    }
-
-    // ── Detect and draw any PLOT(...) commands ──
-    const plots=detectPlots(full);
-    if(plots.length){
-      const plotSection=document.createElement("div");
-      plotSection.style.cssText="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px";
-      const plotLabel=document.createElement("div");
-      plotLabel.style.cssText="font-size:.75rem;color:var(--ac);font-weight:600;margin-bottom:6px";
-      plotLabel.textContent="📈 Függvény a feladatból:";
-      plotSection.appendChild(plotLabel);
-      plots.forEach(p=>{
-        try{drawPlot(p.expr,p.xmin,p.xmax,plotSection);}catch(ex){
-          const err=document.createElement("div");
-          err.className="abw";err.textContent="Rajzolási hiba: "+ex.message;
-          plotSection.appendChild(err);
-        }
-      });
-      resultEl.parentNode.insertBefore(plotSection,resultEl.nextSibling);
-    }
-
-    // ── Also use extractFunctions as fallback if no PLOT commands found ──
-    if(!plots.length){
-      const funcs=extractFunctions(full);
-      if(funcs.length){
-        const plotSection=document.createElement("div");
-        plotSection.style.cssText="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px";
-        const plotLabel=document.createElement("div");
-        plotLabel.style.cssText="font-size:.75rem;color:var(--ac);font-weight:600;margin-bottom:6px";
-        plotLabel.textContent="📈 Függvény a feladatból:";
-        plotSection.appendChild(plotLabel);
-        funcs.forEach(f=>{
-          const[xmin,xmax]=guessRange(f.expr);
-          try{drawPlot(f.expr,xmin,xmax,plotSection);}catch(ex){}
-        });
-        resultEl.parentNode.insertBefore(plotSection,resultEl.nextSibling);
-      }
-    }
-
-    // ── ABBILDUNG_NICHT_LESBAR warning ──
-    if(full.includes("ABBILDUNG_NICHT_LESBAR")){
-      const warn=document.createElement("div");
-      warn.className="abw";
-      warn.textContent="⚠️ Az ábra nem volt egyértelműen olvasható — a függvényt kézzel is megadhatod Marthának.";
-      resultEl.parentNode.insertBefore(warn,resultEl.nextSibling);
-    }
-
-    const icons={"image":"📷","pdf":"📄","docx":"📝"};
-    extractedPhotoTask={
-      task_id:(icons[currentFileType]||"📎")+" Feltöltött feladat",
-      topic:"Egyedi feladat",subtopic:"Feltöltött fájlból",
-      source:{level:"",year:""},
-      points:null,question:full,expected_answer:""
-    };
-    document.getElementById("loadPhotoBtn").style.display="inline-flex";
-  } else if(full.includes("KEIN_AUFGABE")){
-    resultEl.textContent="⚠️ Nem találtam matematikai feladatot ebben a fájlban.";
-  }
-  btn.disabled=false;btnTxt.textContent="🔄 Újra";
-}
-
-function loadPhotoTask(){
-  if(!extractedPhotoTask)return;
-  T.unshift(extractedPhotoTask);
-  if(si>=0)si++;
-  H[0]=[];
-  closePhotoModal();
-  rF();aF();
-  sel(0);
-}
-
-let _kt=0;
-const _ki=setInterval(()=>{if(typeof renderMathInElement==="function"||_kt>30){clearInterval(_ki);renderMath()}_kt++;},500);
-
-document.addEventListener("DOMContentLoaded", initLogin);
+<!-- ── Entry point ── -->
+<script type="module">
+  import { initLogin } from "./js/login.js";
+  import "./js/chat.js";
+  import "./js/practice.js";
+  import "./js/upload.js";
+
+  // KaTeX auto-init retry (deferred CDN)
+  let _kt = 0;
+  const _ki = setInterval(() => {
+    if (typeof renderMathInElement === "function" || _kt > 30) clearInterval(_ki);
+    _kt++;
+  }, 500);
+
+  document.addEventListener("DOMContentLoaded", initLogin);
 </script>
 </body>
 </html>

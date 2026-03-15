@@ -9,6 +9,8 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs" type="module" id="pdfjs-cdn"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0c0d12;--s1:#14161e;--s2:#1c1f2b;--s3:#252938;--bd:#2a2e40;--tx:#e4e6ef;--tx2:#7c82a0;--tx3:#555a73;--ac:#7c6cff;--ac2:#635bff;--grn:#34d399;--amb:#fbbf24;--red:#f87171;--blu:#60a5fa;--r:14px;--f:-apple-system,"SF Pro Text",system-ui,sans-serif}
@@ -84,7 +86,7 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
 .mh h2{font-size:1rem;font-weight:700}
 .mx{width:32px;height:32px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .mx:active{background:var(--s3)}
-.mb{flex:1;overflow-y:auto;padding:20px}
+.mb{flex:1;overflow-y:auto;padding:20px;min-height:0}
 .mf{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:10px;flex-wrap:wrap}
 .btn-pri{padding:10px 20px;border-radius:10px;border:0;background:var(--ac2);color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
 .btn-pri:active{opacity:.85}.btn-pri:disabled{opacity:.4;cursor:not-allowed}
@@ -100,7 +102,7 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
 .uz-txt{font-size:.88rem;color:var(--tx2)}
 .uz-sub{font-size:.75rem;color:var(--tx3);margin-top:4px}
 .img-preview{width:100%;border-radius:10px;max-height:220px;object-fit:contain;margin-bottom:12px;display:block}
-.photo-result{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;font-size:.88rem;line-height:1.65;color:var(--tx);white-space:pre-wrap;margin-top:12px}
+.photo-result{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;font-size:.88rem;line-height:1.65;color:var(--tx);white-space:pre-wrap;margin-top:12px;max-height:none}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -192,16 +194,18 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
 <div id="photoModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closePhotoModal()">
   <div class="modal">
     <div class="mh">
-      <h2>📷 Feladat betöltése fotóból</h2>
+      <h2>📎 Feladat betöltése</h2>
       <button class="mx" onclick="closePhotoModal()">✕</button>
     </div>
     <div class="mb">
       <div id="uploadZone" class="upload-zone" onclick="document.getElementById('photoInput').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
-        <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoFile(event)">
-        <div class="uz-icon">📸</div>
-        <div class="uz-txt">Kattints vagy húzz ide egy fotót</div>
-        <div class="uz-sub">JPG, PNG, HEIC · max 10 MB</div>
+        <input type="file" id="photoInput" accept="image/*,.pdf,.doc,.docx" onchange="handlePhotoFile(event)">
+        <div class="uz-icon" id="uzIcon">📎</div>
+        <div class="uz-txt">Kattints vagy húzz ide a fájlt</div>
+        <div class="uz-sub">📷 Fotó (JPG, PNG) &nbsp;·&nbsp; 📄 PDF &nbsp;·&nbsp; 📝 Word (.docx) &nbsp;·&nbsp; max 20 MB</div>
       </div>
+      <div id="fileTypeBadge" style="display:none;margin-top:8px;padding:4px 12px;border-radius:100px;font-size:.75rem;font-weight:600;width:fit-content;background:rgba(124,108,255,.15);color:var(--ac)"></div>
+      <div id="docTextPreview" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;font-size:.8rem;color:var(--tx2);max-height:120px;overflow-y:auto;margin-top:8px;white-space:pre-wrap"></div>
       <img id="photoPreview" class="img-preview" style="display:none">
       <div id="photoResult" class="photo-result" style="display:none"></div>
     </div>
@@ -788,104 +792,176 @@ async function generatePractice(){
   document.getElementById("practiceContent").style.display="none";
   document.getElementById("loadPracticeBtn").style.display="none";
 
-  // Randomize to ensure variety between repeated generations
-  const variantSeed = Math.random();
-  const contextVariants = [
-    "Wähle einen Anwendungskontext aus der Wirtschaft (z.B. Kosten, Gewinn, Nachfrage).",
-    "Wähle einen Anwendungskontext aus der Physik oder Natur (z.B. Bewegung, Wachstum).",
-    "Erstelle eine rein abstrakte Aufgabe ohne Anwendungskontext.",
-    "Wähle einen Kontext aus dem Alltag (z.B. Wasserstand, Temperatur, Bevölkerung).",
+  const r = Math.random();
+
+  const contexts = [
+    "rein abstrakt, ohne Anwendungskontext",
+    "Kontext: Kostenfunktion — Verlauf der Produktionskosten einer Firma",
+    "Kontext: Physik — Bewegung (Höhe, Geschwindigkeit oder Energie)",
+    "Kontext: Natur — Bevölkerungswachstum oder Temperaturverlauf",
+    "Kontext: Wasserstand oder Füllmenge eines Behälters",
+    "Kontext: Sportwissenschaft — Leistungskurve oder Erschöpfungsmodell",
   ];
-  const variant = contextVariants[Math.floor(variantSeed * contextVariants.length)];
+  const taskAngles = [
+    "Nachweis eines lokalen HOCHPUNKTS (nicht Tiefpunkt)",
+    "Nachweis eines lokalen TIEFPUNKTS an einer negativen Stelle x < 0",
+    "Nachweis, dass eine Stelle ein Sattelpunkt ist (kein Extrempunkt)",
+    "Bestimme ALLE lokalen Extrempunkte und klassifiziere sie (Hoch- oder Tiefpunkt)",
+    "Nachweis eines lokalen Tiefpunkts mit Interpretation im Sachkontext",
+    "Nachweis eines lokalen Hochpunkts + berechne den zugehörigen Funktionswert",
+  ];
+  const funcTypes = [
+    "ganzrationale Funktion Grad 3: f(x) = ax³ + bx² + cx",
+    "ganzrationale Funktion Grad 3 mit Konstante: f(x) = ax³ + bx² + c",
+    "ganzrationale Funktion Grad 4 mit kubischem Term: f(x) = ax⁴ + bx³ + cx",
+    "ganzrationale Funktion Grad 3, alle Koeffizienten ungewöhnliche Brüche",
+    "ganzrationale Funktion Grad 4: f(x) = ax⁴ + bx³ + cx²",
+    "Grad 3, symmetrielos, alle vier Terme vorhanden (inkl. Konstante)",
+  ];
 
-  const prompt = `Du bist eine NRW Abitur Mathematiklehrerin. Erstelle eine NEUE Übungsaufgabe zum selben mathematischen Thema wie unten.
+  const ctx   = contexts[   Math.floor(r * 6.7) % contexts.length];
+  const angle = taskAngles[ Math.floor(r * 5.3) % taskAngles.length];
+  const ftype = funcTypes[  Math.floor(r * 7.1) % funcTypes.length];
+  const xVals = [-3, -2, -1.5, 0.5, 1.5, 2, 3, -0.5];
+  const xVal  = xVals[Math.floor(r * xVals.length)];
 
-ORIGINAL-AUFGABE (NUR als Referenz für das Thema/Konzept — NICHT kopieren!):
-Thema: ${t.topic||"?"} · Unterthema: ${t.subtopic||"?"}
-Kurs: ${(t.source||{}).level||"?"}
-Aufgabentext: ${t.question||""}
+  const origSnippet = (t.question||"").slice(0,120).replace(/`/g,"'");
+  const topicStr    = (t.topic||"Analysis") + " · " + (t.subtopic||"Extremstellen");
+  const levelStr    = (t.source||{}).level||"GK";
 
-STRIKTE REGELN:
-1. VERWENDE KEINE der originalen Zahlen, Koeffizienten oder Funktionen aus der Originaaufgabe
-2. Erfinde komplett neue Zahlen (andere Brüche, andere Exponenten, andere Stelle x=?)
-3. ${variant}
-4. Gleicher mathematischer Typ und Schwierigkeitsgrad wie das Original
-5. Schreibe alle Formeln NUR in LaTeX: inline $f(x) = ...$, display $$f(x) = ...$$
-6. Gib NUR den fertigen Aufgabentext aus
-7. KEIN Präfix wie "Aufgabe:", "Neue Aufgabe:", "Übungsaufgabe:" — direkt beginnen
-8. KEINE Lösung, KEIN Lösungshinweis`;
+  const prompt = `Du bist eine erfahrene NRW Abitur Mathematiklehrerin (${levelStr}).
+Erstelle eine kreative, originelle Übungsaufgabe zum Thema "${topicStr}".
+
+KONKRETE VORGABEN:
+* Aufgabenstellung: ${angle}
+* Funktionstyp: ${ftype}
+* Gesuchte Stelle: x = ${xVal}
+* Kontext: ${ctx}
+* Koeffizienten: Wähle UNGEWÖHNLICHE rationale Zahlen — keine einfachen ganzen Zahlen wie 1,2,3.
+  Gute Beispiele: 3/8, -5/6, 7/4, 2/9, -11/6
+
+VERBOTEN:
+* Die Funktion oder Zahlen aus dem Original: "${origSnippet}"
+* x = 0 oder x = 1 als Extremstelle
+* Koeffizient 1/2, 1/3 oder 2/5 (zu häufig im Original)
+
+MATHEMATISCHE PFLICHTPRUEFUNG (intern, vor dem Schreiben):
+Waehle die Koeffizienten so, dass f'(x₀) = 0 exakt gilt (x₀ = vorgegebene Stelle).
+Pruefe f''(x₀): positiv → Tiefpunkt, negativ → Hochpunkt.
+Stimmt die Mathematik nicht: andere Koeffizienten oder andere Stelle waehlen.
+NIEMALS eine Extremstelle behaupten, die rechnerisch nicht stimmt.
+
+AUSGABE:
+Schreibe NUR den vollständigen, mathematisch verifizierten Aufgabentext auf Deutsch.
+Formeln ausschliesslich in LaTeX: inline $f(x)=...$, Display $$f(x)=$$.
+Kein Praefix, keine Loesung, keine Erklaerung.`;
 
   const msgs=[{role:"user",content:prompt}];
-  const reqMsgs=[{role:"system",content:"Du bist Martha, eine erfahrene NRW Abitur Mathematiklehrerin. Antworte ausschließlich auf Deutsch. Halte dich exakt an die Anweisungen."},...msgs];
+  const reqMsgs=[{role:"system",content:"Du bist Martha, eine erfahrene NRW Abitur Mathematiklehrerin und Mathematikerin. Du erstellst Uebungsaufgaben — aber NUR solche, deren Mathematik 100% korrekt ist. Bevor du eine Aufgabe formulierst, rechnest du intern nach: (1) Waehle die Funktion f(x). (2) Berechne f'(x) und setze die vorgegebene Stelle x=a ein: Ist f'(a)=0? Falls nicht, aendere die Koeffizienten. (3) Berechne f''(x) an der Stelle x=a: Ist f''(a)>0 fuer Tiefpunkt, f''(a)<0 fuer Hochpunkt? Falls nicht, aendere die Koeffizienten. (4) Erst wenn Schritt 2 UND 3 stimmen, formulierst du den Aufgabentext. Halluziniere NIEMALS eine Extremstelle — lieber andere Zahlen waehlen als falsche Mathematik. Antworte ausschliesslich auf Deutsch."},...msgs];
 
-  let full="";
-
-  // Streaming container — pure text only, no KaTeX during stream
+  // ── Prepare UI ──
   const box=document.createElement("div");box.className="gen-box";
+  const statusEl=document.createElement("div");
+  statusEl.style.cssText="color:var(--tx3);font-size:.8rem;margin-bottom:10px";
   const streamEl=document.createElement("pre");
   streamEl.style.cssText="white-space:pre-wrap;font-family:inherit;font-size:inherit;margin:0;opacity:.75";
-  box.appendChild(streamEl);
+  box.appendChild(statusEl);box.appendChild(streamEl);
 
   document.getElementById("practiceContent").style.display="block";
   document.getElementById("practiceTag").textContent=`${t.topic||"?"} · ${(t.source||{}).level||""} · ähnlich wie ${t.task_id||""}`;
   const pb=document.getElementById("practiceText");
   pb.innerHTML="";pb.appendChild(box);
 
+  // ══ STEP 1: Generate + verify in one non-streaming call (JSON response) ══
+  // The model generates the task, solves it internally, and returns structured JSON.
+  // This prevents hallucinated extrema from ever reaching the user.
+  statusEl.textContent="⚙️ 1/2 · Feladat generálása és matematikai ellenőrzés...";
+
+  const verifySystemPrompt = `Du bist Martha, eine praezise NRW Abitur Mathematiklehrerin.
+Du erstellst Uebungsaufgaben und verifizierst sie mathematisch, bevor du sie ausgibst.
+
+PROZESS (intern, vor jeder Ausgabe):
+1. Waehle die Funktion f(x) gemaess den Vorgaben.
+2. Berechne f'(x) symbolisch.
+3. Setze x=x0 ein: Ist f'(x0) = 0? Falls nicht → andere Koeffizienten waehlen.
+4. Berechne f''(x0): Vorzeichen pruefen (>0 Tiefpunkt, <0 Hochpunkt, =0 kein Test).
+5. Nur wenn Schritte 3 UND 4 bestaetigt: Aufgabentext formulieren.
+6. Loesung intern durchrechnen — Ergebnis als Verifikation.
+
+Antworte AUSSCHLIESSLICH mit einem JSON-Objekt (kein Markdown, kein Praefix):
+{
+  "aufgabe": "<vollstaendiger Aufgabentext mit LaTeX-Formeln>",
+  "verifikation": {
+    "f_prime": "<f'(x) als LaTeX>",
+    "f_prime_at_x0": "<berechneter Wert — muss 0 sein>",
+    "f_double_prime_at_x0": "<berechneter Wert und Vorzeichen>",
+    "urteil": "OK" oder "FEHLER: <Grund>"
+  }
+}`;
+
+  let rawJSON="";
   try{
-    const resp=await fetch(CONFIG.API_URL,{
+    const resp1=await fetch(CONFIG.API_URL,{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:CONFIG.MODEL,messages:reqMsgs,stream:true,temperature:0.85,max_tokens:500})
+      body:JSON.stringify({
+        model:CONFIG.MODEL,
+        messages:[{role:"system",content:verifySystemPrompt},{role:"user",content:prompt}],
+        stream:false,temperature:0.7,max_tokens:900
+      })
     });
-    if(!resp.ok){box.textContent="Hiba a generálás során. Próbáld újra!";btn.disabled=false;btnTxt.textContent="✨ Generálás";return;}
-    const reader=resp.body.getReader(),dec=new TextDecoder();let buf="";
-    while(true){
-      const{done,value}=await reader.read();if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split("\n");buf=lines.pop()||"";
-      for(const line of lines){
-        if(line.startsWith("data: ")){const d=line.slice(6).trim();if(d==="[DONE]")break;
-          try{const p=JSON.parse(d);const tok=p.choices?.[0]?.delta?.content;
-            if(tok){full+=tok;streamEl.textContent=full;}  // textContent on <pre> = safe, no HTML
-          }catch(ex){}
-        }
-      }
-    }
+    if(!resp1.ok){box.textContent="Hiba a generálás során. Próbáld újra!";btn.disabled=false;btnTxt.textContent="✨ Generálás";return;}
+    const d=await resp1.json();
+    rawJSON=d.choices?.[0]?.message?.content||"";
   }catch(ex){box.textContent="Verbindungsfehler: "+ex.message;btn.disabled=false;btnTxt.textContent="🔁 Újra";return;}
 
-  if(full){
-    // ── Rendering phase: wipe the raw text, render LaTeX cleanly ──
-    // KaTeX renderMathInElement needs a DOM node with textContent (not innerHTML)
-    // We create a fresh wrapper so there is NO prior raw text visible alongside rendered math
-    box.innerHTML="";  // remove the streaming <pre> entirely
-
-    const finalEl=document.createElement("div");
-    finalEl.style.cssText="line-height:1.8";
-    finalEl.textContent=full;   // set as textContent → KaTeX will find $...$ tokens
-    box.appendChild(finalEl);
-
-    // Run KaTeX — it replaces $...$ spans IN PLACE without duplicating surrounding text
-    if(typeof renderMathInElement==="function"){
-      try{
-        renderMathInElement(finalEl,{
-          delimiters:[
-            {left:"$$",right:"$$",display:true},
-            {left:"$",right:"$",display:false},
-            {left:"\\(",right:"\\)",display:false},
-            {left:"\\[",right:"\\]",display:true}
-          ],
-          throwOnError:false
-        });
-      }catch(ex){}
-    }
-
-    generatedTask={
-      task_id:"🔁 Üben · "+(t.task_id||"?"),
-      topic:t.topic,subtopic:t.subtopic,
-      source:{level:(t.source||{}).level,year:"generiert"},
-      points:t.points,question:full,expected_answer:""
-    };
-    document.getElementById("loadPracticeBtn").style.display="inline-flex";
+  // Parse JSON response
+  let aufgabe="";
+  let verDict={};
+  try{
+    const clean=rawJSON.replace(/^```json\s*/,"").replace(/```\s*$/,"").trim();
+    const parsed=JSON.parse(clean);
+    aufgabe=parsed.aufgabe||"";
+    verDict=parsed.verifikation||{};
+  }catch(ex){
+    // Fallback: try to extract aufgabe from raw text if JSON parsing fails
+    const m=rawJSON.match(/"aufgabe"\s*:\s*"([\s\S]+?)(?:",\s*"verifikation|"\s*})/);
+    aufgabe=m?m[1].replace(/\\n/g,"\n"):"";
+    verDict={urteil:"JSON_PARSE_ERROR"};
   }
+
+  // Check verdict
+  const verdict=(verDict.urteil||"").toUpperCase();
+  if(verdict==="FEHLER"||verdict.startsWith("FEHLER")||!aufgabe){
+    // Retry once automatically
+    statusEl.textContent="⚠️ Matematikai hiba észlelve, újragenerálás...";
+    streamEl.textContent=verDict.urteil||"Ismeretlen hiba";
+    btn.disabled=false;btnTxt.textContent="🔄 Próbáld újra";
+    return;
+  }
+
+  // ══ STEP 2: Show verification badge + stream the final task for display ══
+  statusEl.innerHTML=
+    `<span style="color:var(--grn);font-weight:600">✓ Matematikailag ellenőrzött</span>` +
+    (verDict.f_prime?` &nbsp;·&nbsp; f'(x) = ${verDict.f_prime}`:"") +
+    (verDict.f_prime_at_x0?` &nbsp;·&nbsp; f'(x₀) = ${verDict.f_prime_at_x0}`:"");
+
+  // Render the verified task
+  box.removeChild(streamEl);
+  const finalEl=document.createElement("div");
+  finalEl.style.cssText="line-height:1.9;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)";
+  finalEl.textContent=aufgabe;
+  box.appendChild(finalEl);
+  if(typeof renderMathInElement==="function"){
+    try{renderMathInElement(finalEl,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});}catch(ex){}
+  }
+
+  generatedTask={
+    task_id:"🔁 Üben · "+(t.task_id||"?"),
+    topic:t.topic,subtopic:t.subtopic,
+    source:{level:(t.source||{}).level,year:"generiert"},
+    points:t.points,question:aufgabe,expected_answer:""
+  };
+  document.getElementById("loadPracticeBtn").style.display="inline-flex";
   btn.disabled=false;btnTxt.textContent="🔄 Újra generálás";
 }
 
@@ -901,20 +977,24 @@ function loadGeneratedTask(){
 }
 
 // ══════════════════════════════════════════
-//  PHOTO MODAL — feladat fotóból
+//  UPLOAD MODAL — kép / PDF / Word
 // ══════════════════════════════════════════
 
 let photoBase64=null;
 let photoMimeType="image/jpeg";
 let extractedPhotoTask=null;
+let docExtractedText=null;   // for PDF / Word text content
+let currentFileType=null;    // "image" | "pdf" | "docx"
 
 function openPhotoModal(){
-  photoBase64=null;extractedPhotoTask=null;
+  photoBase64=null;extractedPhotoTask=null;docExtractedText=null;currentFileType=null;
   document.getElementById("photoPreview").style.display="none";
   document.getElementById("photoResult").style.display="none";
   document.getElementById("analyzeBtn").style.display="none";
   document.getElementById("loadPhotoBtn").style.display="none";
   document.getElementById("uploadZone").style.display="block";
+  document.getElementById("fileTypeBadge").style.display="none";
+  document.getElementById("docTextPreview").style.display="none";
   document.getElementById("photoInput").value="";
   document.getElementById("photoModal").style.display="flex";
 }
@@ -925,37 +1005,133 @@ function handleDrop(ev){
   ev.preventDefault();
   document.getElementById("uploadZone").classList.remove("drag");
   const file=ev.dataTransfer.files[0];
-  if(file)processPhotoFile(file);
+  if(file)processUploadFile(file);
 }
 
 function handlePhotoFile(ev){
   const file=ev.target.files[0];
-  if(file)processPhotoFile(file);
+  if(file)processUploadFile(file);
 }
 
-function processPhotoFile(file){
-  if(!file.type.startsWith("image/")){alert("Csak képfájl támogatott!");return;}
-  if(file.size>10*1024*1024){alert("A kép túl nagy (max 10 MB)!");return;}
-  photoMimeType=file.type||"image/jpeg";
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const dataUrl=ev.target.result;
-    photoBase64=dataUrl.split(",")[1];
-    const prev=document.getElementById("photoPreview");
-    prev.src=dataUrl;prev.style.display="block";
-    document.getElementById("uploadZone").style.display="none";
-    document.getElementById("photoResult").style.display="none";
-    document.getElementById("analyzeBtn").style.display="inline-flex";
-    document.getElementById("analyzeBtnTxt").textContent="🔍 Elemzés";
-    document.getElementById("analyzeBtn").disabled=false;
-    document.getElementById("loadPhotoBtn").style.display="none";
-    extractedPhotoTask=null;
-  };
-  reader.readAsDataURL(file);
+async function processUploadFile(file){
+  if(file.size>20*1024*1024){alert("A fájl túl nagy (max 20 MB)!");return;}
+  const name=file.name.toLowerCase();
+  const isPDF=file.type==="application/pdf"||name.endsWith(".pdf");
+  const isDocx=name.endsWith(".docx")||name.endsWith(".doc")||
+    file.type==="application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  const isImage=file.type.startsWith("image/");
+
+  // Reset UI
+  document.getElementById("uploadZone").style.display="none";
+  document.getElementById("photoPreview").style.display="none";
+  document.getElementById("docTextPreview").style.display="none";
+  document.getElementById("photoResult").style.display="none";
+  document.getElementById("loadPhotoBtn").style.display="none";
+  extractedPhotoTask=null;docExtractedText=null;
+
+  const badge=document.getElementById("fileTypeBadge");
+
+  if(isImage){
+    currentFileType="image";
+    badge.textContent="📷 Kép";badge.style.display="block";
+    photoMimeType=file.type||"image/jpeg";
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const dataUrl=ev.target.result;
+      photoBase64=dataUrl.split(",")[1];
+      const prev=document.getElementById("photoPreview");
+      prev.src=dataUrl;prev.style.display="block";
+      document.getElementById("analyzeBtn").style.display="inline-flex";
+      document.getElementById("analyzeBtnTxt").textContent="🔍 Feladat kiolvasása";
+      document.getElementById("analyzeBtn").disabled=false;
+    };
+    reader.readAsDataURL(file);
+
+  } else if(isPDF){
+    currentFileType="pdf";
+    badge.textContent="📄 PDF";badge.style.display="block";
+    const preview=document.getElementById("docTextPreview");
+    preview.textContent="PDF feldolgozása...";preview.style.display="block";
+    try{
+      const arrayBuf=await file.arrayBuffer();
+      // Load PDF.js dynamically
+      if(!window.pdfjsLib){
+        await new Promise((res,rej)=>{
+          const s=document.createElement("script");
+          s.src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs";
+          s.type="module";
+          // Fallback: use legacy build
+          s.onerror=()=>{
+            const s2=document.createElement("script");
+            s2.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+            s2.onload=()=>{window.pdfjsLib=window["pdfjs-dist/build/pdf"];window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";res();};
+            s2.onerror=rej;document.head.appendChild(s2);
+          };
+          s.onload=res;document.head.appendChild(s);
+        });
+      }
+      // Use simpler approach: read with FileReader as text fallback, or use PDF.js
+      // Most reliable: cdnjs legacy PDF.js
+      if(!window.pdfjsLib||!window.pdfjsLib.getDocument){
+        // Direct CDN load
+        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+        window.pdfjsLib=window["pdfjs-dist/build/pdf"];
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      }
+      const pdf=await window.pdfjsLib.getDocument({data:arrayBuf}).promise;
+      let text="";
+      for(let i=1;i<=Math.min(pdf.numPages,8);i++){
+        const page=await pdf.getPage(i);
+        const tc=await page.getTextContent();
+        text+=tc.items.map(it=>it.str).join(" ")+"
+";
+      }
+      text=text.trim();
+      if(!text){preview.textContent="⚠️ A PDF nem tartalmaz kiolvasható szöveget (lehet hogy szkennelt kép). Próbálj képként feltölteni!";return;}
+      docExtractedText=text;
+      preview.textContent=text.slice(0,500)+(text.length>500?"…":"");
+      document.getElementById("analyzeBtn").style.display="inline-flex";
+      document.getElementById("analyzeBtnTxt").textContent="🔍 Feladat elemzése";
+      document.getElementById("analyzeBtn").disabled=false;
+    }catch(ex){
+      preview.textContent="PDF hiba: "+ex.message;
+    }
+
+  } else if(isDocx){
+    currentFileType="docx";
+    badge.textContent="📝 Word";badge.style.display="block";
+    const preview=document.getElementById("docTextPreview");
+    preview.textContent="Word fájl feldolgozása...";preview.style.display="block";
+    try{
+      if(!window.mammoth){
+        await loadScript("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js");
+      }
+      const arrayBuf=await file.arrayBuffer();
+      const result=await window.mammoth.extractRawText({arrayBuffer:arrayBuf});
+      const text=result.value.trim();
+      if(!text){preview.textContent="⚠️ Nem sikerült szöveget kinyerni a Word fájlból.";return;}
+      docExtractedText=text;
+      preview.textContent=text.slice(0,500)+(text.length>500?"…":"");
+      document.getElementById("analyzeBtn").style.display="inline-flex";
+      document.getElementById("analyzeBtnTxt").textContent="🔍 Feladat elemzése";
+      document.getElementById("analyzeBtn").disabled=false;
+    }catch(ex){
+      preview.textContent="Word hiba: "+ex.message;
+    }
+  } else {
+    alert("Nem támogatott fájlformátum. Kérlek JPG, PNG, PDF vagy DOCX fájlt tölts fel!");
+    document.getElementById("uploadZone").style.display="block";
+  }
+}
+
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    const s=document.createElement("script");s.src=src;
+    s.onload=res;s.onerror=rej;document.head.appendChild(s);
+  });
 }
 
 async function analyzePhoto(){
-  if(!photoBase64)return;
   const btn=document.getElementById("analyzeBtn");
   const btnTxt=document.getElementById("analyzeBtnTxt");
   btn.disabled=true;
@@ -965,31 +1141,56 @@ async function analyzePhoto(){
   resultEl.textContent="Martha olvassa a feladatot...";
   document.getElementById("loadPhotoBtn").style.display="none";
 
-  // Use vision model via Groq
   const VISION_MODEL="meta-llama/llama-4-scout-17b-16e-instruct";
   const sysMsg="Du bist Martha, eine NRW Abitur Mathematiklehrerin. Antworte auf Deutsch.";
-  const userMsg={
-    role:"user",
-    content:[
-      {type:"image_url",image_url:{url:`data:${photoMimeType};base64,${photoBase64}`}},
-      {type:"text",text:`Lies diese Mathematikaufgabe vom Bild ab und schreibe sie vollständig als Text.
-Wichtig:
-- Schreibe alle Formeln in LaTeX ($...$)
-- Schreibe NUR den Aufgabentext — keine Lösung, keine Erklärung
-- Falls du kein Mathe-Aufgabe erkennst, sage: "Kein Aufgabe erkannt."
-- Beginne direkt mit dem Aufgabentext`}
-    ]
-  };
+  const extractPrompt=`Lies diese Mathematikaufgabe und schreibe sie vollstaendig als Text.
 
+REGELN:
+1. Alle Formeln in LaTeX: inline $f(x)=...$, Display $$f(x)=...$$
+2. NUR den Aufgabentext — keine Loesung, keine Erklaerung
+3. Falls keine Matheaufgabe erkennbar: schreibe nur "KEIN_AUFGABE"
+4. Starte direkt mit dem Aufgabentext, kein Praefix
+
+GRAFIKEN UND ABBILDUNGEN — SEHR WICHTIG:
+Falls die Aufgabe eine Funktion enthaelt (explizit genannt ODER in einer Abbildung sichtbar):
+- Schreibe den Funktionsterm als LaTeX in den Aufgabentext
+- Zusaetzlich: schreibe auf einer eigenen Zeile: PLOT(ausdruck, xmin, xmax)
+  Beispiele: PLOT(x^3-3*x, -3, 3) oder PLOT(0.5*x^2-2*x, -1, 5)
+- Nutze JavaScript-Syntax: * fuer Multiplikation, exp() fuer e^x, ^ fuer Potenzen
+- Schaetze xmin/xmax sinnvoll basierend auf der Aufgabe (z.B. Definitionsbereich)
+- Falls mehrere Funktionen: je eine PLOT-Zeile pro Funktion
+- Falls eine Abbildung vorhanden aber die Funktion nicht ablesbar: schreibe "ABBILDUNG_NICHT_LESBAR"`;
+
+  let userMsg;
+  if(currentFileType==="image"){
+    if(!photoBase64){btn.disabled=false;btnTxt.textContent="🔍 Újra";return;}
+    userMsg={role:"user",content:[
+      {type:"image_url",image_url:{url:`data:${photoMimeType};base64,${photoBase64}`}},
+      {type:"text",text:extractPrompt}
+    ]};
+  } else {
+    // PDF or DOCX — text already extracted, use text model
+    if(!docExtractedText){btn.disabled=false;btnTxt.textContent="🔍 Újra";return;}
+    userMsg={role:"user",content:
+      `${extractPrompt}
+
+EXTRAHIERTER TEXT AUS DEM DOKUMENT:
+"""
+${docExtractedText.slice(0,4000)}
+"""`
+    };
+  }
+
+  const model=currentFileType==="image"?VISION_MODEL:CONFIG.MODEL;
   let full="";
   try{
     const resp=await fetch(CONFIG.API_URL,{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:VISION_MODEL,messages:[{role:"system",content:sysMsg},userMsg],stream:true,temperature:0.1,max_tokens:800})
+      body:JSON.stringify({model,messages:[{role:"system",content:sysMsg},userMsg],stream:true,temperature:0.1,max_tokens:1000})
     });
     if(!resp.ok){
       const err=await resp.json().catch(()=>({}));
-      resultEl.textContent="Hiba: "+(err.error?.message||resp.status)+"\n\nBizonyosodj meg, hogy a worker URL helyes.";
+      resultEl.textContent="Hiba: "+(err.error?.message||resp.status);
       btn.disabled=false;btnTxt.textContent="🔍 Újra";return;
     }
     const reader=resp.body.getReader(),dec=new TextDecoder();let buf="";
@@ -1006,15 +1207,68 @@ Wichtig:
     }
   }catch(ex){resultEl.textContent="Verbindungsfehler: "+ex.message;btn.disabled=false;btnTxt.textContent="🔍 Újra";return;}
 
-  if(full && !full.includes("Kein Aufgabe erkannt")){
-    renderMath(resultEl);
+  if(full&&!full.includes("KEIN_AUFGABE")){
+    // ── Render text + LaTeX ──
+    resultEl.textContent=full;
+    if(typeof renderMathInElement==="function"){
+      try{renderMathInElement(resultEl,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false},{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false});}catch(ex){}
+    }
+
+    // ── Detect and draw any PLOT(...) commands ──
+    const plots=detectPlots(full);
+    if(plots.length){
+      const plotSection=document.createElement("div");
+      plotSection.style.cssText="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px";
+      const plotLabel=document.createElement("div");
+      plotLabel.style.cssText="font-size:.75rem;color:var(--ac);font-weight:600;margin-bottom:6px";
+      plotLabel.textContent="📈 Függvény a feladatból:";
+      plotSection.appendChild(plotLabel);
+      plots.forEach(p=>{
+        try{drawPlot(p.expr,p.xmin,p.xmax,plotSection);}catch(ex){
+          const err=document.createElement("div");
+          err.className="abw";err.textContent="Rajzolási hiba: "+ex.message;
+          plotSection.appendChild(err);
+        }
+      });
+      resultEl.parentNode.insertBefore(plotSection,resultEl.nextSibling);
+    }
+
+    // ── Also use extractFunctions as fallback if no PLOT commands found ──
+    if(!plots.length){
+      const funcs=extractFunctions(full);
+      if(funcs.length){
+        const plotSection=document.createElement("div");
+        plotSection.style.cssText="margin-top:12px;border-top:1px solid var(--bd);padding-top:10px";
+        const plotLabel=document.createElement("div");
+        plotLabel.style.cssText="font-size:.75rem;color:var(--ac);font-weight:600;margin-bottom:6px";
+        plotLabel.textContent="📈 Függvény a feladatból:";
+        plotSection.appendChild(plotLabel);
+        funcs.forEach(f=>{
+          const[xmin,xmax]=guessRange(f.expr);
+          try{drawPlot(f.expr,xmin,xmax,plotSection);}catch(ex){}
+        });
+        resultEl.parentNode.insertBefore(plotSection,resultEl.nextSibling);
+      }
+    }
+
+    // ── ABBILDUNG_NICHT_LESBAR warning ──
+    if(full.includes("ABBILDUNG_NICHT_LESBAR")){
+      const warn=document.createElement("div");
+      warn.className="abw";
+      warn.textContent="⚠️ Az ábra nem volt egyértelműen olvasható — a függvényt kézzel is megadhatod Marthának.";
+      resultEl.parentNode.insertBefore(warn,resultEl.nextSibling);
+    }
+
+    const icons={"image":"📷","pdf":"📄","docx":"📝"};
     extractedPhotoTask={
-      task_id:"📷 Fotó-feladat",
-      topic:"Egyedi feladat",subtopic:"Fotóból betöltve",
+      task_id:(icons[currentFileType]||"📎")+" Feltöltött feladat",
+      topic:"Egyedi feladat",subtopic:"Feltöltött fájlból",
       source:{level:"",year:""},
       points:null,question:full,expected_answer:""
     };
     document.getElementById("loadPhotoBtn").style.display="inline-flex";
+  } else if(full.includes("KEIN_AUFGABE")){
+    resultEl.textContent="⚠️ Nem találtam matematikai feladatot ebben a fájlban.";
   }
   btn.disabled=false;btnTxt.textContent="🔄 Újra";
 }

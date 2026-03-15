@@ -424,6 +424,9 @@ function exprToLatex(expr) {
   e = e.replace(/\*x/g, "x");
   e = e.replace(/\*e\^/g, " e^");
   e = e.replace(/(\d)\s*x/g, "$1x");
+  // Convert x^n to proper superscripts
+  e = e.replace(/x\^(\d+)/g, "x^{$1}");
+  // Letter coefficient before x: ax → ax (keep as is, LaTeX handles it)
   return e;
 }
 
@@ -454,6 +457,8 @@ function plainMathToLatex(text) {
 
   // "x = <number>" standalone (e.g. "an der Stelle x = 0")
   t = t.replace(/\bx\s*=\s*(-?\d+(?:[.,]\d+)?)\b(?!\s*[+\-*/^])/g, "$x = $1$");
+  // x₀ = n  
+  t = t.replace(/x[₀0]\s*=\s*(-?\d+(?:[.,]\d+)?)/g, "$x_0 = $1$");
 
   // Remaining bare (a/b) fractions not yet wrapped
   t = t.replace(/(?<!\$)\((\d+)\/(\d+)\)/g, "$\\frac{$1}{$2}$");

@@ -951,6 +951,7 @@ async function getTranslatedQuestion(i) {
   _translCache[key] = "__loading__";
 
   try {
+    const targetLang = lang === "hu" ? "Hungarian" : lang === "en" ? "English" : "Spanish";
     const resp = await fetch(CONFIG.API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -958,12 +959,10 @@ async function getTranslatedQuestion(i) {
         model: CONFIG.MODEL,
         messages: [{
           role: "system",
-          content: "You are a precise mathematical translator. Translate the following German math task text to " +
-            (lang === "hu" ? "Hungarian" : lang === "en" ? "English" : "Spanish") +
-            ". Keep all mathematical expressions, formulas, variable names and numbers exactly as they are. Only translate the natural language parts. Be concise and accurate."
+          content: "You are a mathematical text translator. Output ONLY the translated text — no explanations, no meta-commentary, no quotes around the result. Translate natural language to " + targetLang + ". Keep ALL math expressions unchanged: f(x), x ∈ ℝ, formulas, numbers, variable names."
         }, {
           role: "user",
-          content: t.question
+          content: "Translate this math task to " + targetLang + ". Output ONLY the translation, nothing else:\n\n" + t.question
         }],
         stream: false,
         temperature: 0.1,
@@ -1424,7 +1423,10 @@ MATHEMATISCHE PFLICHTPRÜFUNG (intern, vor dem Schreiben):
 Wähle Koeffizienten so dass f'(x₀) = 0 exakt gilt.
 Prüfe f''(x₀): Vorzeichen muss zur Aufgabenstellung passen.
 Stimmt die Stelle nicht: andere Koeffizienten oder andere Stelle wählen.
-NIEMALS falsche Extremstelle behaupten.`;
+NIEMALS falsche Extremstelle behaupten.
+
+SPRACHE: Schreibe die Aufgabe auf ${(typeof _currentLang !== "undefined" && _currentLang === "hu") ? "Ungarisch" : (typeof _currentLang !== "undefined" && _currentLang === "en") ? "Englisch" : (typeof _currentLang !== "undefined" && _currentLang === "es") ? "Spanisch" : "Deutsch"}.
+Nur die natürlichsprachlichen Teile übersetzen — Formeln, f(x), x ∈ ℝ etc. unverändert lassen.`;
 
   // ── Prepare UI ─────────────────────────────────────────────────────────────
   const box = document.createElement("div"); box.className = "gen-box";

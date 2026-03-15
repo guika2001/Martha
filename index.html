@@ -755,27 +755,43 @@ async function generatePractice(){
   document.getElementById("practiceContent").style.display="none";
   document.getElementById("loadPracticeBtn").style.display="none";
 
-  const prompt = `Du bist eine Abitur-Mathematiklehrerin. Erstelle eine NEUE Übungsaufgabe, die dem folgenden Aufgabentyp ähnelt.
+  // Randomize to ensure variety between repeated generations
+  const variantSeed = Math.random();
+  const contextVariants = [
+    "Wähle einen Anwendungskontext aus der Wirtschaft (z.B. Kosten, Gewinn, Nachfrage).",
+    "Wähle einen Anwendungskontext aus der Physik oder Natur (z.B. Bewegung, Wachstum).",
+    "Erstelle eine rein abstrakte Aufgabe ohne Anwendungskontext.",
+    "Wähle einen Kontext aus dem Alltag (z.B. Wasserstand, Temperatur, Bevölkerung).",
+  ];
+  const variant = contextVariants[Math.floor(variantSeed * contextVariants.length)];
 
-ORIGINAL-AUFGABE:
-Thema: ${t.topic||"?"} - ${t.subtopic||"?"}
+  const prompt = `Du bist eine NRW Abitur Mathematiklehrerin. Erstelle eine NEUE Übungsaufgabe zum selben mathematischen Thema wie unten.
+
+ORIGINAL-AUFGABE (NUR als Referenz für das Thema/Konzept — NICHT kopieren!):
+Thema: ${t.topic||"?"} · Unterthema: ${t.subtopic||"?"}
 Kurs: ${(t.source||{}).level||"?"}
-Punkte: ${t.points||"?"} BE
-Text: ${t.question||""}
+Aufgabentext: ${t.question||""}
 
-ANWEISUNG:
-- Erstelle eine neue, ähnliche Aufgabe mit anderen Zahlen/Kontext
-- Gleiches mathematisches Konzept, gleicher Schwierigkeitsgrad
-- Schreibe alle Formeln in LaTeX mit $...$
-- Gib NUR den Aufgabentext aus — keine Lösung, keine Erklärung
-- Format: Aufgabe direkt beginnen, kein Präfix wie "Aufgabe:" oder "Neue Aufgabe:"`;
+STRIKTE REGELN:
+1. VERWENDE KEINE der originalen Zahlen, Koeffizienten oder Funktionen aus der Originaaufgabe
+2. Erfinde komplett neue Zahlen (andere Brüche, andere Exponenten, andere Stelle x=?)
+3. ${variant}
+4. Gleicher mathematischer Typ und Schwierigkeitsgrad wie das Original
+5. Schreibe alle Formeln NUR in LaTeX: inline $f(x) = ...$, display $$f(x) = ...$$
+6. Gib NUR den fertigen Aufgabentext aus
+7. KEIN Präfix wie "Aufgabe:", "Neue Aufgabe:", "Übungsaufgabe:" — direkt beginnen
+8. KEINE Lösung, KEIN Lösungshinweis`;
 
   const msgs=[{role:"user",content:prompt}];
-  const fullSys="Du bist Martha, eine NRW Abitur Mathematiklehrerin. Antworte IMMER auf Deutsch.";
-  const reqMsgs=[{role:"system",content:fullSys},...msgs];
+  const reqMsgs=[{role:"system",content:"Du bist Martha, eine erfahrene NRW Abitur Mathematiklehrerin. Antworte ausschließlich auf Deutsch. Halte dich exakt an die Anweisungen."},...msgs];
 
   let full="";
+  // Show streaming in a raw pre-element first, then render LaTeX after done
   const box=document.createElement("div");box.className="gen-box";
+  const streamPre=document.createElement("span");
+  streamPre.style.cssText="opacity:.7;white-space:pre-wrap";
+  box.appendChild(streamPre);
+
   document.getElementById("practiceContent").style.display="block";
   document.getElementById("practiceTag").textContent=`${t.topic||"?"} · ${(t.source||{}).level||""} · ähnlich wie ${t.task_id||""}`;
   const pb=document.getElementById("practiceText");
@@ -784,7 +800,7 @@ ANWEISUNG:
   try{
     const resp=await fetch(CONFIG.API_URL,{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:CONFIG.MODEL,messages:reqMsgs,stream:true,temperature:0.75,max_tokens:600})
+      body:JSON.stringify({model:CONFIG.MODEL,messages:reqMsgs,stream:true,temperature:0.85,max_tokens:500})
     });
     if(!resp.ok){box.textContent="Hiba a generálás során. Próbáld újra!";btn.disabled=false;btnTxt.textContent="✨ Generálás";return;}
     const reader=resp.body.getReader(),dec=new TextDecoder();let buf="";
@@ -794,23 +810,33 @@ ANWEISUNG:
       const lines=buf.split("\n");buf=lines.pop()||"";
       for(const line of lines){
         if(line.startsWith("data: ")){const d=line.slice(6).trim();if(d==="[DONE]")break;
-          try{const p=JSON.parse(d);const tok=p.choices?.[0]?.delta?.content;if(tok){full+=tok;box.textContent=full;}}catch(ex){}
+          try{const p=JSON.parse(d);const tok=p.choices?.[0]?.delta?.content;
+            // Stream as plain text — do NOT use textContent during streaming (breaks LaTeX later)
+            if(tok){full+=tok;streamPre.textContent=full;}
+          }catch(ex){}
         }
       }
     }
-  }catch(ex){box.textContent="Verbindungsfehler: "+ex.message;}
+  }catch(ex){box.textContent="Verbindungsfehler: "+ex.message;btn.disabled=false;btnTxt.textContent="🔁 Újra";return;}
 
   if(full){
-    renderMath(document.getElementById("practiceContent"));
+    // Replace streaming span with rendered HTML + LaTeX
+    box.innerHTML="";
+    const rendered=document.createElement("div");
+    rendered.style.cssText="white-space:pre-wrap;line-height:1.7";
+    rendered.textContent=full;
+    box.appendChild(rendered);
+    renderMath(box);
+
     generatedTask={
-      task_id:"Üben · "+( t.task_id||"?"),
+      task_id:"🔁 Üben · "+(t.task_id||"?"),
       topic:t.topic,subtopic:t.subtopic,
       source:{level:(t.source||{}).level,year:"generiert"},
       points:t.points,question:full,expected_answer:""
     };
     document.getElementById("loadPracticeBtn").style.display="inline-flex";
   }
-  btn.disabled=false;btnTxt.textContent="🔄 Újra";
+  btn.disabled=false;btnTxt.textContent="🔄 Újra generálás";
 }
 
 function loadGeneratedTask(){

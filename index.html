@@ -91,15 +91,26 @@
       <button class="mx" onclick="window._closePracticeModal()">✕</button>
     </div>
     <div class="mb" id="practiceBody">
-      <div style="color:var(--tx2);font-size:.85rem;margin-bottom:14px">
-        Martha egy hasonló típusú, de új, matematikailag ellenőrzött feladatot generál.
+
+      <!-- Difficulty selector -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:.75rem;color:var(--tx3);font-weight:600;margin-bottom:8px;letter-spacing:.04em">NEHÉZSÉG</div>
+        <div style="display:flex;gap:8px">
+          <button class="diff-btn" id="diff-easy"   onclick="window._setDiff('easy')"   title="Egyszerűbb számok, egyértelmű feladatstruktúra">🟢 Könnyebb</button>
+          <button class="diff-btn active" id="diff-same" onclick="window._setDiff('same')" title="Az eredeti feladathoz hasonló nehézség">🟡 Hasonló</button>
+          <button class="diff-btn" id="diff-hard"   onclick="window._setDiff('hard')"   title="Összetettebb függvény, extra részfeladat">🔴 Nehezebb</button>
+        </div>
+        <div id="diffDesc" style="font-size:.75rem;color:var(--tx2);margin-top:8px;min-height:16px">
+          Az eredeti feladathoz hasonló nehézségű feladatot generál.
+        </div>
       </div>
+
       <div id="practiceContent" style="display:none">
         <div class="gen-tag" id="practiceTag"></div>
         <div class="gen-box" id="practiceText"></div>
       </div>
-      <div id="practicePlaceholder" style="color:var(--tx3);font-size:.85rem;text-align:center;padding:30px">
-        Nyomj a „Generálás" gombra
+      <div id="practicePlaceholder" style="color:var(--tx3);font-size:.85rem;text-align:center;padding:20px">
+        Válaszd ki a nehézséget, majd nyomj a „Generálás" gombra
       </div>
     </div>
     <div class="mf">
@@ -128,11 +139,12 @@
            ondragleave="this.classList.remove('drag')"
            ondrop="window._handleDrop(event)">
         <input type="file" id="photoInput" accept="image/*,.pdf,.doc,.docx"
-               onchange="window._handleFileInput(event)">
+               multiple onchange="window._handleFileInput(event)">
         <div class="uz-icon">📎</div>
-        <div class="uz-txt">Kattints vagy húzz ide a fájlt</div>
-        <div class="uz-sub">📷 Fotó &nbsp;·&nbsp; 📄 PDF &nbsp;·&nbsp; 📝 Word (.docx) &nbsp;·&nbsp; max 20 MB</div>
+        <div class="uz-txt">Kattints vagy húzz ide a fájlokat</div>
+        <div class="uz-sub">📷 Fotó &nbsp;·&nbsp; 📄 PDF &nbsp;·&nbsp; 📝 Word (.docx) &nbsp;·&nbsp; max 10 fájl · 20 MB/fájl</div>
       </div>
+      <div id="fileQueue" style="display:none;margin-top:10px"></div>
       <div id="fileTypeBadge" style="display:none;margin-top:8px;padding:4px 12px;border-radius:100px;font-size:.75rem;font-weight:600;background:rgba(124,108,255,.15);color:var(--ac);width:fit-content"></div>
       <div id="docTextPreview" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;font-size:.8rem;color:var(--tx2);max-height:120px;overflow-y:auto;margin-top:8px;white-space:pre-wrap"></div>
       <img id="photoPreview" class="img-preview" style="display:none">

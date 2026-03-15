@@ -9,6 +9,108 @@ export function esc(s) {
   return d.innerHTML;
 }
 
+/**
+ * Convert plain-text math notation (as found in tasks.json) to LaTeX.
+ * Handles patterns like: (1/2)·x³, f(x) = ..., x ∈ ℝ, etc.
+ * Returns the string with $...$ wrapped LaTeX expressions.
+ */
+export function plainMathToLatex(text) {
+  if (!text) return text;
+  let t = text;
+
+  // Already has LaTeX — don't double-process
+  if (t.includes("$")) return t;
+
+  // Protect inline code blocks
+  // Step 1: normalize unicode math chars to ASCII equivalents first
+  t = t.replace(/·/g, "*").replace(/⋅/g, "*");
+  t = t.replace(/−/g, "-").replace(/–/g, "-");
+
+  // Step 2: convert superscripts
+  t = t.replace(/x²/g, "x^2").replace(/x³/g, "x^3").replace(/x⁴/g, "x^4");
+  t = t.replace(/(\w)²/g, "$1^2").replace(/(\w)³/g, "$1^3").replace(/(\w)⁴/g, "$1^4");
+
+  // Step 3: convert f(x) = ... expressions to LaTeX inline
+  // Match: f(x) = <expression>, x ∈ ℝ  or  f(x) = <expression>.
+  t = t.replace(
+    /\b([fghp])\(x\)\s*=\s*([^,.\n]+?)(\s*[,.]|\s*,\s*x\s*∈|\s*$)/gm,
+    (match, fn, expr, tail) => {
+      const latexExpr = exprToLatex(expr.trim());
+      const latexTail = tail.replace(/x\s*∈\s*ℝ/, ", x \\in \\mathbb{R}");
+      return `$${fn}(x) = ${latexExpr}$${latexTail}`;
+    }
+  );
+
+  // Step 4: standalone "x ∈ ℝ"
+  t = t.replace(/\bx\s*∈\s*ℝ\b/g, "$x \\in \\mathbb{R}$");
+  t = t.replace(/\bt\s*∈\s*ℝ\b/g, "$t \\in \\mathbb{R}$");
+
+  // Step 5: "x = <number>" standalone (e.g. "an der Stelle x = 0")
+  t = t.replace(/\bx\s*=\s*(-?\d+(?:[.,]\d+)?)\b/g, "$x = $1$");
+
+  // Step 6: wrap remaining (a/b) fractions not yet in $
+  t = t.replace(/(?<!\$[^$]*)\((\d+)\/(\d+)\)(?![^$]*\$)/g, "$\\frac{$1}{$2}$");
+
+  return t;
+}
+
+/**
+ * Convert a plain expression string like "(1/2)*x^3 - (6/28)*x^2"
+ * to LaTeX like "\frac{1}{2}x^3 - \frac{6}{28}x^2"
+ */
+function exprToLatex(expr) {
+  let e = expr;
+  // (a/b) → \frac{a}{b}
+  e = e.replace(/\((\d+)\/(\d+)\)/g, "\\frac{$1}{$2}");
+  // bare a/b fractions
+  e = e.replace(/\b(\d+)\/(\d+)\b/g, "\\frac{$1}{$2}");
+  // e^(...) → e^{...}  (but keep it readable for KaTeX)
+  e = e.replace(/e\^\(([^)]+)\)/g, "e^{$1}");
+  // remove explicit * between number/closing-paren and x
+  e = e.replace(/\*x/g, "x");
+  e = e.replace(/\*e\^/g, " e^");
+  e = e.replace(/(\d)\s*x/g, "$1x");
+  return e;
+}
+
+/**
+ * Convert plain-text math notation (as found in tasks.json) to LaTeX $...$
+ * Only activates when no $ signs are present (avoids double-processing).
+ */
+export function plainMathToLatex(text) {
+  if (!text) return text;
+  // Already has LaTeX — don't double-process
+  if (text.includes("$")) return text;
+
+  let t = text;
+
+  // Normalize unicode operators
+  t = t.replace(/·/g, "*").replace(/⋅/g, "*");
+  t = t.replace(/−/g, "-").replace(/–/g, "-");
+
+  // Unicode superscripts → ASCII
+  t = t.replace(/x²/g, "x^2").replace(/x³/g, "x^3").replace(/x⁴/g, "x^4");
+  t = t.replace(/(\w)²/g, "$1^2").replace(/(\w)³/g, "$1^3").replace(/(\w)⁴/g, "$1^4");
+
+  // f(x) = <expr>  followed by comma, period, "x ∈ ℝ", or end-of-line
+  t = t.replace(
+    /\b([fghpk])\(x\)\s*=\s*([^,\n]+?)(?=\s*,\s*x\s*[∈∊]|\s*,\s*$|\s*\.\s*[A-ZÜÖÄ]|\s*[,.]\s*x\s*∈|\s*$)/gm,
+    (match, fn, expr) => `$${fn}(x) = ${exprToLatex(expr.trim())}$`
+  );
+
+  // "x ∈ ℝ" standalone
+  t = t.replace(/\bx\s*[∈∊]\s*ℝ\b/g, "$x \\in \\mathbb{R}$");
+  t = t.replace(/\bt\s*[∈∊]\s*ℝ\b/g, "$t \\in \\mathbb{R}$");
+
+  // "x = <number>" standalone (e.g. "an der Stelle x = 0")
+  t = t.replace(/\bx\s*=\s*(-?\d+(?:[.,]\d+)?)\b(?!\s*[+\-*/^])/g, "$x = $1$");
+
+  // Remaining bare (a/b) fractions not yet wrapped
+  t = t.replace(/(?<!\$)\((\d+)\/(\d+)\)/g, "$\\frac{$1}{$2}$");
+
+  return t;
+}
+
 /** Run KaTeX on a DOM element — safe, no-op if KaTeX not loaded yet */
 export function renderMath(el) {
   if (typeof renderMathInElement !== "function") return;

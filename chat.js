@@ -4,7 +4,7 @@
 
 import { state } from "./state.js";
 import { buildContext, streamGroq } from "./api.js";
-import { esc, renderMath, setTextAndRenderMath, extractFunctions, detectPlots, drawPlot, guessRange } from "./math.js";
+import { esc, renderMath, setTextAndRenderMath, extractFunctions, detectPlots, drawPlot, guessRange, plainMathToLatex } from "./math.js";
 import { renderTaskList } from "./tasks.js";
 
 /** Select a task by index — populates the chat panel */
@@ -37,7 +37,26 @@ export function renderChat(i) {
   const el = document.getElementById("cms");
   const t = state.tasks[i], h = state.history[i] || [];
 
-  let html = `<div class="mg s"><div class="bu"><strong>${esc(t.task_id || "Aufgabe")}</strong><br><br>${esc(t.question || "Kein Text.")}</div></div>`;
+  // Convert plain-text math (from tasks.json) to LaTeX before rendering
+  const questionLatex = plainMathToLatex(t.question || "Kein Text.");
+
+  // Build task bubble via DOM (not innerHTML) so $...$ is preserved for KaTeX
+  const taskBubbleDiv = document.createElement("div");
+  taskBubbleDiv.className = "mg s";
+  const taskBubbleInner = document.createElement("div");
+  taskBubbleInner.className = "bu";
+  const taskTitle = document.createElement("strong");
+  taskTitle.textContent = t.task_id || "Aufgabe";
+  taskBubbleInner.appendChild(taskTitle);
+  taskBubbleInner.appendChild(document.createElement("br"));
+  taskBubbleInner.appendChild(document.createElement("br"));
+  // Use textContent so $...$ is preserved as literal text for KaTeX to find
+  const taskText = document.createElement("span");
+  taskText.textContent = questionLatex;
+  taskBubbleInner.appendChild(taskText);
+  taskBubbleDiv.appendChild(taskBubbleInner);
+
+  let html = "";
 
   const q = (t.question || "").toLowerCase();
   if (q.includes("abbildung") || q.includes("dargestellt") || q.includes("histogramm")) {
@@ -57,11 +76,12 @@ export function renderChat(i) {
   });
 
   el.innerHTML = html;
+  // Prepend the task bubble (built via DOM to preserve $...$ for KaTeX)
+  el.insertBefore(taskBubbleDiv, el.firstChild);
   el.scrollTop = el.scrollHeight;
 
-  // Render task bubble math
-  const taskBubble = el.querySelector(".mg.s");
-  if (taskBubble) renderMath(taskBubble);
+  // Render math in task bubble — KaTeX finds $...$ in textContent
+  renderMath(taskBubbleInner);
 
   // Render assistant history messages — textContent + KaTeX, then plots
   h.forEach((m, idx) => {

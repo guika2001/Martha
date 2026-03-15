@@ -7,15 +7,20 @@ import { streamToElement } from "./api.js";
 import { renderMath, renderPlotsFromText } from "./math.js";
 import { injectAndSelect } from "./tasks.js";
 
+// Multi-file state: arrays of file objects ready for processing
+let uploadedFiles = [];     // [{base64, mimeType, name, type, text}]
+let currentFileIdx = 0;     // which file is being previewed/analyzed
+let extractedTask = null;
+// Legacy single-file vars (kept for analyzeUpload compatibility)
 let photoBase64 = null;
 let photoMimeType = "image/jpeg";
-let extractedTask = null;
 let docExtractedText = null;
 let currentFileType = null; // "image" | "pdf" | "docx"
 
 // ── Modal open/close ──────────────────────────────────────────────────────────
 
 export function openUploadModal() {
+  uploadedFiles = []; currentFileIdx = 0;
   photoBase64 = null; extractedTask = null; docExtractedText = null; currentFileType = null;
   _el("photoPreview").style.display = "none";
   _el("photoResult").style.display = "none";
@@ -24,6 +29,8 @@ export function openUploadModal() {
   _el("uploadZone").style.display = "block";
   _el("fileTypeBadge").style.display = "none";
   _el("docTextPreview").style.display = "none";
+  _el("fileQueue").style.display = "none";
+  _el("fileQueue").innerHTML = "";
   _el("photoInput").value = "";
   _el("photoModal").style.display = "flex";
 }
@@ -37,13 +44,70 @@ export function closeUploadModal() {
 export function handleDrop(ev) {
   ev.preventDefault();
   _el("uploadZone").classList.remove("drag");
-  const file = ev.dataTransfer.files[0];
-  if (file) processFile(file);
+  const files = [...ev.dataTransfer.files];
+  if (files.length) processFiles(files);
 }
 
 export function handleFileInput(ev) {
-  const file = ev.target.files[0];
-  if (file) processFile(file);
+  const files = [...ev.target.files];
+  if (files.length) processFiles(files);
+}
+
+// Entry point for multi-file processing
+async function processFiles(files) {
+  // Filter supported types
+  const supported = files.filter(f => {
+    const n = f.name.toLowerCase();
+    return f.type.startsWith("image/") ||
+      f.type === "application/pdf" || n.endsWith(".pdf") ||
+      n.endsWith(".docx") || n.endsWith(".doc");
+  });
+  if (!supported.length) {
+    alert("Nem támogatott formátum! JPG, PNG, PDF vagy DOCX fájlokat válassz.");
+    return;
+  }
+  if (supported.length > 10) {
+    alert("Egyszerre maximum 10 fájl tölthető fel!");
+    return;
+  }
+
+  // If single file, use existing flow directly
+  if (supported.length === 1) {
+    processFile(supported[0]);
+    return;
+  }
+
+  // Multi-file: show queue, process one by one
+  uploadedFiles = [];
+  _el("uploadZone").style.display = "none";
+  _el("fileTypeBadge").style.display = "none";
+  _el("photoPreview").style.display = "none";
+  _el("docTextPreview").style.display = "none";
+  _el("photoResult").style.display = "none";
+  _el("loadPhotoBtn").style.display = "none";
+
+  // Build queue UI
+  const queue = _el("fileQueue");
+  queue.style.display = "block";
+  queue.innerHTML = `<div style="font-size:.8rem;color:var(--tx3);margin-bottom:8px">📎 ${supported.length} fájl kiválasztva:</div>`;
+
+  for (let i = 0; i < supported.length; i++) {
+    const row = document.createElement("div");
+    row.id = `fq-${i}`;
+    row.style.cssText = "display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:var(--s2);margin-bottom:4px;font-size:.82rem";
+    const icon = supported[i].type.startsWith("image/") ? "📷" :
+      supported[i].name.toLowerCase().endsWith(".pdf") ? "📄" : "📝";
+    row.innerHTML = `<span>${icon}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${supported[i].name}</span><span id="fq-status-${i}" style="color:var(--tx3)">⏳</span>`;
+    queue.appendChild(row);
+  }
+
+  // Show analyze button for batch
+  _el("analyzeBtn").style.display = "inline-flex";
+  _el("analyzeBtnTxt").textContent = `🔍 ${supported.length} fájl elemzése`;
+  _el("analyzeBtn").disabled = false;
+
+  // Store files for batch processing
+  uploadedFiles = supported;
 }
 
 async function processFile(file) {
@@ -172,6 +236,12 @@ INHALT:
 - Starte direkt mit dem ersten Aufgabentitel, kein Praefix`;
 
 export async function analyzeUpload() {
+  // If multi-file batch — process all in sequence
+  if (uploadedFiles.length > 1) {
+    await analyzeBatch();
+    return;
+  }
+
   const btn = _el("analyzeBtn");
   const btnTxt = _el("analyzeBtnTxt");
   btn.disabled = true;
@@ -277,6 +347,148 @@ function _loadScript(src) {
     s.src = src; s.onload = res; s.onerror = rej;
     document.head.appendChild(s);
   });
+}
+
+// ── Batch processing ─────────────────────────────────────────────────────────
+
+async function analyzeBatch() {
+  const btn = _el("analyzeBtn");
+  btn.disabled = true;
+  _el("analyzeBtnTxt").innerHTML = '<span class="spin"></span> Feldolgozás...';
+
+  const sysMsg = "Du bist Martha, eine NRW Abitur Mathematiklehrerin. Antworte auf Deutsch.";
+  const allResults = [];
+
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    const file = uploadedFiles[i];
+    const statusEl = document.getElementById(`fq-status-${i}`);
+    if (statusEl) statusEl.textContent = "⏳ Feldolgozás...";
+
+    try {
+      let userContent, model;
+      const name = file.name.toLowerCase();
+      const isPDF = file.type === "application/pdf" || name.endsWith(".pdf");
+      const isDocx = name.endsWith(".docx") || name.endsWith(".doc");
+      const isImage = file.type.startsWith("image/");
+
+      if (isImage) {
+        const b64 = await _fileToBase64(file);
+        userContent = [
+          { type: "image_url", image_url: { url: `data:${file.type};base64,${b64}` } },
+          { type: "text", text: EXTRACT_PROMPT },
+        ];
+        model = CONFIG.VISION_MODEL;
+      } else if (isPDF) {
+        const text = await _extractPDFText(file);
+        if (!text) { if (statusEl) statusEl.textContent = "⚠️ Üres"; continue; }
+        userContent = `${EXTRACT_PROMPT}\n\nEXTRAHIERTER TEXT:\n"""\n${text.slice(0, 4000)}\n"""`;
+        model = CONFIG.MODEL;
+      } else if (isDocx) {
+        const text = await _extractDocxText(file);
+        if (!text) { if (statusEl) statusEl.textContent = "⚠️ Üres"; continue; }
+        userContent = `${EXTRACT_PROMPT}\n\nEXTRAHIERTER TEXT:\n"""\n${text.slice(0, 4000)}\n"""`;
+        model = CONFIG.MODEL;
+      } else { continue; }
+
+      // Non-streaming call for batch
+      const resp = await fetch(CONFIG.API_URL, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model, messages: [{ role:"system", content:sysMsg }, { role:"user", content:userContent }], stream:false, temperature:0.1, max_tokens:1000 }),
+      });
+      const data = await resp.json();
+      const full = data.choices?.[0]?.message?.content || "";
+
+      if (full.includes("MEGOLDAS_OLDAL")) {
+        if (statusEl) statusEl.textContent = "📖 Megoldásoldal";
+      } else if (full.includes("KEIN_AUFGABE") || !full.trim()) {
+        if (statusEl) statusEl.textContent = "❌ Nem feladat";
+      } else {
+        if (statusEl) statusEl.textContent = "✅ Kész";
+        allResults.push({ name: file.name, content: full });
+      }
+    } catch (ex) {
+      if (statusEl) statusEl.textContent = "❌ Hiba";
+    }
+  }
+
+  btn.disabled = false;
+  _el("analyzeBtnTxt").textContent = "🔄 Újra";
+
+  if (!allResults.length) {
+    _el("photoResult").style.display = "block";
+    _el("photoResult").textContent = "⚠️ Egy feladatot sem sikerült kiolvasni.";
+    return;
+  }
+
+  // Show all results and create a combined task
+  const resultEl = _el("photoResult");
+  resultEl.style.display = "block";
+  resultEl.textContent = "";
+
+  const combined = allResults.map((r, i) =>
+    `[Fájl ${i+1}: ${r.name}]\n${r.content}`
+  ).join("\n\n---\n\n");
+
+  const header = document.createElement("div");
+  header.style.cssText = "font-size:.78rem;color:var(--ac);font-weight:600;margin-bottom:10px";
+  header.textContent = `✅ ${allResults.length} feladat kiolvasva ${uploadedFiles.length} fájlból`;
+  resultEl.appendChild(header);
+
+  allResults.forEach((r, i) => {
+    const block = document.createElement("div");
+    block.style.cssText = "margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bd)";
+    const lbl = document.createElement("div");
+    lbl.style.cssText = "font-size:.72rem;color:var(--tx3);margin-bottom:6px";
+    lbl.textContent = `📄 ${r.name}`;
+    const txt = document.createElement("div");
+    txt.textContent = r.content;
+    block.appendChild(lbl); block.appendChild(txt);
+    resultEl.appendChild(block);
+    if (typeof renderMathInElement === "function") {
+      try { renderMathInElement(txt, { delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}], throwOnError:false }); } catch(_) {}
+    }
+  });
+
+  extractedTask = {
+    task_id: `📎 ${allResults.length} feltöltött feladat`,
+    topic: "Egyedi feladat", subtopic: "Több fájlból feltöltve",
+    source: { level: "", year: "" },
+    points: null, question: combined, expected_answer: "",
+  };
+  _el("loadPhotoBtn").style.display = "inline-flex";
+}
+
+// ── File reading helpers ──────────────────────────────────────────────────────
+
+function _fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = e => res(e.target.result.split(",")[1]);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function _extractPDFText(file) {
+  await _loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+  const lib = window["pdfjs-dist/build/pdf"];
+  lib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const buf = await file.arrayBuffer();
+  const pdf = await lib.getDocument({ data: buf }).promise;
+  let text = "";
+  for (let p = 1; p <= Math.min(pdf.numPages, 8); p++) {
+    const page = await pdf.getPage(p);
+    const tc = await page.getTextContent();
+    text += tc.items.map(it => it.str).join(" ") + "\n";
+  }
+  return text.trim();
+}
+
+async function _extractDocxText(file) {
+  if (!window.mammoth) await _loadScript("https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js");
+  const buf = await file.arrayBuffer();
+  const result = await window.mammoth.extractRawText({ arrayBuffer: buf });
+  return result.value.trim();
 }
 
 // Expose to inline HTML

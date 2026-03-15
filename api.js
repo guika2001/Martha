@@ -4,18 +4,20 @@
 
 import { CONFIG, SYSTEM_PROMPT } from "./config.js";
 import { state } from "./state.js";
+import { plainMathToLatex } from "./math.js";
 
 /** Build task context string for the system prompt */
 export function buildContext(task) {
+  const question = plainMathToLatex(task.question || "Kein Text.");
   const parts = [
     `AUFGABE: ${task.task_id || "Aufgabe"}`,
     `THEMA: ${task.topic || "?"} - ${task.subtopic || "?"}`,
     `PUNKTE: ${task.points || "?"} BE`,
     `KURS: ${(task.source || {}).level || "?"}`,
-    `\nAUFGABENTEXT:\n${task.question || "Kein Text."}`,
+    `\nAUFGABENTEXT:\n${question}`,
   ];
   if (task.expected_answer) {
-    parts.push(`\nOFFIZIELLE MUSTERLOESUNG:\n${task.expected_answer}`);
+    parts.push(`\nOFFIZIELLE MUSTERLOESUNG:\n${plainMathToLatex(task.expected_answer)}`);
   }
   return parts.join("\n");
 }

@@ -9,10 +9,74 @@ import { renderMath } from "./math.js";
 import { injectAndSelect } from "./tasks.js";
 
 let generatedTask = null;
+let currentDifficulty = "same"; // "easy" | "same" | "hard"
+
+// GK vs LK specific adjustments injected into prompts
+const LEVEL_NOTES = {
+  GK: `KURS: Grundkurs (GK) — Aufgaben nach GK-Niveau: elementare Ableitungsregeln,
+einfache Nachweise, max. 2-3 Rechenschritte pro Teilaufgabe.`,
+  LK: `KURS: Leistungskurs (LK) — Aufgaben nach LK-Niveau: komplexere Funktionen erlaubt
+(Exponential, Produkt-/Quotientenregel), mehr Rechenschritte, praezisere Begruendungen gefragt.`,
+};
+
+const DIFF_CONFIG = {
+  easy: {
+    desc: "Egyszerűbb számok, kevesebb lépés — ideális az alap elsajátításához.",
+    tag:  "🟢 Könnyebb",
+    gkExtra: `* Funktionstyp: einfaches Polynom Grad 3, ganzzahlige Koeffizienten (z.B. 2, -3, 1)
+* Stelle x₀ ganzzahlig und nahe 0
+* Nur eine Teilaufgabe: einfacher Nachweis Hoch- oder Tiefpunkt`,
+    lkExtra: `* Funktionstyp: Polynom Grad 3 mit einfachen Bruechen (z.B. 1/2, 3/4)
+* Stelle x₀ ganzzahlig
+* Eine Teilaufgabe, aber mit Begruendungsanforderung`,
+  },
+  same: {
+    desc: "Az eredeti feladathoz hasonló nehézségű és típusú feladatot generál.",
+    tag:  "🟡 Hasonló",
+    gkExtra: `* Vergleichbarer Schwierigkeitsgrad fuer GK
+* Polynom Grad 3 oder 4, rationale Koeffizienten
+* Aehnliche Anzahl Rechenschritte wie das Original`,
+    lkExtra: `* Vergleichbarer Schwierigkeitsgrad fuer LK
+* Komplexerer Funktionstyp erlaubt (z.B. f(x) = x*e^x oder Polynom Grad 4)
+* Praezisere mathematische Formulierung erwartet`,
+  },
+  hard: {
+    desc: "Összetettebb függvény, több részfeladat — kihívás a magabiztosabb tanulóknak.",
+    tag:  "🔴 Nehezebb",
+    gkExtra: `* Schwerer als typische GK-Aufgaben, aber noch ohne Produkt-/Kettenregel
+* Polynom Grad 4, ungewoehnliche Bruchkoeffizienten
+* Zusaetzliche Teilaufgabe: Funktionswert oder Monotonieverhalten bestimmen`,
+    lkExtra: `* LK-Niveau auf hoechstem Schwierigkeitsgrad
+* Funktionstyp mit Produkt- oder Kettenregel (z.B. f(x) = x²*e^(-x))
+* Mehrere Teilaufgaben: Extrempunkt + Wendepunkt + Skizze oder Sachkontext-Interpretation
+* Stelle x₀ als Bruch oder irrationale Naeherung`,
+  },
+};
+
+export function setDifficulty(level) {
+  currentDifficulty = level;
+  ["easy", "same", "hard"].forEach(l => {
+    document.getElementById(`diff-${l}`).classList.toggle("active", l === level);
+  });
+  document.getElementById("diffDesc").textContent = DIFF_CONFIG[level].desc;
+  // Reset generated content when difficulty changes
+  generatedTask = null;
+  document.getElementById("practiceContent").style.display = "none";
+  document.getElementById("practicePlaceholder").style.display = "block";
+  document.getElementById("loadPracticeBtn").style.display = "none";
+  document.getElementById("genBtnTxt").textContent = "✨ Generálás";
+  document.getElementById("genBtn").disabled = false;
+}
 
 export function openPracticeModal() {
   if (state.selectedIdx < 0) return;
   generatedTask = null;
+  currentDifficulty = "same";
+  // Reset difficulty UI
+  ["easy","same","hard"].forEach(l =>
+    document.getElementById(`diff-${l}`).classList.toggle("active", l === "same")
+  );
+  document.getElementById("diffDesc").textContent = DIFF_CONFIG["same"].desc;
   document.getElementById("practiceContent").style.display = "none";
   document.getElementById("practicePlaceholder").style.display = "block";
   document.getElementById("loadPracticeBtn").style.display = "none";
@@ -25,6 +89,8 @@ export function closePracticeModal() {
   document.getElementById("practiceModal").style.display = "none";
 }
 
+const MAX_RETRIES = 3;
+
 export async function generatePractice() {
   if (state.selectedIdx < 0) return;
   const t = state.tasks[state.selectedIdx];
@@ -35,6 +101,29 @@ export async function generatePractice() {
   document.getElementById("practicePlaceholder").style.display = "none";
   document.getElementById("practiceContent").style.display = "none";
   document.getElementById("loadPracticeBtn").style.display = "none";
+
+  // Auto-retry loop — invisible to user until success or max attempts
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    const success = await _tryGenerate(t, btn, btnTxt, attempt);
+    if (success) return;
+    // Small delay between retries
+    if (attempt < MAX_RETRIES) await new Promise(r => setTimeout(r, 800));
+  }
+
+  // All retries exhausted — show friendly error
+  const pb = document.getElementById("practiceText");
+  pb.innerHTML = "";
+  const errBox = document.createElement("div");
+  errBox.className = "gen-box";
+  errBox.innerHTML = \`<div style="color:var(--amb);font-weight:600;margin-bottom:8px">⚠️ \${MAX_RETRIES} próbálkozás után sem sikerült matematikailag helyes feladatot generálni.</div>
+    <div style="font-size:.82rem;color:var(--tx2)">Próbálj másik feladatot kiválasztani, vagy változtass a nehézségi szinten.</div>\`;
+  document.getElementById("practiceContent").style.display = "block";
+  pb.appendChild(errBox);
+  btn.disabled = false;
+  btnTxt.textContent = "🔄 Újra";
+}
+
+async function _tryGenerate(t, btn, btnTxt, attempt) {
 
   // ── Build a varied prompt ──────────────────────────────────────────────────
   const r = Math.random();
@@ -70,22 +159,30 @@ export async function generatePractice() {
   const xVal  = xVals[Math.floor(r * xVals.length)];
   const origSnippet = (t.question || "").slice(0, 120).replace(/`/g, "'");
 
+  const diffCfg = DIFF_CONFIG[currentDifficulty];
+  const level = (t.source || {}).level || "GK";
+  const levelNote = LEVEL_NOTES[level] || LEVEL_NOTES["GK"];
+  const levelExtra = level === "LK" ? diffCfg.lkExtra : diffCfg.gkExtra;
+
   const userPrompt =
-`Thema: ${t.topic || "Analysis"} · ${t.subtopic || "Extremstellen"} · Kurs: ${(t.source || {}).level || "GK"}
+`Thema: ${t.topic || "Analysis"} · ${t.subtopic || "Extremstellen"}
+
+${levelNote}
+
+NEHÉZSÉGI SZINT: ${currentDifficulty.toUpperCase()} (${diffCfg.tag})
+${levelExtra}
 
 VORGABEN:
 * Aufgabenstellung: ${angle}
-* Funktionstyp: ${ftype}
-* Stelle x₀ = ${xVal}
+* Funktionstyp (angepasst an Kurs und Schwierigkeitsgrad): ${ftype}
+* Angestrebte Stelle x₀ = ${xVal} (falls mathematisch passend, sonst freie Wahl)
 * Kontext: ${ctx}
-* Koeffizienten: Wähle UNGEWÖHNLICHE rationale Zahlen (z.B. 3/8, -5/6, 7/4, 2/9)
 
 VERBOTEN:
-* Zahlen/Funktion aus: "${origSnippet}"
-* x = 0 oder x = 1 als Extremstelle
-* Koeffizient 1/2, 1/3 oder 2/5
+* Zahlen/Funktion aus dem Original: "${origSnippet}"
+* x = 0 oder x = 1 als Extremstelle (ausser bei "easy")
 
-MATHEMATISCHE PFLICHTPRÜFUNG (intern):
+MATHEMATISCHE PFLICHTPRÜFUNG (intern, vor dem Schreiben):
 Wähle Koeffizienten so dass f'(x₀) = 0 exakt gilt.
 Prüfe f''(x₀): Vorzeichen muss zur Aufgabenstellung passen.
 Stimmt die Stelle nicht: andere Koeffizienten oder andere Stelle wählen.
@@ -95,12 +192,14 @@ NIEMALS falsche Extremstelle behaupten.`;
   const box = document.createElement("div"); box.className = "gen-box";
   const statusEl = document.createElement("div");
   statusEl.style.cssText = "color:var(--tx3);font-size:.8rem;margin-bottom:10px";
-  statusEl.textContent = "⚙️ Generálás és matematikai ellenőrzés...";
+  statusEl.textContent = attempt > 1
+    ? `⚙️ Újrapróbálás (${attempt}/${MAX_RETRIES})...`
+    : "⚙️ Generálás és matematikai ellenőrzés...";
   box.appendChild(statusEl);
 
   document.getElementById("practiceContent").style.display = "block";
   document.getElementById("practiceTag").textContent =
-    `${t.topic || "?"} · ${(t.source || {}).level || ""} · ähnlich wie ${t.task_id || ""}`;
+    `${diffCfg.tag} · ${t.topic || "?"} · ${(t.source || {}).level || ""} · ähnlich wie ${t.task_id || ""}`;
   const pb = document.getElementById("practiceText");
   pb.innerHTML = ""; pb.appendChild(box);
 
@@ -114,9 +213,8 @@ NIEMALS falsche Extremstelle behaupten.`;
       maxTokens: 900,
     });
   } catch (ex) {
-    box.textContent = "Verbindungsfehler: " + ex.message;
-    btn.disabled = false; btnTxt.textContent = "🔁 Újra";
-    return;
+    statusEl.textContent = "Verbindungsfehler: " + ex.message;
+    return false;
   }
 
   // ── Parse JSON ─────────────────────────────────────────────────────────────
@@ -135,13 +233,9 @@ NIEMALS falsche Extremstelle behaupten.`;
 
   const verdict = (verDict.urteil || "").toUpperCase();
   if (verdict.startsWith("FEHLER") || !aufgabe) {
-    statusEl.textContent = "⚠️ Matematikai hiba: " + (verDict.urteil || "ismeretlen");
-    const retryHint = document.createElement("div");
-    retryHint.style.cssText = "color:var(--tx3);font-size:.78rem;margin-top:6px";
-    retryHint.textContent = "Próbálj újra — más koefficienseket generál.";
-    box.appendChild(retryHint);
-    btn.disabled = false; btnTxt.textContent = "🔄 Újra generálás";
-    return;
+    // Silent fail — auto-retry loop will try again
+    statusEl.textContent = `⚠️ Próba ${attempt} sikertelen, újrapróbálás...`;
+    return false;
   }
 
   // ── Show verification badge + render task ──────────────────────────────────
@@ -164,6 +258,7 @@ NIEMALS falsche Extremstelle behaupten.`;
   };
   document.getElementById("loadPracticeBtn").style.display = "inline-flex";
   btn.disabled = false; btnTxt.textContent = "🔄 Újra generálás";
+  return true; // success
 }
 
 export function loadGeneratedTask() {
@@ -177,3 +272,4 @@ window._openPracticeModal = openPracticeModal;
 window._closePracticeModal = closePracticeModal;
 window._generatePractice = generatePractice;
 window._loadGeneratedTask = loadGeneratedTask;
+window._setDiff = setDifficulty;

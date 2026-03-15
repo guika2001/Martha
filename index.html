@@ -77,16 +77,16 @@
     <div class="cm" id="cms">
       <div class="ec">
         <div class="ei">👩‍🏫</div>
-        <div class="et">Hallo, ich bin Martha!</div>
-        <div class="ed">Wähle links eine Aufgabe — ich erkläre dir Schritt für Schritt.</div>
+        <div class="et" id="welcome-title">Hallo, ich bin Martha!</div>
+        <div class="ed" id="welcome-sub">Wähle links eine Aufgabe — ich erkläre dir Schritt für Schritt.</div>
       </div>
     </div>
 
     <div class="qa" id="qa" style="display:none">
-      <button class="qb" id="btn-tip" onclick="window._quickSend(getUI().tip.replace(/^\S+\s/,''))">💡 Tipp</button>
-      <button class="qb" id="btn-step" onclick="window._quickSend(getUI().step.replace(/^\S+\s/,''))">👣 Erster Schritt</button>
-      <button class="qb" id="btn-solpath" onclick="window._quickSend(getUI().solpath.replace(/^\S+\s/,''))">🧠 Lösungsweg</button>
-      <button class="qb" id="btn-sol" onclick="window._quickSend(getUI().solution.replace(/^\S+\s/,''))">✅ Lösung</button>
+      <button class="qb" id="btn-tip" onclick="window._quickSend(getUI().tip)">💡 Tipp</button>
+      <button class="qb" id="btn-step" onclick="window._quickSend(getUI().step)">👣 Erster Schritt</button>
+      <button class="qb" id="btn-solpath" onclick="window._quickSend(getUI().solpath)">🧠 Lösungsweg</button>
+      <button class="qb" id="btn-sol" onclick="window._quickSend(getUI().solution)">✅ Lösung</button>
       <button class="qb" id="btn-plot" onclick="window._plotFromTask()" style="display:none">📈 Funktion zeichnen</button>
       <button class="qb" id="btn-practice" onclick="window._openPracticeModal()" style="display:none">🔁 Üben</button>
     </div>
@@ -210,6 +210,8 @@ const LANGUAGES = {
       upload_sub: "\ud83d\udcf7 Foto \u00b7 \ud83d\udcc4 PDF \u00b7 \ud83d\udcdd Word \u00b7 max 10 Dateien",
       analyzing: "Martha liest die Aufgabe...", no_task: "\u26a0\ufe0f Keine Mathematikaufgabe gefunden.",
       solution_page_title: "Das ist eine L\u00f6sungsseite", solution_page_hint: "Bitte eine Aufgabenseite hochladen.",
+      welcome_title: "Hallo, ich bin Martha!",
+      welcome_sub: "Wähle links eine Aufgabe — ich erkläre dir Schritt für Schritt.",
       wrong_pin: "Falscher PIN. Versuche es nochmal.",
       greeting: "Hallo! \ud83d\udc4b Ich bin Martha, deine Mathe-Nachhilfelehrerin.\n\nSchau dir die Aufgabe oben an. Wie m\u00f6chtest du anfangen?\nDu kannst mir sagen, was du schon wei\u00dft, oder einen \ud83d\udca1 Tipp verlangen.",
       verified: "\u2713 Mathematisch verifiziert", math_error: "Mathematischer Fehler, erneuter Versuch...",
@@ -241,6 +243,8 @@ Aufgabe auf Deutsch.`,
       upload_sub: "\ud83d\udcf7 Fotó \u00b7 \ud83d\udcc4 PDF \u00b7 \ud83d\udcdd Word \u00b7 max 10 fájl",
       analyzing: "Martha olvassa a feladatot...", no_task: "\u26a0\ufe0f Nem találtam matematikai feladatot.",
       solution_page_title: "Ez egy megoldásoldal", solution_page_hint: "Kérlek egy feladatoldalt tölts fel!",
+      welcome_title: "Szia, Martha vagyok!",
+      welcome_sub: "Válassz egy feladatot balról — lépésről lépésre magyarázom.",
       wrong_pin: "Hibás PIN. Próbáld újra.",
       greeting: "Szia! \ud83d\udc4b Martha vagyok, a matektanárod.\n\nNézd meg a fenti feladatot. Hogyan szeretnéd elkezdeni?\nMondhatod, mit tudsz már, vagy kérhetsz \ud83d\udca1 tippet.",
       verified: "\u2713 Matematikailag ellenőrzött", math_error: "Matematikai hiba, újrapróbálás...",
@@ -272,6 +276,8 @@ A feladatot magyarul fogalmazd meg.`,
       upload_sub: "\ud83d\udcf7 Photo \u00b7 \ud83d\udcc4 PDF \u00b7 \ud83d\udcdd Word \u00b7 max 10 files",
       analyzing: "Martha is reading the task...", no_task: "\u26a0\ufe0f No math task found.",
       solution_page_title: "This is a solutions page", solution_page_hint: "Please upload a task page instead.",
+      welcome_title: "Hello, I'm Martha!",
+      welcome_sub: "Choose a task on the left — I'll explain it step by step.",
       wrong_pin: "Wrong PIN. Please try again.",
       greeting: "Hello! \ud83d\udc4b I'm Martha, your math tutor.\n\nTake a look at the task above. How would you like to start?\nYou can tell me what you already know, or ask for a \ud83d\udca1 hint.",
       verified: "\u2713 Mathematically verified", math_error: "Math error, retrying...",
@@ -303,6 +309,8 @@ Write the task in English.`,
       upload_sub: "\ud83d\udcf7 Foto \u00b7 \ud83d\udcc4 PDF \u00b7 \ud83d\udcdd Word \u00b7 máx 10 archivos",
       analyzing: "Martha está leyendo el ejercicio...", no_task: "\u26a0\ufe0f No se encontró ningún ejercicio.",
       solution_page_title: "Esta es una página de soluciones", solution_page_hint: "Por favor sube una página de ejercicios.",
+      welcome_title: "¡Hola, soy Martha!",
+      welcome_sub: "Elige un ejercicio a la izquierda — te lo explicaré paso a paso.",
       wrong_pin: "PIN incorrecto. Inténtalo de nuevo.",
       greeting: "¡Hola! \ud83d\udc4b Soy Martha, tu profesora de matemáticas.\n\nMira el ejercicio de arriba. ¿Cómo quieres empezar?\nPuedes decirme lo que ya sabes o pedir una \ud83d\udca1 pista.",
       verified: "\u2713 Verificado matemáticamente", math_error: "Error matemático, reintentando...",
@@ -362,6 +370,8 @@ function applyUILanguage() {
   if (st && st.textContent && (st.textContent.includes("bereit") || st.textContent.includes("készen") || st.textContent.includes("ready") || st.textContent.includes("lista"))) {
     st.textContent = ui.ready + " \u00b7 " + CONFIG.MODEL;
   }
+  set("welcome-title", ui.welcome_title || "");
+  set("welcome-sub",   ui.welcome_sub   || "");
   document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === _currentLang));
   if (typeof currentDifficulty !== "undefined") {
     const descs = { easy: ui.easier_desc, same: ui.similar_desc, hard: ui.harder_desc };
@@ -832,7 +842,7 @@ async function init() {
     const r = await fetch("tasks.json");
     state.tasks = await r.json();
     document.getElementById("sd").className = "dot ok";
-    document.getElementById("st").textContent = "Martha bereit · " + CONFIG.MODEL;
+    document.getElementById("st").textContent = getUI().ready + " · " + CONFIG.MODEL;
     renderFilters();
     applyFilters();
   } catch (_) {
@@ -941,8 +951,8 @@ function sel(i) {
   document.getElementById("app").classList.add("co");
 
   const funcs = extractFunctions((t.question || "") + " " + (t.expected_answer || ""));
-  document.getElementById("plotBtn").style.display = funcs.length ? "inline-block" : "none";
-  document.getElementById("practiceBtn").style.display = "inline-block";
+  document.getElementById("btn-plot").style.display = funcs.length ? "inline-block" : "none";
+  document.getElementById("btn-practice").style.display = "inline-block";
 
   if (!state.history[i]) state.history[i] = [];
   renderChat(i);

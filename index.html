@@ -542,6 +542,10 @@ function extractFunctions(text) {
     if (expr.length < 3 || !expr.includes("x")) continue;
     // Reject if still contains natural-language patterns
     if (/[a-zA-ZáéíóöőúüűÄÖÜäöüß]{4,}/.test(expr.replace(/exp|sin|cos|tan|log|sqrt|abs/g, ""))) continue;
+    // Reject if contains undefined letter coefficients (a, b, c... before x or standalone)
+    // e.g. "ax^3 + bx^2" cannot be plotted — skip these
+    const _noMath = expr.replace(/exp|sin|cos|tan|log|sqrt|abs|pi/g, "##");
+    if (/(?<!\w)[a-wyzA-WYZ](?=\*?x|\^|\*|\s*[+\-])/.test(_noMath)) continue;
     expr = expr.replace(/(\d)([x(])/g, "$1*$2");
     expr = expr.replace(/([)])(\d)/g, "$1*$2");
     expr = expr.replace(/([x)])([x(])/g, "$1*$2");
@@ -1500,7 +1504,16 @@ Nur die natürlichsprachlichen Teile übersetzen — Formeln, f(x), x ∈ ℝ et
 
   const finalEl = document.createElement("div");
   finalEl.style.cssText = "line-height:1.9;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)";
-  finalEl.textContent = plainMathToLatex(aufgabe);
+  // Convert math in generated task text to LaTeX
+  let aufgabeLatex = aufgabe;
+  // Wrap f(x) = ... expressions
+  aufgabeLatex = aufgabeLatex.replace(/\b([fghpk])\(x\)\s*=\s*([^.,;\n]+?)(?=[.,;]|\s{2,}|$)/gm,
+    (m, fn, expr) => '$' + fn + '(x) = ' + expr.trim() + '$');
+  // Wrap x₀ = number
+  aufgabeLatex = aufgabeLatex.replace(/x[₀0]\s*=\s*(-?\d+(?:[,.]\d+)?)/g, '$x_0 = $1$');
+  // Wrap standalone x = number
+  aufgabeLatex = aufgabeLatex.replace(/\bx\s*=\s*(-?\d+(?:[,.]\d+)?)(?![\d])/g, '$x = $1$');
+  finalEl.textContent = aufgabeLatex;
   box.appendChild(finalEl);
   renderMath(finalEl);
   setTimeout(() => renderMath(finalEl), 400);

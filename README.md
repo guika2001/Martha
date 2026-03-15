@@ -1,89 +1,75 @@
 # Martha · NRW Abitur Mathe Tutor — Webes verzió
 
-## Architektúra
+## 🚀 Deployment GitHub Pages-re (100% ingyenes)
 
-```
-Diák böngészője ──→ GitHub Pages (index.html + tasks.json)
-        │
-        └──→ Cloudflare Worker (proxy) ──→ Groq API (Llama 3.3 70B)
-                  ↑
-            API key itt van elrejtve
+### 1. lépés: GitHub repo létrehozása
+```bash
+# Hozz létre egy új repot a GitHub-on, pl. "martha-tutor"
+# Klónold le:
+git clone https://github.com/FELHASZNALONEV/martha-tutor.git
+cd martha-tutor
+
+# Másold be a fájlokat:
+# - index.html
+# - tasks.json
 ```
 
-Minden 100% ingyenes.
+### 2. lépés: Push és GitHub Pages bekapcsolása
+```bash
+git add .
+git commit -m "Martha tutor v1"
+git push origin main
+```
+
+Ezután:
+1. Menj a GitHub repo **Settings** → **Pages**
+2. Source: **Deploy from a branch**
+3. Branch: **main** / **(root)**
+4. **Save**
+
+Pár perc múlva elérhető lesz: `https://FELHASZNALONEV.github.io/martha-tutor/`
+
+### 3. lépés: Groq API Key (ingyenes)
+1. Menj ide: [console.groq.com/keys](https://console.groq.com/keys)
+2. Regisztrálj (ingyenes, Google/GitHub login)
+3. Hozz létre egy API key-t
+4. Az oldalon a ⚙️ gombbal add meg a key-t
+
+> **Groq ingyenes limit**: ~30 request/perc, napi ~14.400 request — bőven elég néhány diáknak.
 
 ---
 
-## 🚀 Setup (15 perc)
+## 🔧 Konfigurálás
 
-### 1. Cloudflare Worker létrehozása (API proxy)
-
-1. Menj ide: [dash.cloudflare.com](https://dash.cloudflare.com) → regisztrálj (ingyenes)
-2. Bal oldalt: **Workers & Pages** → **Create**
-3. Válaszd: **Create Worker**
-4. Név: `martha-proxy` → **Deploy**
-5. Kattints: **Edit Code**
-6. Töröld a meglévő kódot, és másold be a `worker.js` tartalmát
-7. **Save and Deploy**
-
-### 2. API Key hozzáadása a Worker-hez
-
-1. A Worker oldalán: **Settings** → **Variables and Secrets**
-2. **Add** → Name: `GROQ_API_KEY` → Value: a te Groq key-ed
-3. Type: **Secret** → **Save**
-
-A Worker URL-ed valami ilyesmi lesz:
-```
-https://martha-proxy.TENEVEDED.workers.dev
-```
-
-### 3. index.html frissítése
-
-Nyisd meg az `index.html`-t és keresd meg ezt a sort:
+### PIN megváltoztatása
+A PIN hash-t az `index.html` CONFIG részében találod:
 ```javascript
-API_URL: "https://martha-proxy.TENEVEDED.workers.dev",
-```
-Cseréld ki a valódi Worker URL-re.
-
-### 4. GitHub Pages
-
-1. Hozz létre egy GitHub repót (pl. `Martha`)
-2. Töltsd fel: `index.html` + `tasks.json`
-3. **Settings** → **Pages** → Source: **Deploy from branch** → **main** / **(root)** → **Save**
-
-Kész! Az oldal elérhető: `https://FELHASZNALONEV.github.io/Martha/`
-
----
-
-## 📁 Fájlok
-
-| Fájl | Hova kerül | Leírás |
-|------|-----------|--------|
-| `index.html` | GitHub repo | Frontend (PIN login + chat UI) |
-| `tasks.json` | GitHub repo | 278 NRW Abitur matek feladat |
-| `worker.js` | Cloudflare Worker | API proxy (elrejti a Groq key-t) |
-
----
-
-## 🔧 PIN megváltoztatása
-
-Az `index.html`-ben:
-```javascript
-PIN_HASH: "53d6668b...",
+PIN_HASH: "53d6668b995a4117d05d7799f6563672f4659d05f9f9fd45f961164de256b5d0",
 ```
 
-Új hash generálásához nyisd meg a böngésző konzolt:
+Új PIN generálásához nyisd meg a böngésző konzolt és futtasd:
 ```javascript
 crypto.subtle.digest('SHA-256', new TextEncoder().encode('UJPIN'))
   .then(b => console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
 ```
 
+### Modell választás
+Az alapértelmezett `llama-3.3-70b-versatile` a legjobb ingyenes opció matekra.
+Alternatívák: `llama-3.1-8b-instant` (gyorsabb, kevésbé pontos).
+
 ---
 
-## 💰 Ingyenes limitek
+## 📁 Fájlok
 
-| Szolgáltatás | Limit |
-|-------------|-------|
-| GitHub Pages | Korlátlan |
-| Cloudflare Worker | 100.000 request/nap |
-| Groq API | ~30 req/perc, ~14.400/nap |
+| Fájl | Leírás |
+|------|--------|
+| `index.html` | Teljes alkalmazás (frontend + Groq API hívás) |
+| `tasks.json` | 278 NRW Abitur matek feladat (Analysis, Stochastik, Geometrie) |
+
+---
+
+## ⚠️ Fontos megjegyzések
+
+- **A Groq API key a böngésző localStorage-jában tárolódik** — minden diáknak egyszer meg kell adnia. Ha nem szeretnéd hogy minden diák saját key-t csináljon, beégetheted a kódba (de ez biztonsági kockázat publikus repóban).
+- **A PIN kliens-oldali** — nem 100% biztonságos, de a cél csak az, hogy ne használja bárki véletlenül.
+- **Nincs szerver** — minden a böngészőben fut, nincs havi költség.

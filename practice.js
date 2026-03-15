@@ -125,38 +125,67 @@ export async function generatePractice() {
 
 async function _tryGenerate(t, btn, btnTxt, attempt) {
 
-  // ── Build a varied prompt ──────────────────────────────────────────────────
+  // ── Build difficulty-specific prompt pools ────────────────────────────────
   const r = Math.random();
+  const pick = (arr) => arr[Math.floor(r * arr.length * 1.7) % arr.length];
+
   const contexts = [
     "rein abstrakt, ohne Anwendungskontext",
-    "Kontext: Kostenfunktion — Verlauf der Produktionskosten einer Firma",
-    "Kontext: Physik — Bewegung (Höhe, Geschwindigkeit oder Energie)",
-    "Kontext: Natur — Bevölkerungswachstum oder Temperaturverlauf",
-    "Kontext: Wasserstand oder Füllmenge eines Behälters",
-    "Kontext: Sportwissenschaft — Leistungskurve oder Erschöpfungsmodell",
-  ];
-  const taskAngles = [
-    "Nachweis eines lokalen HOCHPUNKTS (nicht Tiefpunkt)",
-    "Nachweis eines lokalen TIEFPUNKTS an einer negativen Stelle x < 0",
-    "Nachweis, dass eine Stelle ein Sattelpunkt ist (kein Extrempunkt)",
-    "Bestimme ALLE lokalen Extrempunkte und klassifiziere sie (Hoch- oder Tiefpunkt)",
-    "Nachweis eines lokalen Tiefpunkts mit Interpretation im Sachkontext",
-    "Nachweis eines lokalen Hochpunkts + berechne den zugehörigen Funktionswert",
-  ];
-  const funcTypes = [
-    "ganzrationale Funktion Grad 3: f(x) = ax³ + bx² + cx",
-    "ganzrationale Funktion Grad 3 mit Konstante: f(x) = ax³ + bx² + c",
-    "ganzrationale Funktion Grad 4 mit kubischem Term: f(x) = ax⁴ + bx³ + cx",
-    "ganzrationale Funktion Grad 3, alle Koeffizienten ungewöhnliche Brüche",
-    "ganzrationale Funktion Grad 4: f(x) = ax⁴ + bx³ + cx²",
-    "Grad 3, symmetrielos, alle vier Terme vorhanden (inkl. Konstante)",
+    "Kontext: Kostenfunktion — Produktionskosten einer Firma",
+    "Kontext: Physik — Bewegung (Höhe oder Energie)",
+    "Kontext: Natur — Temperaturverlauf oder Wachstum",
+    "Kontext: Wasserstand eines Behälters",
+    "Kontext: Sportwissenschaft — Leistungskurve",
   ];
 
-  const ctx   = contexts[   Math.floor(r * 6.7) % contexts.length];
-  const angle = taskAngles[ Math.floor(r * 5.3) % taskAngles.length];
-  const ftype = funcTypes[  Math.floor(r * 7.1) % funcTypes.length];
-  const xVals = [-3, -2, -1.5, 0.5, 1.5, 2, 3, -0.5];
-  const xVal  = xVals[Math.floor(r * xVals.length)];
+  // Angle and funcType pools are LOCKED per difficulty level
+  const ANGLE_POOLS = {
+    easy: [
+      "Nachweis eines lokalen HOCHPUNKTS an einer positiven ganzzahligen Stelle",
+      "Nachweis eines lokalen TIEFPUNKTS an einer positiven ganzzahligen Stelle",
+    ],
+    same: [
+      "Nachweis eines lokalen HOCHPUNKTS (nicht Tiefpunkt)",
+      "Nachweis eines lokalen TIEFPUNKTS an einer negativen Stelle x < 0",
+      "Nachweis eines lokalen Tiefpunkts mit Interpretation im Sachkontext",
+      "Nachweis eines lokalen Hochpunkts + berechne den zugehörigen Funktionswert",
+    ],
+    hard: [
+      "Nachweis, dass eine Stelle ein Sattelpunkt ist (kein Extrempunkt)",
+      "Bestimme ALLE lokalen Extrempunkte und klassifiziere sie",
+      "Nachweis eines Extrempunkts + Monotonieverhalten bestimmen",
+      "Nachweis eines Hochpunkts + Wendepunkt bestimmen",
+    ],
+  };
+
+  const FUNC_POOLS = {
+    easy: [
+      "einfaches Polynom Grad 3: f(x) = ax³ + bx² + cx, ganzzahlige Koeffizienten",
+      "Polynom Grad 3 mit Konstante: f(x) = ax³ + bx², Koeffizienten einfache Brüche wie 1/2, 2/3",
+    ],
+    same: [
+      "ganzrationale Funktion Grad 3 mit ungewöhnlichen Brüchen (z.B. 3/8, -5/6)",
+      "ganzrationale Funktion Grad 3 mit Konstante: f(x) = ax³ + bx² + c",
+      "ganzrationale Funktion Grad 4: f(x) = ax⁴ + bx³ + cx²",
+    ],
+    hard: [
+      "Polynom Grad 4 mit kubischem Term: f(x) = ax⁴ + bx³ + cx, alle Bruchkoeffizienten",
+      "Grad 3, alle vier Terme, symmetrielos, LK-Niveau",
+      "gemischte Funktion mit Exponentialterm (nur LK): f(x) = ax² · e^(bx)",
+    ],
+  };
+
+  const X_POOLS = {
+    easy:  [1, 2, 3, -1, -2],
+    same:  [-3, -2, -1.5, 0.5, 1.5, 2, 3, -0.5],
+    hard:  [-2.5, -1.5, 0.5, 1.5, -0.5, 2.5, -3],
+  };
+
+  const diff = currentDifficulty;
+  const angle = pick(ANGLE_POOLS[diff]);
+  const ftype = pick(FUNC_POOLS[diff]);
+  const xVal  = pick(X_POOLS[diff]);
+  const ctx   = pick(contexts);
   const origSnippet = (t.question || "").slice(0, 120).replace(/`/g, "'");
 
   const diffCfg = DIFF_CONFIG[currentDifficulty];

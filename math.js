@@ -111,20 +111,40 @@ export function plainMathToLatex(text) {
   return t;
 }
 
-/** Run KaTeX on a DOM element — safe, no-op if KaTeX not loaded yet */
-export function renderMath(el) {
+const KATEX_OPTS = {
+  delimiters: [
+    { left: "$$", right: "$$", display: true },
+    { left: "$",  right: "$",  display: false },
+    { left: "\\(", right: "\\)", display: false },
+    { left: "\\[", right: "\\]", display: true },
+  ],
+  throwOnError: false,
+};
+
+// Queue of pending renders — flushed once KaTeX is ready
+const _renderQueue = [];
+let _katexReady = false;
+
+function _doRender(el) {
   if (typeof renderMathInElement !== "function") return;
-  try {
-    renderMathInElement(el || document.body, {
-      delimiters: [
-        { left: "$$", right: "$$", display: true },
-        { left: "$", right: "$", display: false },
-        { left: "\\(", right: "\\)", display: false },
-        { left: "\\[", right: "\\]", display: true },
-      ],
-      throwOnError: false,
-    });
-  } catch (_) { /* KaTeX errors are non-fatal */ }
+  try { renderMathInElement(el, KATEX_OPTS); } catch (_) {}
+}
+
+/** Called once KaTeX finishes loading — flushes the render queue */
+export function onKatexReady() {
+  _katexReady = true;
+  _renderQueue.forEach(el => _doRender(el));
+  _renderQueue.length = 0;
+}
+
+/** Run KaTeX on a DOM element — queues automatically if KaTeX not yet ready */
+export function renderMath(el) {
+  const target = el || document.body;
+  if (_katexReady && typeof renderMathInElement === "function") {
+    _doRender(target);
+  } else {
+    _renderQueue.push(target);
+  }
 }
 
 /**

@@ -8,7 +8,8 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="import('./math.js').then(m => m.onKatexReady())"></script>
 <script src="https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js" defer></script>
 </head>
@@ -167,13 +168,6 @@
   import "./chat.js";
   import "./practice.js";
   import "./upload.js";
-
-  // KaTeX auto-init retry (deferred CDN)
-  let _kt = 0;
-  const _ki = setInterval(() => {
-    if (typeof renderMathInElement === "function" || _kt > 30) clearInterval(_ki);
-    _kt++;
-  }, 500);
 
   document.addEventListener("DOMContentLoaded", initLogin);
 </script>

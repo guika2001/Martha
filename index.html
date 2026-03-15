@@ -935,6 +935,53 @@ window._sel = (i) => { if (typeof sel === "function") sel(i); };
 
 // ══ chat.js ══
 // chat.js
+// Translation cache: { taskIndex_langCode: translatedText }
+const _translCache = {};
+
+async function getTranslatedQuestion(i) {
+  const lang = typeof _currentLang !== "undefined" ? _currentLang : "de";
+  if (lang === "de") return null; // No translation needed for German
+  const key = i + "_" + lang;
+  if (_translCache[key]) return _translCache[key];
+
+  const t = state.tasks[i];
+  if (!t || !t.question) return null;
+
+  // Mark as loading
+  _translCache[key] = "__loading__";
+
+  try {
+    const resp = await fetch(CONFIG.API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: CONFIG.MODEL,
+        messages: [{
+          role: "system",
+          content: "You are a precise mathematical translator. Translate the following German math task text to " +
+            (lang === "hu" ? "Hungarian" : lang === "en" ? "English" : "Spanish") +
+            ". Keep all mathematical expressions, formulas, variable names and numbers exactly as they are. Only translate the natural language parts. Be concise and accurate."
+        }, {
+          role: "user",
+          content: t.question
+        }],
+        stream: false,
+        temperature: 0.1,
+        max_tokens: 600,
+      })
+    });
+    const data = await resp.json();
+    const translated = data.choices?.[0]?.message?.content || null;
+    if (translated) {
+      _translCache[key] = translated;
+      return translated;
+    }
+  } catch(_) {}
+
+  delete _translCache[key];
+  return null;
+}
+
 function sel(i) {
   state.selectedIdx = i;
   const t = state.tasks[i], sr = t.source || {};
@@ -958,11 +1005,15 @@ function sel(i) {
 
 function goBack() { document.getElementById('app').classList.remove('co'); }
 
-function renderChat(i) {
+async function renderChat(i) {
   const el = document.getElementById('cms');
   if (!el) return;
   const t = state.tasks[i], h = state.history[i] || [];
-  const questionLatex = plainMathToLatex(t.question || 'Kein Text.');
+
+  // Try to get translated question (non-blocking — uses DE as fallback)
+  const translated = await getTranslatedQuestion(i);
+  const questionSource = translated || t.question || 'Kein Text.';
+  const questionLatex = plainMathToLatex(questionSource);
 
   const taskBubbleDiv = document.createElement('div');
   taskBubbleDiv.className = 'mg s';
@@ -997,7 +1048,10 @@ function renderChat(i) {
   el.innerHTML = html;
   el.insertBefore(taskBubbleDiv, el.firstChild);
   el.scrollTop = el.scrollHeight;
+  // Render math — try immediately and retry after a short delay for KaTeX timing
   renderMath(taskBubbleInner);
+  setTimeout(() => renderMath(taskBubbleInner), 300);
+  setTimeout(() => renderMath(taskBubbleInner), 800);
 
   h.forEach((m, idx) => {
     if (m.role !== 'assistant') return;
@@ -1378,7 +1432,7 @@ NIEMALS falsche Extremstelle behaupten.`;
   statusEl.style.cssText = "color:var(--tx3);font-size:.8rem;margin-bottom:10px";
   statusEl.textContent = attempt > 1
     ? `⚙️ Újrapróbálás (${attempt}/${MAX_RETRIES})...`
-    : "⚙️ " + ui("generate") + "...";
+    : "⚙️ " + getUI().generate + "...";
   box.appendChild(statusEl);
 
   document.getElementById("practiceContent").style.display = "block";
@@ -1441,7 +1495,7 @@ NIEMALS falsche Extremstelle behaupten.`;
     points: t.points, question: aufgabe, expected_answer: "",
   };
   document.getElementById("loadPracticeBtn").style.display = "inline-flex";
-  btn.disabled = false; btnTxt.textContent = "🔄 " + ui("generate");
+  btn.disabled = false; btnTxt.textContent = "🔄 " + getUI().generate;
   return true; // success
 }
 

@@ -75,7 +75,34 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
 .pin-dot.wrong{border-color:var(--red);animation:shake .4s}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;animation:mfade .2s ease-out}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+.modal{background:var(--s1);border:1px solid var(--bd);border-radius:20px;width:100%;max-width:560px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;animation:mslide .25s ease-out}
+@keyframes mslide{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--bd)}
+.mh h2{font-size:1rem;font-weight:700}
+.mx{width:32px;height:32px;border-radius:8px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mx:active{background:var(--s3)}
+.mb{flex:1;overflow-y:auto;padding:20px}
+.mf{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:10px;flex-wrap:wrap}
+.btn-pri{padding:10px 20px;border-radius:10px;border:0;background:var(--ac2);color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-pri:active{opacity:.85}.btn-pri:disabled{opacity:.4;cursor:not-allowed}
+.btn-sec{padding:10px 20px;border-radius:10px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);font-size:.88rem;font-weight:600;cursor:pointer}
+.btn-sec:active{background:var(--s3)}
+.gen-box{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:16px;font-size:.88rem;line-height:1.7;color:var(--tx);white-space:pre-wrap;min-height:80px}
+.gen-tag{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.72rem;font-weight:600;background:rgba(124,108,255,.15);color:var(--ac);margin-bottom:10px}
+/* photo upload zone */
+.upload-zone{border:2px dashed var(--bd);border-radius:14px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s2)}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--ac);background:rgba(124,108,255,.06)}
+.upload-zone input{display:none}
+.uz-icon{font-size:2.2rem;margin-bottom:10px}
+.uz-txt{font-size:.88rem;color:var(--tx2)}
+.uz-sub{font-size:.75rem;color:var(--tx3);margin-top:4px}
+.img-preview{width:100%;border-radius:10px;max-height:220px;object-fit:contain;margin-bottom:12px;display:block}
+.photo-result{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;font-size:.88rem;line-height:1.65;color:var(--tx);white-space:pre-wrap;margin-top:12px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -130,11 +157,61 @@ body{height:100%;overflow:hidden;padding:env(safe-area-inset-top) 0 env(safe-are
     <button class="qb" onclick="sQ('Erkläre den Lösungsweg')">🧠 Lösungsweg</button>
     <button class="qb" onclick="sQ('Zeig mir die vollständige Lösung')">✅ Lösung</button>
     <button class="qb" id="plotBtn" onclick="plotFromTask()" style="display:none">📈 Funktion zeichnen</button>
+    <button class="qb" id="practiceBtn" onclick="openPracticeModal()" style="display:none">🔁 Üben</button>
   </div>
   <div class="ci" id="cin" style="display:none">
+    <button class="sb" id="photoBtn" onclick="openPhotoModal()" title="Feladat fotóból" style="background:var(--s2);border:1px solid var(--bd);color:var(--tx2);font-size:1rem">📷</button>
     <textarea id="mi" rows="1" placeholder="Frage Martha..." onkeydown="hK(event)" oninput="aG(this)"></textarea>
     <button class="sb" id="sbt" onclick="sM()">↑</button>
   </div>
+
+<!-- ── PRACTICE MODAL ── -->
+<div id="practiceModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closePracticeModal()">
+  <div class="modal">
+    <div class="mh">
+      <h2>🔁 Hasonló feladat generálása</h2>
+      <button class="mx" onclick="closePracticeModal()">✕</button>
+    </div>
+    <div class="mb" id="practiceBody">
+      <div style="color:var(--tx2);font-size:.85rem;margin-bottom:14px">Martha egy hasonló típusú, de új feladatot generál a kiválasztott témából. Kattints a gombra!</div>
+      <div id="practiceContent" style="display:none">
+        <div class="gen-tag" id="practiceTag"></div>
+        <div class="gen-box" id="practiceText"></div>
+      </div>
+      <div id="practicePlaceholder" style="color:var(--tx3);font-size:.85rem;text-align:center;padding:30px">Nyomj a „Generálás" gombra</div>
+    </div>
+    <div class="mf">
+      <button class="btn-pri" id="genBtn" onclick="generatePractice()"><span id="genBtnTxt">✨ Generálás</span></button>
+      <button class="btn-pri" id="loadPracticeBtn" onclick="loadGeneratedTask()" style="display:none;background:var(--grn);color:#000">📚 Betöltés Marthának</button>
+      <button class="btn-sec" onclick="closePracticeModal()">Bezárás</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PHOTO MODAL ── -->
+<div id="photoModal" class="modal-bg" style="display:none" onclick="if(event.target===this)closePhotoModal()">
+  <div class="modal">
+    <div class="mh">
+      <h2>📷 Feladat betöltése fotóból</h2>
+      <button class="mx" onclick="closePhotoModal()">✕</button>
+    </div>
+    <div class="mb">
+      <div id="uploadZone" class="upload-zone" onclick="document.getElementById('photoInput').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+        <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoFile(event)">
+        <div class="uz-icon">📸</div>
+        <div class="uz-txt">Kattints vagy húzz ide egy fotót</div>
+        <div class="uz-sub">JPG, PNG, HEIC · max 10 MB</div>
+      </div>
+      <img id="photoPreview" class="img-preview" style="display:none">
+      <div id="photoResult" class="photo-result" style="display:none"></div>
+    </div>
+    <div class="mf">
+      <button class="btn-pri" id="analyzeBtn" onclick="analyzePhoto()" style="display:none"><span id="analyzeBtnTxt">🔍 Elemzés</span></button>
+      <button class="btn-pri" id="loadPhotoBtn" onclick="loadPhotoTask()" style="display:none;background:var(--grn);color:#000">📚 Megnyitás Marthával</button>
+      <button class="btn-sec" onclick="closePhotoModal()">Bezárás</button>
+    </div>
+  </div>
+</div>
 </div>
 </div>
 
@@ -574,6 +651,7 @@ function sel(i){
   document.getElementById("app").classList.add("co");
   const funcs=extractFunctions((t.question||"")+" "+(t.expected_answer||""));
   document.getElementById("plotBtn").style.display=funcs.length?"inline-block":"none";
+  document.getElementById("practiceBtn").style.display="inline-block";
   if(!H[i])H[i]=[];
   rC(i);rTL();
   setTimeout(()=>document.getElementById("mi").focus(),300);
@@ -644,6 +722,236 @@ async function sM(){
 function sQ(t){document.getElementById("mi").value=t;sM();}
 function hK(ev){if(ev.key==="Enter"&&!ev.shiftKey){ev.preventDefault();sM();}}
 function aG(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight,120)+"px";}
+
+// ══════════════════════════════════════════
+//  PRACTICE MODAL — hasonló feladat
+// ══════════════════════════════════════════
+
+let generatedTask = null;
+
+function openPracticeModal(){
+  if(si<0)return;
+  generatedTask=null;
+  document.getElementById("practiceContent").style.display="none";
+  document.getElementById("practicePlaceholder").style.display="block";
+  document.getElementById("loadPracticeBtn").style.display="none";
+  document.getElementById("genBtnTxt").textContent="✨ Generálás";
+  document.getElementById("genBtn").disabled=false;
+  document.getElementById("practiceModal").style.display="flex";
+}
+
+function closePracticeModal(){
+  document.getElementById("practiceModal").style.display="none";
+}
+
+async function generatePractice(){
+  if(si<0)return;
+  const t=T[si];
+  const btn=document.getElementById("genBtn");
+  const btnTxt=document.getElementById("genBtnTxt");
+  btn.disabled=true;
+  btnTxt.innerHTML='<span class="spin"></span> Generálás...';
+  document.getElementById("practicePlaceholder").style.display="none";
+  document.getElementById("practiceContent").style.display="none";
+  document.getElementById("loadPracticeBtn").style.display="none";
+
+  const prompt = `Du bist eine Abitur-Mathematiklehrerin. Erstelle eine NEUE Übungsaufgabe, die dem folgenden Aufgabentyp ähnelt.
+
+ORIGINAL-AUFGABE:
+Thema: ${t.topic||"?"} - ${t.subtopic||"?"}
+Kurs: ${(t.source||{}).level||"?"}
+Punkte: ${t.points||"?"} BE
+Text: ${t.question||""}
+
+ANWEISUNG:
+- Erstelle eine neue, ähnliche Aufgabe mit anderen Zahlen/Kontext
+- Gleiches mathematisches Konzept, gleicher Schwierigkeitsgrad
+- Schreibe alle Formeln in LaTeX mit $...$
+- Gib NUR den Aufgabentext aus — keine Lösung, keine Erklärung
+- Format: Aufgabe direkt beginnen, kein Präfix wie "Aufgabe:" oder "Neue Aufgabe:"`;
+
+  const msgs=[{role:"user",content:prompt}];
+  const fullSys="Du bist Martha, eine NRW Abitur Mathematiklehrerin. Antworte IMMER auf Deutsch.";
+  const reqMsgs=[{role:"system",content:fullSys},...msgs];
+
+  let full="";
+  const box=document.createElement("div");box.className="gen-box";
+  document.getElementById("practiceContent").style.display="block";
+  document.getElementById("practiceTag").textContent=`${t.topic||"?"} · ${(t.source||{}).level||""} · ähnlich wie ${t.task_id||""}`;
+  const pb=document.getElementById("practiceText");
+  pb.innerHTML="";pb.appendChild(box);
+
+  try{
+    const resp=await fetch(CONFIG.API_URL,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:CONFIG.MODEL,messages:reqMsgs,stream:true,temperature:0.75,max_tokens:600})
+    });
+    if(!resp.ok){box.textContent="Hiba a generálás során. Próbáld újra!";btn.disabled=false;btnTxt.textContent="✨ Generálás";return;}
+    const reader=resp.body.getReader(),dec=new TextDecoder();let buf="";
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split("\n");buf=lines.pop()||"";
+      for(const line of lines){
+        if(line.startsWith("data: ")){const d=line.slice(6).trim();if(d==="[DONE]")break;
+          try{const p=JSON.parse(d);const tok=p.choices?.[0]?.delta?.content;if(tok){full+=tok;box.textContent=full;}}catch(ex){}
+        }
+      }
+    }
+  }catch(ex){box.textContent="Verbindungsfehler: "+ex.message;}
+
+  if(full){
+    renderMath(document.getElementById("practiceContent"));
+    generatedTask={
+      task_id:"Üben · "+( t.task_id||"?"),
+      topic:t.topic,subtopic:t.subtopic,
+      source:{level:(t.source||{}).level,year:"generiert"},
+      points:t.points,question:full,expected_answer:""
+    };
+    document.getElementById("loadPracticeBtn").style.display="inline-flex";
+  }
+  btn.disabled=false;btnTxt.textContent="🔄 Újra";
+}
+
+function loadGeneratedTask(){
+  if(!generatedTask)return;
+  // Inject at beginning of T and select it
+  T.unshift(generatedTask);
+  if(si>=0)si++;// shift existing index
+  H[0]=[];
+  closePracticeModal();
+  rF();aF();
+  sel(0);
+}
+
+// ══════════════════════════════════════════
+//  PHOTO MODAL — feladat fotóból
+// ══════════════════════════════════════════
+
+let photoBase64=null;
+let photoMimeType="image/jpeg";
+let extractedPhotoTask=null;
+
+function openPhotoModal(){
+  photoBase64=null;extractedPhotoTask=null;
+  document.getElementById("photoPreview").style.display="none";
+  document.getElementById("photoResult").style.display="none";
+  document.getElementById("analyzeBtn").style.display="none";
+  document.getElementById("loadPhotoBtn").style.display="none";
+  document.getElementById("uploadZone").style.display="block";
+  document.getElementById("photoInput").value="";
+  document.getElementById("photoModal").style.display="flex";
+}
+
+function closePhotoModal(){document.getElementById("photoModal").style.display="none";}
+
+function handleDrop(ev){
+  ev.preventDefault();
+  document.getElementById("uploadZone").classList.remove("drag");
+  const file=ev.dataTransfer.files[0];
+  if(file)processPhotoFile(file);
+}
+
+function handlePhotoFile(ev){
+  const file=ev.target.files[0];
+  if(file)processPhotoFile(file);
+}
+
+function processPhotoFile(file){
+  if(!file.type.startsWith("image/")){alert("Csak képfájl támogatott!");return;}
+  if(file.size>10*1024*1024){alert("A kép túl nagy (max 10 MB)!");return;}
+  photoMimeType=file.type||"image/jpeg";
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const dataUrl=ev.target.result;
+    photoBase64=dataUrl.split(",")[1];
+    const prev=document.getElementById("photoPreview");
+    prev.src=dataUrl;prev.style.display="block";
+    document.getElementById("uploadZone").style.display="none";
+    document.getElementById("photoResult").style.display="none";
+    document.getElementById("analyzeBtn").style.display="inline-flex";
+    document.getElementById("analyzeBtnTxt").textContent="🔍 Elemzés";
+    document.getElementById("analyzeBtn").disabled=false;
+    document.getElementById("loadPhotoBtn").style.display="none";
+    extractedPhotoTask=null;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzePhoto(){
+  if(!photoBase64)return;
+  const btn=document.getElementById("analyzeBtn");
+  const btnTxt=document.getElementById("analyzeBtnTxt");
+  btn.disabled=true;
+  btnTxt.innerHTML='<span class="spin"></span> Elemzés...';
+  const resultEl=document.getElementById("photoResult");
+  resultEl.style.display="block";
+  resultEl.textContent="Martha olvassa a feladatot...";
+  document.getElementById("loadPhotoBtn").style.display="none";
+
+  // Use vision model via Groq
+  const VISION_MODEL="meta-llama/llama-4-scout-17b-16e-instruct";
+  const sysMsg="Du bist Martha, eine NRW Abitur Mathematiklehrerin. Antworte auf Deutsch.";
+  const userMsg={
+    role:"user",
+    content:[
+      {type:"image_url",image_url:{url:`data:${photoMimeType};base64,${photoBase64}`}},
+      {type:"text",text:`Lies diese Mathematikaufgabe vom Bild ab und schreibe sie vollständig als Text.
+Wichtig:
+- Schreibe alle Formeln in LaTeX ($...$)
+- Schreibe NUR den Aufgabentext — keine Lösung, keine Erklärung
+- Falls du kein Mathe-Aufgabe erkennst, sage: "Kein Aufgabe erkannt."
+- Beginne direkt mit dem Aufgabentext`}
+    ]
+  };
+
+  let full="";
+  try{
+    const resp=await fetch(CONFIG.API_URL,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:VISION_MODEL,messages:[{role:"system",content:sysMsg},userMsg],stream:true,temperature:0.1,max_tokens:800})
+    });
+    if(!resp.ok){
+      const err=await resp.json().catch(()=>({}));
+      resultEl.textContent="Hiba: "+(err.error?.message||resp.status)+"\n\nBizonyosodj meg, hogy a worker URL helyes.";
+      btn.disabled=false;btnTxt.textContent="🔍 Újra";return;
+    }
+    const reader=resp.body.getReader(),dec=new TextDecoder();let buf="";
+    resultEl.textContent="";
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split("\n");buf=lines.pop()||"";
+      for(const line of lines){
+        if(line.startsWith("data: ")){const d=line.slice(6).trim();if(d==="[DONE]")break;
+          try{const p=JSON.parse(d);const tok=p.choices?.[0]?.delta?.content;if(tok){full+=tok;resultEl.textContent=full;}}catch(ex){}
+        }
+      }
+    }
+  }catch(ex){resultEl.textContent="Verbindungsfehler: "+ex.message;btn.disabled=false;btnTxt.textContent="🔍 Újra";return;}
+
+  if(full && !full.includes("Kein Aufgabe erkannt")){
+    renderMath(resultEl);
+    extractedPhotoTask={
+      task_id:"📷 Fotó-feladat",
+      topic:"Egyedi feladat",subtopic:"Fotóból betöltve",
+      source:{level:"",year:""},
+      points:null,question:full,expected_answer:""
+    };
+    document.getElementById("loadPhotoBtn").style.display="inline-flex";
+  }
+  btn.disabled=false;btnTxt.textContent="🔄 Újra";
+}
+
+function loadPhotoTask(){
+  if(!extractedPhotoTask)return;
+  T.unshift(extractedPhotoTask);
+  if(si>=0)si++;
+  H[0]=[];
+  closePhotoModal();
+  rF();aF();
+  sel(0);
+}
 
 let _kt=0;
 const _ki=setInterval(()=>{if(typeof renderMathInElement==="function"||_kt>30){clearInterval(_ki);renderMath()}_kt++;},500);

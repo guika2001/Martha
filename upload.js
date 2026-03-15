@@ -127,23 +127,49 @@ async function processFile(file) {
 
 // ── Analysis ──────────────────────────────────────────────────────────────────
 
-const EXTRACT_PROMPT = `Lies diese Mathematikaufgabe und schreibe sie vollstaendig als Text.
+const EXTRACT_PROMPT = `Analysiere dieses Bild und extrahiere den Aufgabentext fuer einen Mathe-Tutor.
 
-REGELN:
-1. Alle Formeln in LaTeX: inline $f(x)=...$, Display $$f(x)=...$$
-2. NUR den Aufgabentext — keine Loesung, keine Erklaerung
-3. Falls keine Matheaufgabe erkennbar: schreibe nur "KEIN_AUFGABE"
-4. Starte direkt mit dem Aufgabentext, kein Praefix
+═══ SCHRITT 1: SEITENTYP ERKENNEN ═══
 
-GRAFIKEN UND ABBILDUNGEN:
-Falls die Aufgabe eine Funktion enthaelt (explizit ODER in einer Abbildung):
-- Schreibe den Funktionsterm als LaTeX in den Aufgabentext
-- Zusaetzlich auf einer eigenen Zeile: PLOT(ausdruck, xmin, xmax)
-  Beispiel: PLOT(x^3-3*x, -3, 3)
-- Nutze JS-Syntax: * fuer Multiplikation, exp() fuer e^x, ^ fuer Potenzen
-- Schaetze xmin/xmax sinnvoll basierend auf der Aufgabe
-- Falls mehrere Funktionen: je eine PLOT-Zeile
-- Falls Abbildung nicht lesbar: schreibe "ABBILDUNG_NICHT_LESBAR"`;
+Ist die Seite eine LOESUNGSSEITE?
+Merkmale: Kopfzeile "Lösungen", fertig ausgerechnete Ergebnisse, "Fazit:" mit Antworten,
+ausgefuellte Luecken, Musterloesung mit konkreten Zahlenwerten.
+→ Falls ja: schreibe NUR das Wort MEGOLDAS_OLDAL
+
+Kein Mathe-Inhalt erkennbar?
+→ schreibe NUR: KEIN_AUFGABE
+
+═══ SCHRITT 2: AUFGABENTEXT EXTRAHIEREN ═══
+
+LUECKEN UND LEERE FELDER:
+- Leere Luecken (___) → schreibe: ______
+- Leere Kaestchen (□) → schreibe: [ ]
+- Leere Raster/Millimeterpapier → ignorieren, nicht erwaehnen
+- Noch nicht ausgefuellte Antwortzeilen → als Leerzeile lassen
+
+LATEX — einmal, korrekt, nie doppelt:
+- Jeden Ausdruck GENAU EINMAL schreiben — entweder als LaTeX ODER als Text, nie beides
+- Inline: $\vec{a} = \vec{p} + 1 \cdot \vec{u}$
+- Display (eigene Zeile): $$g\colon \vec{x} = \vec{p} + t \cdot \vec{u}, \quad t \in \mathbb{R}$$
+- Vektoren IMMER mit Pfeil: $\vec{a}$, $\vec{u}$, $\vec{p}$
+- Spaltenvektoren: $\begin{pmatrix} 1 \\ -2 \\ 4 \end{pmatrix}$
+- Punkte: $P(1 \mid -2 \mid 4)$
+- NIEMALS Unicode-Zeichen fuer Mathe: kein ⃗, kein ×, kein ∈ als Text — immer LaTeX
+
+ABBILDUNGEN UND GRAFIKEN:
+- Koordinatensystem mit eingetragenen Punkten/Vektoren (Geometrie):
+  Beschreibe kurz was sichtbar ist, z.B.: "[Abbildung: Koordinatensystem mit Punkten P, A, B, C, D, E und Vektoren $\vec{p}$, $\vec{u}$]"
+  KEIN PLOT-Befehl bei Geometrie-Abbildungen!
+- Funktionsgraph $f(x)$ (Analysis): PLOT(ausdruck, xmin, xmax) auf eigener Zeile
+  Beispiel: PLOT(x^3-3*x, -3, 3) — nur wenn Funktion klar ablesbar
+
+INHALT:
+- Aufgabennummern (1, 2, 3...) und Aufgabentext vollstaendig uebernehmen
+- Aufgabenstellung inkl. "Zeigen Sie...", "Bestimmen Sie...", "Begründen Sie..." etc.
+- Informationsboxen (z.B. "Parametergleichung einer Geraden") mit Inhalt uebernehmen
+- Gespraeche/Denkblasen (wie Kim und Janne) vollstaendig uebernehmen
+- KEINE Loesungen, KEINE ausgefuellten Ergebnisse, KEIN "Fazit:" mit Antworten
+- Starte direkt mit dem ersten Aufgabentitel, kein Praefix`;
 
 export async function analyzeUpload() {
   const btn = _el("analyzeBtn");
@@ -189,7 +215,7 @@ export async function analyzeUpload() {
     return;
   }
 
-  if (full && !full.includes("KEIN_AUFGABE")) {
+  if (full && !full.includes("KEIN_AUFGABE") && !full.includes("MEGOLDAS_OLDAL")) {
     // Render LaTeX
     resultEl.textContent = full;
     renderMath(resultEl);
@@ -213,6 +239,13 @@ export async function analyzeUpload() {
       points: null, question: full, expected_answer: "",
     };
     _el("loadPhotoBtn").style.display = "inline-flex";
+  } else if (full.includes("MEGOLDAS_OLDAL")) {
+    resultEl.innerHTML = `<div style="text-align:center;padding:20px">
+      <div style="font-size:2rem;margin-bottom:10px">📖</div>
+      <div style="font-weight:600;color:var(--amb);margin-bottom:8px">Ez egy megoldásoldal</div>
+      <div style="font-size:.85rem;color:var(--tx2)">A feltöltött kép megoldásokat tartalmaz, nem feladatokat.<br>
+      Kérlek egy <strong>feladatoldalt</strong> tölts fel!</div>
+    </div>`;
   } else if (full.includes("KEIN_AUFGABE")) {
     resultEl.textContent = "⚠️ Nem találtam matematikai feladatot ebben a fájlban.";
   }
